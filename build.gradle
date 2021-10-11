@@ -34,6 +34,8 @@ dependencies {
     implementation('com.h2database:h2')
     // MariaDB
     implementation("org.mariadb.jdbc:mariadb-java-client")
+    // spring security
+    implementation('org.springframework.boot:spring-boot-starter-security')
     // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
