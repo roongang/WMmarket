@@ -1,4 +1,4 @@
-package com.around.wmmarket.domain.deal_review;
+package com.around.wmmarket.domain.deal_success;
 
 import com.around.wmmarket.domain.BaseTimeEntity;
 import lombok.Builder;
@@ -9,26 +9,19 @@ import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor
-@Table(name = "deal_review")
+@Table(name = "deal_success")
 @Entity
-public class DealReview extends BaseTimeEntity {
+public class DealSuccess extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer dealPostId;
 
     @Column(nullable = false)
     private Integer buyerId;
 
-    @Column(nullable = false)
-    private Integer sellerId;
-
-    @Column(nullable = false)
-    private String content;
-
     @Builder
-    public DealReview(Integer buyerId,Integer sellerId){
+    public DealSuccess(Integer buyerId){
         this.buyerId=buyerId;
-        this.sellerId=sellerId;
     }
 }

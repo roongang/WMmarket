@@ -25,11 +25,11 @@ public class User extends BaseTimeEntity {
     @Column
     private String image;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length=100)
     private String nickname;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length=50)
     private Role role;
 
     @Builder
