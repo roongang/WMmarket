@@ -30,10 +30,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     // lombok
     implementation('org.projectlombok:lombok')
+    annotationProcessor('org.projectlombok:lombok')
     // 내장 DB
     implementation('com.h2database:h2')
     // MariaDB
     implementation("org.mariadb.jdbc:mariadb-java-client")
+    // session
+    implementation('org.springframework.session:spring-session-jdbc')
     // spring security
     implementation('org.springframework.boot:spring-boot-starter-security')
     // test

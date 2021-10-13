@@ -15,13 +15,11 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception{
         http
-                .authorizeRequests()
-                    .antMatchers("/h2-console/**").permitAll()
-                    .and()
-                .csrf()
-                    .ignoringAntMatchers("/h2-console/**")
+                .csrf().disable()
+                .headers().frameOptions().disable()
                 .and()
-                .headers().addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
+                    .authorizeRequests()
+                    .antMatchers("/h2-console/**").permitAll()
                 .and()
                 .formLogin()
                     .loginPage("/login")
