@@ -1,5 +1,7 @@
 package com.around.wmmarket.domain.manner_review;
 
+import com.around.wmmarket.domain.user.User;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "manner_review")
 @Entity
 public class MannerReview {
@@ -15,11 +17,13 @@ public class MannerReview {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
-    private Integer sellerId;
+    @ManyToOne
+    @JoinColumn(name = "SELLER_ID")
+    private User seller;
 
-    @Column(nullable = false)
-    private Integer buyerId;
+    @ManyToOne
+    @JoinColumn(name = "BUYER_ID")
+    private User buyer;
 
     @Column(nullable = false)
     private Integer mannerCnt;
@@ -29,9 +33,9 @@ public class MannerReview {
     private Manner manner;
 
     @Builder
-    public MannerReview(Integer sellerId,Integer buyerId,Integer mannerCnt,Manner manner){
-        this.sellerId=sellerId;
-        this.buyerId=buyerId;
+    public MannerReview(User seller,User buyer,Integer mannerCnt,Manner manner){
+        this.seller=seller;
+        this.buyer=buyer;
         this.mannerCnt=mannerCnt;
         this.manner=manner;
     }

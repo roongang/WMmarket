@@ -1,5 +1,6 @@
-package com.around.wmmarket.controller.dto;
+package com.around.wmmarket.controller;
 
+import com.around.wmmarket.controller.dto.UserSaveRequestDto;
 import com.around.wmmarket.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PutMapping;

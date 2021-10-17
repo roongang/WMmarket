@@ -1,6 +1,8 @@
 package com.around.wmmarket.domain.deal_review;
 
 import com.around.wmmarket.domain.BaseTimeEntity;
+import com.around.wmmarket.domain.user.User;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +10,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "deal_review")
 @Entity
 public class DealReview extends BaseTimeEntity {
@@ -17,18 +19,21 @@ public class DealReview extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
-    private Integer buyerId;
+    @ManyToOne
+    @JoinColumn(name = "SELLER_ID")
+    private User seller;
 
-    @Column(nullable = false)
-    private Integer sellerId;
+    @ManyToOne
+    @JoinColumn(name = "BUYER_ID")
+    private User buyer;
 
     @Column(nullable = false)
     private String content;
 
     @Builder
-    public DealReview(Integer buyerId,Integer sellerId){
-        this.buyerId=buyerId;
-        this.sellerId=sellerId;
+    public DealReview(User seller,User buyer,String content){
+        this.seller=seller;
+        this.buyer=buyer;
+        this.content=content;
     }
 }
