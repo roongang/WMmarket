@@ -1,15 +1,22 @@
 package com.around.wmmarket.domain.deal_post;
 
 import com.around.wmmarket.domain.BaseTimeEntity;
+import com.around.wmmarket.domain.deal_post_image.DealPostImage;
+import com.around.wmmarket.domain.deal_success.DealSuccess;
+import com.around.wmmarket.domain.user.User;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "deal_post")
 @Entity
 public class DealPost extends BaseTimeEntity {
@@ -17,13 +24,13 @@ public class DealPost extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
-    private Integer userId;
+    @ManyToOne
+    @JoinColumn(name = "USER_ID")
+    private User user;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Integer categoryId;
-
-    private Integer dealPostImageId;
+    private Category category;
 
     @Column(nullable = false)
     private String title;
@@ -34,8 +41,8 @@ public class DealPost extends BaseTimeEntity {
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)  //datetime 어떻게 해야될지 확인 필요
-    private Date pullingDate;
+    @Column(nullable = false)
+    private LocalDateTime pullingDate;
 
     @Column(nullable = false)
     private Integer pullingCnt;
@@ -43,16 +50,19 @@ public class DealPost extends BaseTimeEntity {
     @Column(nullable = false)
     private Character dealState;
 
+    @OneToMany(mappedBy = "dealPost")
+    List<DealPostImage> dealPostImages = new ArrayList<>();
+
+    @OneToOne(mappedBy = "dealPost")
+    private DealSuccess dealSuccess;
+
     @Builder
-    public DealPost(Integer userId,Integer categoryId,Integer dealPostImageId,String title,Integer price,String content,Date pullingDate,Integer pullingCnt,Character dealState){
-        this.userId=userId;
-        this.categoryId=categoryId;
-        this.dealPostImageId=dealPostImageId;
+    public DealPost(User user,Category category,String title,Integer price,String content,Character dealState){
+        this.user=user;
+        this.category=category;
         this.title=title;
         this.price=price;
         this.content=content;
-        this.pullingDate=pullingDate;
-        this.pullingCnt=pullingCnt;
         this.dealState=dealState;
     }
 }

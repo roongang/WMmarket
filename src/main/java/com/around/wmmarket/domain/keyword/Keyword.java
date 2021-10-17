@@ -1,5 +1,7 @@
 package com.around.wmmarket.domain.keyword;
 
+import com.around.wmmarket.domain.user.User;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "keyword")
 @Entity
 public class Keyword {
@@ -16,15 +18,16 @@ public class Keyword {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
-    private Integer userId;
+    @ManyToOne
+    @JoinColumn(name = "USER_ID")
+    private User user;
 
     @Column(nullable = false)
     private String word;
 
     @Builder
-    public Keyword(Integer userId, String word){
-        this.userId=userId;
+    public Keyword(User user,String word){
+        this.user=user;
         this.word=word;
     }
 }
