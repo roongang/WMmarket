@@ -41,22 +41,22 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false, length=50)
     private Role role;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String city_1;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String town_1;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String city_2;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String town_2;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Integer isAuth;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String code;
 
     // 관계 매핑

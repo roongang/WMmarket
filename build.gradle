@@ -39,6 +39,8 @@ dependencies {
     implementation('org.springframework.session:spring-session-jdbc')
     // spring security
     implementation('org.springframework.boot:spring-boot-starter-security')
+    // test security (권한을 필요로하는 api 호출을 위한)
+    testImplementation('org.springframework.security:spring-security-test')
     // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
