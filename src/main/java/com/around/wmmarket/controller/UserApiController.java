@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -26,6 +27,7 @@ public class UserApiController {
     private final UserService userService;
     private final CustomUserDetailsService customUserDetailsService;
     private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
 
     @PutMapping("/api/v1/user")
     public void save(@RequestBody UserSaveRequestDto requestDto){
@@ -34,11 +36,12 @@ public class UserApiController {
 
     @PostMapping("/api/v1/user/signIn")
     public ResponseEntity<?> signIn(@RequestBody UserLoginRequestDto requestDto, HttpSession session){
-        SignedUser signedUser = customUserDetailsService.getSignedUser(requestDto,session);
+        SignedUser signedUser = customUserDetailsService.getSignedUser(requestDto);
         // 인증 토큰 발급
         UsernamePasswordAuthenticationToken token =
-                new UsernamePasswordAuthenticationToken(requestDto.getUsername(),requestDto.getPassword());;
+                new UsernamePasswordAuthenticationToken(signedUser.getUsername(),signedUser.getPassword());
         // 인증 객체
+        // ERROR
         Authentication authentication = authenticationManager.authenticate(token);
         // 시큐리티 컨텍스트에 인증 저장
         SecurityContextHolder.getContext().setAuthentication(authentication);

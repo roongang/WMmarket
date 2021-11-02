@@ -11,17 +11,15 @@ import java.util.Collection;
 @Getter
 @RequiredArgsConstructor
 public class SignedUser implements UserDetails {
-    private int id;
-    private String password;
     private String name;
+    private String password;
     private Collection<? extends GrantedAuthority> role;
     private String tokenId;
 
     @Builder
-    public SignedUser(int id,String password,String name,Collection<? extends GrantedAuthority> role){
-        this.id=id;
-        this.password=password;
+    public SignedUser(String name,String password,Collection<? extends GrantedAuthority> role){
         this.name=name;
+        this.password=password;
         this.role=role;
     }
 
