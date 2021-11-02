@@ -2,6 +2,7 @@ package com.around.wmmarket.controller.dto;
 
 import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.User;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,4 +14,13 @@ public class UserSaveRequestDto {
     private String image;
     private String nickname;
     private Role role;
+
+    @Builder
+    public UserSaveRequestDto(String email,String password,String image,String nickname,Role role){
+        this.email=email;
+        this.password=password;
+        this.image=image;
+        this.nickname=nickname;
+        this.role=role;
+    }
 }
