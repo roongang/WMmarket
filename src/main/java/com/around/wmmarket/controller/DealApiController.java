@@ -1,6 +1,8 @@
 package com.around.wmmarket.controller;
 
+import com.around.wmmarket.controller.dto.DealPostResponseDto;
 import com.around.wmmarket.controller.dto.DealPostSaveRequestDto;
+import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.service.deal.DealService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -18,4 +20,8 @@ public class DealApiController {
         return dealService.save(requestDto);
     }
 
+    @GetMapping("/api/v1/dealpost/{id}")
+    public DealPostResponseDto findById(@PathVariable Integer id){
+        return dealService.findById(id);
+    }
 }

@@ -269,3 +269,25 @@
 [2021-11-15 21:13:25:101375][http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/json, application/*+json]
 [2021-11-15 21:13:25:101375][http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [3]
 [2021-11-15 21:13:25:101376][http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+[2021-11-15 21:23:23:1563][main] DEBUG o.s.web.context.ContextLoader - Published root WebApplicationContext as ServletContext attribute with name [org.springframework.web.context.WebApplicationContext.ROOT]
+[2021-11-15 21:23:23:1563][main] INFO  o.s.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 1125 ms
+[2021-11-15 21:23:25:3295][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/**/favicon.ico] in 'faviconHandlerMapping'
+[2021-11-15 21:23:25:3423][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+[2021-11-15 21:23:25:3463][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 6 mappings in 'requestMappingHandlerMapping'
+[2021-11-15 21:23:25:3473][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+[2021-11-15 21:23:25:3479][main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+[2021-11-15 21:23:27:5930][http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+[2021-11-15 21:23:27:5931][http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Detected StandardServletMultipartResolver
+[2021-11-15 21:23:27:5937][http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+[2021-11-15 21:23:27:5937][http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 6 ms
+[2021-11-15 21:23:27:5954][http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/v1/dealpost", parameters={}
+[2021-11-15 21:23:27:5957][http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public java.lang.Integer com.around.wmmarket.controller.DealApiController.save(com.around.wmmarket.controller.dto.DealPostSaveRequestDto)
+[2021-11-15 21:23:28:6013][http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [com.around.wmmarket.controller.dto.DealPostSaveRequestDto@353ec0cb]
+[2021-11-15 21:23:28:6102][http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/json, application/*+json]
+[2021-11-15 21:23:28:6103][http-nio-8080-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [1]
+[2021-11-15 21:23:28:6113][http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+[2021-11-15 21:23:37:15145][http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/v1/dealpost/1", parameters={}
+[2021-11-15 21:23:37:15146][http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public com.around.wmmarket.controller.dto.DealPostResponseDto com.around.wmmarket.controller.DealApiController.findById(java.lang.Integer)
+[2021-11-15 21:23:37:15170][http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/json, application/*+json]
+[2021-11-15 21:23:37:15171][http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [com.around.wmmarket.controller.dto.DealPostResponseDto@6211a338]
+[2021-11-15 21:23:37:15172][http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK

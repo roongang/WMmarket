@@ -1,6 +1,7 @@
 package com.around.wmmarket.service.deal;
 
 import com.around.wmmarket.controller.dto.DealPostListResponseDto;
+import com.around.wmmarket.controller.dto.DealPostResponseDto;
 import com.around.wmmarket.controller.dto.DealPostSaveRequestDto;
 import com.around.wmmarket.domain.deal_post.Category;
 import com.around.wmmarket.domain.deal_post.DealPost;
@@ -44,6 +45,12 @@ public class DealService {
     @Transactional
     public List<DealPost> getDealPost(){
         return dealPostRepository.findAll();
+    }
+
+    @Transactional
+    public DealPostResponseDto findById(Integer id){
+        DealPost post = dealPostRepository.findById(id).orElseThrow(()->new IllegalArgumentException("해당 게시글이 없습니다. id="+id));
+        return new DealPostResponseDto(post);
     }
 
     //readOnly를 쓰면 조회 속도가 개선
