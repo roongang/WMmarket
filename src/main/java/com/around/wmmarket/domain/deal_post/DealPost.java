@@ -8,11 +8,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -24,9 +24,10 @@ public class DealPost extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "USER_ID")
-    private User user;
+    //@ManyToOne
+    //@JoinColumn(name = "USER_ID")
+    //private User user;
+    private Integer user;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -41,14 +42,15 @@ public class DealPost extends BaseTimeEntity {
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
     private LocalDateTime pullingDate;
 
-    @Column(nullable = false)
+    @ColumnDefault("0")
     private Integer pullingCnt;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Character dealState;
+    @ColumnDefault("0")
+    private DealState dealState;
 
     @OneToMany(mappedBy = "dealPost")
     List<DealPostImage> dealPostImages = new ArrayList<>();
@@ -57,7 +59,7 @@ public class DealPost extends BaseTimeEntity {
     private DealSuccess dealSuccess;
 
     @Builder
-    public DealPost(User user,Category category,String title,Integer price,String content,Character dealState){
+    public DealPost(Integer user,Category category,String title,Integer price,String content,DealState dealState){
         this.user=user;
         this.category=category;
         this.title=title;

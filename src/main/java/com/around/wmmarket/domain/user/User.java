@@ -72,8 +72,8 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "seller")
     List<DealReview> dealReviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
-    List<DealPost> dealPosts = new ArrayList<>();
+    //@OneToMany(mappedBy = "user")
+    //List<DealPost> dealPosts = new ArrayList<>();
 
     @OneToMany(mappedBy = "buyer")
     List<DealSuccess> dealSuccesses = new ArrayList<>();

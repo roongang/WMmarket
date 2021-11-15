@@ -1,0 +1,271 @@
+[2021-11-15 19:57:13:3359][main] DEBUG o.s.web.context.ContextLoader - Published root WebApplicationContext as ServletContext attribute with name [org.springframework.web.context.WebApplicationContext.ROOT]
+[2021-11-15 19:57:13:3364][main] INFO  o.s.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 2214 ms
+[2021-11-15 19:57:16:6744][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/**/favicon.ico] in 'faviconHandlerMapping'
+[2021-11-15 19:57:17:7073][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+[2021-11-15 19:57:17:7204][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 4 mappings in 'requestMappingHandlerMapping'
+[2021-11-15 19:57:17:7237][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+[2021-11-15 19:57:17:7249][main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+[2021-11-15 19:57:17:7654][main] DEBUG o.s.web.client.RestTemplate - HTTP POST http://localhost:58895/api/v1/dealpost
+[2021-11-15 19:57:17:7667][main] DEBUG o.s.web.client.RestTemplate - Accept=[application/json, application/*+json]
+[2021-11-15 19:57:17:7702][main] DEBUG o.s.web.client.RestTemplate - Writing [com.around.wmmarket.controller.dto.DealPostSaveRequestDto@2044f708] with org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
+[2021-11-15 19:57:17:7785][http-nio-auto-1-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+[2021-11-15 19:57:17:7785][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Detected StandardServletMultipartResolver
+[2021-11-15 19:57:17:7807][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+[2021-11-15 19:57:17:7807][http-nio-auto-1-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 22 ms
+[2021-11-15 19:57:17:7830][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/v1/dealpost", parameters={}
+[2021-11-15 19:57:17:7835][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public java.lang.Integer com.around.wmmarket.controller.DealApiController.save(com.around.wmmarket.controller.dto.DealPostSaveRequestDto)
+[2021-11-15 19:57:17:7880][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [com.around.wmmarket.controller.dto.DealPostSaveRequestDto@60c295c6]
+[2021-11-15 19:57:17:7888][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Failed to complete request: java.lang.NullPointerException
+[2021-11-15 19:57:17:7896][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - "ERROR" dispatch for POST "/error", parameters={}
+[2021-11-15 19:57:17:7898][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.error(javax.servlet.http.HttpServletRequest)
+[2021-11-15 19:57:17:7905][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, application/*+json] and supported [application/json, application/*+json, application/json, application/*+json]
+[2021-11-15 19:57:17:7905][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{timestamp=Mon Nov 15 19:57:17 KST 2021, status=500, error=Internal Server Error, message=No message (truncated)...]
+[2021-11-15 19:57:17:7916][main] DEBUG o.s.web.client.RestTemplate - Response 500 INTERNAL_SERVER_ERROR
+[2021-11-15 19:57:17:7916][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ERROR" dispatch, status 500
+[2021-11-15 19:57:17:7917][main] DEBUG o.s.web.client.RestTemplate - Reading to [java.lang.Integer]
+[2021-11-15 20:11:36:3125][main] DEBUG o.s.web.context.ContextLoader - Published root WebApplicationContext as ServletContext attribute with name [org.springframework.web.context.WebApplicationContext.ROOT]
+[2021-11-15 20:11:36:3125][main] INFO  o.s.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 2150 ms
+[2021-11-15 20:11:39:6278][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/**/favicon.ico] in 'faviconHandlerMapping'
+[2021-11-15 20:11:40:6598][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+[2021-11-15 20:11:40:6679][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 4 mappings in 'requestMappingHandlerMapping'
+[2021-11-15 20:11:40:6715][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+[2021-11-15 20:11:40:6728][main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+[2021-11-15 20:13:36:122595][main] DEBUG o.s.web.client.RestTemplate - HTTP POST http://localhost:59048/api/v1/dealpost
+[2021-11-15 20:13:36:122651][main] DEBUG o.s.web.client.RestTemplate - Accept=[application/json, application/*+json]
+[2021-11-15 20:13:36:122822][main] DEBUG o.s.web.client.RestTemplate - Writing [com.around.wmmarket.controller.dto.DealPostSaveRequestDto@30623109] with org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
+[2021-11-15 20:13:36:122914][http-nio-auto-1-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+[2021-11-15 20:13:36:122915][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Detected StandardServletMultipartResolver
+[2021-11-15 20:13:36:122938][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+[2021-11-15 20:13:36:122938][http-nio-auto-1-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 23 ms
+[2021-11-15 20:13:36:122967][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/v1/dealpost", parameters={}
+[2021-11-15 20:13:36:122972][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public java.lang.Integer com.around.wmmarket.controller.DealApiController.save(com.around.wmmarket.controller.dto.DealPostSaveRequestDto)
+[2021-11-15 20:13:36:123023][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [com.around.wmmarket.controller.dto.DealPostSaveRequestDto@455a005b]
+[2021-11-15 20:13:36:123032][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Failed to complete request: java.lang.NullPointerException
+[2021-11-15 20:13:36:123040][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - "ERROR" dispatch for POST "/error", parameters={}
+[2021-11-15 20:13:36:123042][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.error(javax.servlet.http.HttpServletRequest)
+[2021-11-15 20:13:36:123051][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, application/*+json] and supported [application/json, application/*+json, application/json, application/*+json]
+[2021-11-15 20:13:36:123051][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{timestamp=Mon Nov 15 20:13:36 KST 2021, status=500, error=Internal Server Error, message=No message (truncated)...]
+[2021-11-15 20:13:36:123062][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ERROR" dispatch, status 500
+[2021-11-15 20:13:36:123063][main] DEBUG o.s.web.client.RestTemplate - Response 500 INTERNAL_SERVER_ERROR
+[2021-11-15 20:13:36:123071][main] DEBUG o.s.web.client.RestTemplate - Reading to [java.lang.Integer]
+[2021-11-15 20:24:43:2859][main] DEBUG o.s.web.context.ContextLoader - Published root WebApplicationContext as ServletContext attribute with name [org.springframework.web.context.WebApplicationContext.ROOT]
+[2021-11-15 20:24:43:2860][main] INFO  o.s.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 1847 ms
+[2021-11-15 20:24:46:5579][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/**/favicon.ico] in 'faviconHandlerMapping'
+[2021-11-15 20:24:46:5843][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+[2021-11-15 20:24:46:5914][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 4 mappings in 'requestMappingHandlerMapping'
+[2021-11-15 20:24:46:5941][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+[2021-11-15 20:24:46:5951][main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+[2021-11-15 20:25:26:2990][main] DEBUG o.s.web.context.ContextLoader - Published root WebApplicationContext as ServletContext attribute with name [org.springframework.web.context.WebApplicationContext.ROOT]
+[2021-11-15 20:25:26:2990][main] INFO  o.s.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 1987 ms
+[2021-11-15 20:25:29:5943][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/**/favicon.ico] in 'faviconHandlerMapping'
+[2021-11-15 20:25:29:6244][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+[2021-11-15 20:25:30:6322][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 4 mappings in 'requestMappingHandlerMapping'
+[2021-11-15 20:25:30:6356][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+[2021-11-15 20:25:30:6368][main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+[2021-11-15 20:27:05:2788][main] DEBUG o.s.web.context.ContextLoader - Published root WebApplicationContext as ServletContext attribute with name [org.springframework.web.context.WebApplicationContext.ROOT]
+[2021-11-15 20:27:05:2788][main] INFO  o.s.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 1858 ms
+[2021-11-15 20:27:08:5421][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/**/favicon.ico] in 'faviconHandlerMapping'
+[2021-11-15 20:27:08:5695][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+[2021-11-15 20:27:08:5765][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 4 mappings in 'requestMappingHandlerMapping'
+[2021-11-15 20:27:08:5793][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+[2021-11-15 20:27:08:5803][main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+[2021-11-15 20:35:07:2723][main] DEBUG o.s.web.context.ContextLoader - Published root WebApplicationContext as ServletContext attribute with name [org.springframework.web.context.WebApplicationContext.ROOT]
+[2021-11-15 20:35:07:2724][main] INFO  o.s.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 1833 ms
+[2021-11-15 20:35:10:5405][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/**/favicon.ico] in 'faviconHandlerMapping'
+[2021-11-15 20:35:10:5687][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+[2021-11-15 20:35:10:5763][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 5 mappings in 'requestMappingHandlerMapping'
+[2021-11-15 20:35:10:5792][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+[2021-11-15 20:35:10:5802][main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+[2021-11-15 20:35:11:6185][main] DEBUG o.s.web.client.RestTemplate - HTTP POST http://localhost:59408/api/v1/dealpost
+[2021-11-15 20:35:11:6196][main] DEBUG o.s.web.client.RestTemplate - Accept=[application/json, application/*+json]
+[2021-11-15 20:35:11:6230][main] DEBUG o.s.web.client.RestTemplate - Writing [com.around.wmmarket.controller.dto.DealPostSaveRequestDto@1ead6e20] with org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
+[2021-11-15 20:35:11:6291][http-nio-auto-1-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+[2021-11-15 20:35:11:6292][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Detected StandardServletMultipartResolver
+[2021-11-15 20:35:11:6313][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+[2021-11-15 20:35:11:6313][http-nio-auto-1-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 21 ms
+[2021-11-15 20:35:11:6333][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/v1/dealpost", parameters={}
+[2021-11-15 20:35:11:6336][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public java.lang.Integer com.around.wmmarket.controller.DealApiController.save(com.around.wmmarket.controller.dto.DealPostSaveRequestDto)
+[2021-11-15 20:35:11:6383][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [com.around.wmmarket.controller.dto.DealPostSaveRequestDto@613bb4c3]
+[2021-11-15 20:35:11:6482][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Failed to complete request: org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+[2021-11-15 20:35:11:6489][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - "ERROR" dispatch for POST "/error", parameters={}
+[2021-11-15 20:35:11:6491][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.error(javax.servlet.http.HttpServletRequest)
+[2021-11-15 20:35:11:6498][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, application/*+json] and supported [application/json, application/*+json, application/json, application/*+json]
+[2021-11-15 20:35:11:6499][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{timestamp=Mon Nov 15 20:35:11 KST 2021, status=500, error=Internal Server Error, message=could not  (truncated)...]
+[2021-11-15 20:35:11:6507][main] DEBUG o.s.web.client.RestTemplate - Response 500 INTERNAL_SERVER_ERROR
+[2021-11-15 20:35:11:6507][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ERROR" dispatch, status 500
+[2021-11-15 20:35:11:6509][main] DEBUG o.s.web.client.RestTemplate - Reading to [java.lang.Integer]
+[2021-11-15 20:37:02:2729][main] DEBUG o.s.web.context.ContextLoader - Published root WebApplicationContext as ServletContext attribute with name [org.springframework.web.context.WebApplicationContext.ROOT]
+[2021-11-15 20:37:02:2729][main] INFO  o.s.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 1832 ms
+[2021-11-15 20:37:05:5539][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/**/favicon.ico] in 'faviconHandlerMapping'
+[2021-11-15 20:37:05:5829][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+[2021-11-15 20:37:05:5906][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 5 mappings in 'requestMappingHandlerMapping'
+[2021-11-15 20:37:05:5937][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+[2021-11-15 20:37:05:5947][main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+[2021-11-15 20:42:00:2677][main] DEBUG o.s.web.context.ContextLoader - Published root WebApplicationContext as ServletContext attribute with name [org.springframework.web.context.WebApplicationContext.ROOT]
+[2021-11-15 20:42:00:2677][main] INFO  o.s.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 1807 ms
+[2021-11-15 20:42:03:5342][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/**/favicon.ico] in 'faviconHandlerMapping'
+[2021-11-15 20:42:03:5626][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+[2021-11-15 20:42:03:5701][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 5 mappings in 'requestMappingHandlerMapping'
+[2021-11-15 20:42:03:5731][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+[2021-11-15 20:42:03:5742][main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+[2021-11-15 20:42:03:6108][main] DEBUG o.s.web.client.RestTemplate - HTTP POST http://localhost:59456/api/v1/dealpost
+[2021-11-15 20:42:03:6121][main] DEBUG o.s.web.client.RestTemplate - Accept=[application/json, application/*+json]
+[2021-11-15 20:42:03:6152][main] DEBUG o.s.web.client.RestTemplate - Writing [com.around.wmmarket.controller.dto.DealPostSaveRequestDto@6278371a] with org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
+[2021-11-15 20:42:04:6212][http-nio-auto-1-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+[2021-11-15 20:42:04:6213][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Detected StandardServletMultipartResolver
+[2021-11-15 20:42:04:6233][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+[2021-11-15 20:42:04:6233][http-nio-auto-1-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 20 ms
+[2021-11-15 20:42:04:6253][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/v1/dealpost", parameters={}
+[2021-11-15 20:42:04:6256][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public java.lang.Integer com.around.wmmarket.controller.DealApiController.save(com.around.wmmarket.controller.dto.DealPostSaveRequestDto)
+[2021-11-15 20:42:04:6300][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [com.around.wmmarket.controller.dto.DealPostSaveRequestDto@7aed48ad]
+[2021-11-15 20:42:04:6403][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Failed to complete request: org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+[2021-11-15 20:42:04:6410][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - "ERROR" dispatch for POST "/error", parameters={}
+[2021-11-15 20:42:04:6412][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.error(javax.servlet.http.HttpServletRequest)
+[2021-11-15 20:42:04:6420][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, application/*+json] and supported [application/json, application/*+json, application/json, application/*+json]
+[2021-11-15 20:42:04:6421][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{timestamp=Mon Nov 15 20:42:04 KST 2021, status=500, error=Internal Server Error, message=could not  (truncated)...]
+[2021-11-15 20:42:04:6430][main] DEBUG o.s.web.client.RestTemplate - Response 500 INTERNAL_SERVER_ERROR
+[2021-11-15 20:42:04:6430][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ERROR" dispatch, status 500
+[2021-11-15 20:42:04:6431][main] DEBUG o.s.web.client.RestTemplate - Reading to [java.lang.Integer]
+[2021-11-15 20:56:11:2720][main] DEBUG o.s.web.context.ContextLoader - Published root WebApplicationContext as ServletContext attribute with name [org.springframework.web.context.WebApplicationContext.ROOT]
+[2021-11-15 20:56:11:2720][main] INFO  o.s.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 1829 ms
+[2021-11-15 20:56:14:5409][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/**/favicon.ico] in 'faviconHandlerMapping'
+[2021-11-15 20:56:14:5666][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+[2021-11-15 20:56:14:5740][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 5 mappings in 'requestMappingHandlerMapping'
+[2021-11-15 20:56:14:5768][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+[2021-11-15 20:56:14:5779][main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+[2021-11-15 20:56:14:6155][main] DEBUG o.s.web.client.RestTemplate - HTTP POST http://localhost:59544/api/v1/dealpost
+[2021-11-15 20:56:14:6167][main] DEBUG o.s.web.client.RestTemplate - Accept=[application/json, application/*+json]
+[2021-11-15 20:56:14:6198][main] DEBUG o.s.web.client.RestTemplate - Writing [com.around.wmmarket.controller.dto.DealPostSaveRequestDto@68a7bc12] with org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
+[2021-11-15 20:56:14:6258][http-nio-auto-1-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+[2021-11-15 20:56:14:6259][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Detected StandardServletMultipartResolver
+[2021-11-15 20:56:15:6278][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+[2021-11-15 20:56:15:6278][http-nio-auto-1-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 19 ms
+[2021-11-15 20:56:15:6298][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/v1/dealpost", parameters={}
+[2021-11-15 20:56:15:6302][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public java.lang.Integer com.around.wmmarket.controller.DealApiController.save(com.around.wmmarket.controller.dto.DealPostSaveRequestDto)
+[2021-11-15 20:56:15:6346][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [com.around.wmmarket.controller.dto.DealPostSaveRequestDto@d561a51]
+[2021-11-15 20:56:15:6459][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, application/*+json] and supported [application/json, application/*+json, application/json, application/*+json]
+[2021-11-15 20:56:15:6459][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [1]
+[2021-11-15 20:56:15:6464][main] DEBUG o.s.web.client.RestTemplate - Response 200 OK
+[2021-11-15 20:56:15:6464][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+[2021-11-15 20:56:15:6465][main] DEBUG o.s.web.client.RestTemplate - Reading to [java.lang.Integer]
+[2021-11-15 20:56:48:1761][main] DEBUG o.s.web.context.ContextLoader - Published root WebApplicationContext as ServletContext attribute with name [org.springframework.web.context.WebApplicationContext.ROOT]
+[2021-11-15 20:56:48:1761][main] INFO  o.s.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 1181 ms
+[2021-11-15 20:56:50:3494][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/**/favicon.ico] in 'faviconHandlerMapping'
+[2021-11-15 20:56:50:3623][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+[2021-11-15 20:56:50:3669][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 5 mappings in 'requestMappingHandlerMapping'
+[2021-11-15 20:56:50:3684][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+[2021-11-15 20:56:50:3692][main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+[2021-11-15 20:56:58:11671][http-nio-8080-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+[2021-11-15 20:56:58:11672][http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Detected StandardServletMultipartResolver
+[2021-11-15 20:56:58:11678][http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+[2021-11-15 20:56:58:11678][http-nio-8080-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 6 ms
+[2021-11-15 20:56:58:11696][http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/v1/dealpost", parameters={}
+[2021-11-15 20:56:58:11700][http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public java.lang.Integer com.around.wmmarket.controller.DealApiController.save(com.around.wmmarket.controller.dto.DealPostSaveRequestDto)
+[2021-11-15 20:56:58:11758][http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.ServletInvocableHandlerMethod - Could not resolve parameter [0] in public java.lang.Integer com.around.wmmarket.controller.DealApiController.save(com.around.wmmarket.controller.dto.DealPostSaveRequestDto): JSON parse error: Cannot deserialize value of type `com.around.wmmarket.domain.deal_post.Category` from String "cate": value not one of declared Enum instance names: [CateoryA, CategoryB]; nested exception is com.fasterxml.jackson.databind.exc.InvalidFormatException: Cannot deserialize value of type `com.around.wmmarket.domain.deal_post.Category` from String "cate": value not one of declared Enum instance names: [CateoryA, CategoryB]
+ at [Source: (PushbackInputStream); line: 3, column: 18] (through reference chain: com.around.wmmarket.controller.dto.DealPostSaveRequestDto["category"])
+[2021-11-15 20:56:58:11761][http-nio-8080-exec-2] WARN  o.s.w.s.m.s.DefaultHandlerExceptionResolver - Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Cannot deserialize value of type `com.around.wmmarket.domain.deal_post.Category` from String "cate": value not one of declared Enum instance names: [CateoryA, CategoryB]; nested exception is com.fasterxml.jackson.databind.exc.InvalidFormatException: Cannot deserialize value of type `com.around.wmmarket.domain.deal_post.Category` from String "cate": value not one of declared Enum instance names: [CateoryA, CategoryB]
+ at [Source: (PushbackInputStream); line: 3, column: 18] (through reference chain: com.around.wmmarket.controller.dto.DealPostSaveRequestDto["category"])]
+[2021-11-15 20:56:58:11761][http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 400 BAD_REQUEST
+[2021-11-15 20:56:58:11764][http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - "ERROR" dispatch for POST "/error", parameters={}
+[2021-11-15 20:56:58:11766][http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.error(javax.servlet.http.HttpServletRequest)
+[2021-11-15 20:56:58:11777][http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/json, application/*+json]
+[2021-11-15 20:56:58:11777][http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{timestamp=Mon Nov 15 20:56:58 KST 2021, status=400, error=Bad Request, message=JSON parse error: Ca (truncated)...]
+[2021-11-15 20:56:58:11795][http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ERROR" dispatch, status 400
+[2021-11-15 20:58:14:88120][http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/v1/dealpost", parameters={}
+[2021-11-15 20:58:14:88121][http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public java.lang.Integer com.around.wmmarket.controller.DealApiController.save(com.around.wmmarket.controller.dto.DealPostSaveRequestDto)
+[2021-11-15 20:58:14:88121][http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [com.around.wmmarket.controller.dto.DealPostSaveRequestDto@5fad683c]
+[2021-11-15 20:58:14:88199][http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Failed to complete request: org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+[2021-11-15 20:58:14:88203][http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - "ERROR" dispatch for POST "/error", parameters={}
+[2021-11-15 20:58:14:88203][http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.error(javax.servlet.http.HttpServletRequest)
+[2021-11-15 20:58:14:88204][http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/json, application/*+json]
+[2021-11-15 20:58:14:88204][http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{timestamp=Mon Nov 15 20:58:14 KST 2021, status=500, error=Internal Server Error, message=could not  (truncated)...]
+[2021-11-15 20:58:14:88205][http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ERROR" dispatch, status 500
+[2021-11-15 20:58:40:113908][http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/v1/dealpost", parameters={}
+[2021-11-15 20:58:40:113908][http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public java.lang.Integer com.around.wmmarket.controller.DealApiController.save(com.around.wmmarket.controller.dto.DealPostSaveRequestDto)
+[2021-11-15 20:58:40:113909][http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [com.around.wmmarket.controller.dto.DealPostSaveRequestDto@2f97f008]
+[2021-11-15 20:58:40:113913][http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Failed to complete request: org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+[2021-11-15 20:58:40:113914][http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - "ERROR" dispatch for POST "/error", parameters={}
+[2021-11-15 20:58:40:113914][http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.error(javax.servlet.http.HttpServletRequest)
+[2021-11-15 20:58:40:113915][http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/json, application/*+json]
+[2021-11-15 20:58:40:113915][http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{timestamp=Mon Nov 15 20:58:40 KST 2021, status=500, error=Internal Server Error, message=could not  (truncated)...]
+[2021-11-15 20:58:40:113916][http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ERROR" dispatch, status 500
+[2021-11-15 21:10:48:2667][main] DEBUG o.s.web.context.ContextLoader - Published root WebApplicationContext as ServletContext attribute with name [org.springframework.web.context.WebApplicationContext.ROOT]
+[2021-11-15 21:10:48:2667][main] INFO  o.s.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 1800 ms
+[2021-11-15 21:10:51:5394][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/**/favicon.ico] in 'faviconHandlerMapping'
+[2021-11-15 21:10:51:5664][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+[2021-11-15 21:10:52:5739][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 5 mappings in 'requestMappingHandlerMapping'
+[2021-11-15 21:10:52:5769][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+[2021-11-15 21:10:52:5779][main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+[2021-11-15 21:10:52:6145][main] DEBUG o.s.web.client.RestTemplate - HTTP POST http://localhost:60095/api/v1/dealpost
+[2021-11-15 21:10:52:6157][main] DEBUG o.s.web.client.RestTemplate - Accept=[application/json, application/*+json]
+[2021-11-15 21:10:52:6188][main] DEBUG o.s.web.client.RestTemplate - Writing [com.around.wmmarket.controller.dto.DealPostSaveRequestDto@67915454] with org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
+[2021-11-15 21:10:52:6249][http-nio-auto-1-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+[2021-11-15 21:10:52:6250][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Detected StandardServletMultipartResolver
+[2021-11-15 21:10:52:6270][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+[2021-11-15 21:10:52:6270][http-nio-auto-1-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 20 ms
+[2021-11-15 21:10:52:6291][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/v1/dealpost", parameters={}
+[2021-11-15 21:10:52:6294][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public java.lang.Integer com.around.wmmarket.controller.DealApiController.save(com.around.wmmarket.controller.dto.DealPostSaveRequestDto)
+[2021-11-15 21:10:52:6339][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [com.around.wmmarket.controller.dto.DealPostSaveRequestDto@333f5dc4]
+[2021-11-15 21:10:52:6450][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, application/*+json] and supported [application/json, application/*+json, application/json, application/*+json]
+[2021-11-15 21:10:52:6450][http-nio-auto-1-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [1]
+[2021-11-15 21:10:52:6455][main] DEBUG o.s.web.client.RestTemplate - Response 200 OK
+[2021-11-15 21:10:52:6456][main] DEBUG o.s.web.client.RestTemplate - Reading to [java.lang.Integer]
+[2021-11-15 21:10:52:6456][http-nio-auto-1-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+[2021-11-15 21:11:01:1620][main] DEBUG o.s.web.context.ContextLoader - Published root WebApplicationContext as ServletContext attribute with name [org.springframework.web.context.WebApplicationContext.ROOT]
+[2021-11-15 21:11:01:1620][main] INFO  o.s.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 1071 ms
+[2021-11-15 21:11:03:3230][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/**/favicon.ico] in 'faviconHandlerMapping'
+[2021-11-15 21:11:03:3349][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+[2021-11-15 21:11:03:3385][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 5 mappings in 'requestMappingHandlerMapping'
+[2021-11-15 21:11:03:3396][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+[2021-11-15 21:11:03:3401][main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+[2021-11-15 21:11:13:13854][http-nio-8080-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+[2021-11-15 21:11:13:13855][http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Detected StandardServletMultipartResolver
+[2021-11-15 21:11:13:13861][http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+[2021-11-15 21:11:13:13861][http-nio-8080-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 7 ms
+[2021-11-15 21:11:13:13877][http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/v1/dealpost", parameters={}
+[2021-11-15 21:11:13:13880][http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public java.lang.Integer com.around.wmmarket.controller.DealApiController.save(com.around.wmmarket.controller.dto.DealPostSaveRequestDto)
+[2021-11-15 21:11:13:13938][http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.ServletInvocableHandlerMethod - Could not resolve parameter [0] in public java.lang.Integer com.around.wmmarket.controller.DealApiController.save(com.around.wmmarket.controller.dto.DealPostSaveRequestDto): JSON parse error: Cannot deserialize value of type `com.around.wmmarket.domain.deal_post.Category` from String "CategoryA": value not one of declared Enum instance names: [CateoryA, CategoryB]; nested exception is com.fasterxml.jackson.databind.exc.InvalidFormatException: Cannot deserialize value of type `com.around.wmmarket.domain.deal_post.Category` from String "CategoryA": value not one of declared Enum instance names: [CateoryA, CategoryB]
+ at [Source: (PushbackInputStream); line: 3, column: 18] (through reference chain: com.around.wmmarket.controller.dto.DealPostSaveRequestDto["category"])
+[2021-11-15 21:11:13:13941][http-nio-8080-exec-2] WARN  o.s.w.s.m.s.DefaultHandlerExceptionResolver - Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Cannot deserialize value of type `com.around.wmmarket.domain.deal_post.Category` from String "CategoryA": value not one of declared Enum instance names: [CateoryA, CategoryB]; nested exception is com.fasterxml.jackson.databind.exc.InvalidFormatException: Cannot deserialize value of type `com.around.wmmarket.domain.deal_post.Category` from String "CategoryA": value not one of declared Enum instance names: [CateoryA, CategoryB]
+ at [Source: (PushbackInputStream); line: 3, column: 18] (through reference chain: com.around.wmmarket.controller.dto.DealPostSaveRequestDto["category"])]
+[2021-11-15 21:11:13:13941][http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 400 BAD_REQUEST
+[2021-11-15 21:11:13:13944][http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - "ERROR" dispatch for POST "/error", parameters={}
+[2021-11-15 21:11:13:13945][http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.error(javax.servlet.http.HttpServletRequest)
+[2021-11-15 21:11:13:13957][http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/json, application/*+json]
+[2021-11-15 21:11:13:13957][http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{timestamp=Mon Nov 15 21:11:13 KST 2021, status=400, error=Bad Request, message=JSON parse error: Ca (truncated)...]
+[2021-11-15 21:11:13:13972][http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ERROR" dispatch, status 400
+[2021-11-15 21:11:46:1929][main] DEBUG o.s.web.context.ContextLoader - Published root WebApplicationContext as ServletContext attribute with name [org.springframework.web.context.WebApplicationContext.ROOT]
+[2021-11-15 21:11:46:1930][main] INFO  o.s.web.context.ContextLoader - Root WebApplicationContext: initialization completed in 1380 ms
+[2021-11-15 21:11:47:3543][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/**/favicon.ico] in 'faviconHandlerMapping'
+[2021-11-15 21:11:47:3675][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+[2021-11-15 21:11:47:3711][main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 5 mappings in 'requestMappingHandlerMapping'
+[2021-11-15 21:11:47:3722][main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+[2021-11-15 21:11:47:3727][main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+[2021-11-15 21:11:50:6393][http-nio-8080-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+[2021-11-15 21:11:50:6394][http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Detected StandardServletMultipartResolver
+[2021-11-15 21:11:50:6401][http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+[2021-11-15 21:11:50:6401][http-nio-8080-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 7 ms
+[2021-11-15 21:11:50:6419][http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/v1/dealpost", parameters={}
+[2021-11-15 21:11:50:6422][http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public java.lang.Integer com.around.wmmarket.controller.DealApiController.save(com.around.wmmarket.controller.dto.DealPostSaveRequestDto)
+[2021-11-15 21:11:50:6478][http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [com.around.wmmarket.controller.dto.DealPostSaveRequestDto@6c734e40]
+[2021-11-15 21:11:50:6562][http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Failed to complete request: org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+[2021-11-15 21:11:50:6570][http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - "ERROR" dispatch for POST "/error", parameters={}
+[2021-11-15 21:11:50:6571][http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.error(javax.servlet.http.HttpServletRequest)
+[2021-11-15 21:11:50:6582][http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/json, application/*+json]
+[2021-11-15 21:11:50:6583][http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{timestamp=Mon Nov 15 21:11:50 KST 2021, status=500, error=Internal Server Error, message=could not  (truncated)...]
+[2021-11-15 21:11:50:6598][http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ERROR" dispatch, status 500
+[2021-11-15 21:11:51:7613][http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/v1/dealpost", parameters={}
+[2021-11-15 21:11:51:7614][http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public java.lang.Integer com.around.wmmarket.controller.DealApiController.save(com.around.wmmarket.controller.dto.DealPostSaveRequestDto)
+[2021-11-15 21:11:51:7615][http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [com.around.wmmarket.controller.dto.DealPostSaveRequestDto@392c170a]
+[2021-11-15 21:11:51:7618][http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Failed to complete request: org.springframework.dao.DataIntegrityViolationException: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement
+[2021-11-15 21:11:51:7619][http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - "ERROR" dispatch for POST "/error", parameters={}
+[2021-11-15 21:11:51:7619][http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.error(javax.servlet.http.HttpServletRequest)
+[2021-11-15 21:11:51:7620][http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/json, application/*+json]
+[2021-11-15 21:11:51:7620][http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{timestamp=Mon Nov 15 21:11:51 KST 2021, status=500, error=Internal Server Error, message=could not  (truncated)...]
+[2021-11-15 21:11:51:7621][http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ERROR" dispatch, status 500
+[2021-11-15 21:13:25:101362][http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/v1/dealpost", parameters={}
+[2021-11-15 21:13:25:101363][http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to public java.lang.Integer com.around.wmmarket.controller.DealApiController.save(com.around.wmmarket.controller.dto.DealPostSaveRequestDto)
+[2021-11-15 21:13:25:101363][http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [com.around.wmmarket.controller.dto.DealPostSaveRequestDto@6a2cd940]
+[2021-11-15 21:13:25:101375][http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json, application/json, application/*+json]
+[2021-11-15 21:13:25:101375][http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [3]
+[2021-11-15 21:13:25:101376][http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
