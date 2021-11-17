@@ -1,11 +1,15 @@
 package com.around.wmmarket.service.user;
 
+import com.around.wmmarket.controller.dto.UserGetResponseDto;
 import com.around.wmmarket.controller.dto.UserSaveRequestDto;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,5 +26,27 @@ public class UserService{
                 .role(requestDto.getRole())
                 .build();
         userRepository.save(user);
+    }
+
+    public boolean isExist(String email){
+        return userRepository.existsByEmail(email);
+    }
+
+    public UserGetResponseDto getUser(String email){
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(email));
+        System.out.println(user.getEmail());
+        return UserGetResponseDto.builder()
+                .email(user.getEmail())
+                .image(user.getImage())
+                .nickname(user.getNickname())
+                .role(user.getRole())
+                .city_1(user.getCity_1())
+                .town_1(user.getTown_1())
+                .city_2(user.getCity_2())
+                .town_2(user.getTown_2())
+                .isAuth(user.getIsAuth())
+                .code(user.getCode())
+                .build();
     }
 }

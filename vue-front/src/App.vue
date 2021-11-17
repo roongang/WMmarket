@@ -1,26 +1,23 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App!! 환영합니다."/>
+  <WMHeader></WMHeader>
+  <WMContent></WMContent>
+  <WMFooter></WMFooter>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import WMHeader from "@/components/WMHeader";
+import WMContent from "@/components/WMContent";
+import WMFooter from "@/components/WMFooter";
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    WMHeader,
+    WMContent,
+    WMFooter
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 </style>

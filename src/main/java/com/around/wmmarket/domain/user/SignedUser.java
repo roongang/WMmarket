@@ -14,17 +14,12 @@ public class SignedUser implements UserDetails {
     private String name;
     private String password;
     private Collection<? extends GrantedAuthority> role;
-    private String tokenId;
 
     @Builder
     public SignedUser(String name,String password,Collection<? extends GrantedAuthority> role){
         this.name=name;
         this.password=password;
         this.role=role;
-    }
-
-    public void setTokenId(String tokenId) {
-        this.tokenId = tokenId;
     }
 
     @Override

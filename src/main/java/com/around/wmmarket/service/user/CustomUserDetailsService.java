@@ -1,6 +1,6 @@
 package com.around.wmmarket.service.user;
 
-import com.around.wmmarket.controller.dto.UserLoginRequestDto;
+import com.around.wmmarket.controller.dto.UserSigninRequestDto;
 import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
@@ -28,7 +28,7 @@ import java.util.Collections;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class  CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
@@ -46,7 +46,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return Collections.singleton(new SimpleGrantedAuthority("ROLE_"+role.toString()));
     }
 
-    public SignedUser getSignedUser(UserLoginRequestDto requestDto){
+    public SignedUser getSignedUser(UserSigninRequestDto requestDto){
         String email=requestDto.getEmail();
         String password=requestDto.getPassword();
 
