@@ -49,16 +49,16 @@ public class DealPost extends BaseTimeEntity {
 
     // TODO : dealState 는 입력상태가 정해져 있으므로 ENUM 으로 하는게 맞지 않을까?
     @Column(nullable = false)
-    private Character dealState;
+    private DealState dealState;
 
     @OneToMany(mappedBy = "dealPost")
-    List<DealPostImage> dealPostImages = new ArrayList<>();
+    private List<DealPostImage> dealPostImages = new ArrayList<>();
 
     @OneToOne(mappedBy = "dealPost")
     private DealSuccess dealSuccess;
 
     @Builder
-    public DealPost(User user,Category category,String title,Integer price,String content,Character dealState){
+    public DealPost(User user,Category category,String title,Integer price,String content,DealState dealState){
         this.user=user;
         this.category=category;
         this.title=title;

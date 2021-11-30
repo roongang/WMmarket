@@ -29,10 +29,10 @@ dependencies {
     // web
     implementation 'org.springframework.boot:spring-boot-starter-web'
     // lombok
-    implementation('org.projectlombok:lombok')
-    annotationProcessor('org.projectlombok:lombok')
-    testImplementation('org.projectlombok:lombok')
-    testAnnotationProcessor('org.projectlombok:lombok')
+    implementation('org.projectlombok:lombok:1.18.22')
+    annotationProcessor('org.projectlombok:lombok:1.18.22')
+    testImplementation('org.projectlombok:lombok:1.18.22')
+    testAnnotationProcessor('org.projectlombok:lombok:1.18.22')
     // 내장 DB
     implementation('com.h2database:h2')
     // MariaDB
