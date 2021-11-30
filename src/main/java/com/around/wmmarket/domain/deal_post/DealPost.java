@@ -47,6 +47,7 @@ public class DealPost extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer pullingCnt;
 
+    // TODO : dealState 는 입력상태가 정해져 있으므로 ENUM 으로 하는게 맞지 않을까?
     @Column(nullable = false)
     private Character dealState;
 
@@ -64,5 +65,12 @@ public class DealPost extends BaseTimeEntity {
         this.price=price;
         this.content=content;
         this.dealState=dealState;
+    }
+    
+    // 영속화전 전처리
+    @PrePersist
+    public void prePersist(){
+        this.pullingCnt=(this.pullingCnt==null)?0:this.pullingCnt;
+        this.pullingDate=(this.pullingDate==null)?LocalDateTime.now():this.pullingDate;
     }
 }

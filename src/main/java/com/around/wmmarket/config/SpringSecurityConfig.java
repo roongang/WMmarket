@@ -42,8 +42,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     .permitAll()
                 .and()
                     .logout()
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/signout"))
-                    .logoutSuccessUrl("/signin")
+                    .logoutRequestMatcher(new AntPathRequestMatcher("/api/v1/user/signout"))
+                    .logoutSuccessUrl("/api/v1/user/signin")
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID")
                 .and() // 기본 auth 사용
