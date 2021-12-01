@@ -3,6 +3,7 @@ package com.around.wmmarket.service.common;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
+import com.around.wmmarket.domain.deal_post_image.DealPostImageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -10,6 +11,9 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -17,8 +21,10 @@ import java.util.NoSuchElementException;
 @Component
 public class FileHandler {
     private final DealPostRepository dealPostRepository;
+    private final DealPostImageRepository dealPostImageRepository;
+    private SimpleDateFormat simpleDateFormat;
 
-    public void parseFileInfo(Integer dealPostId, List<MultipartFile> files) throws Exception{
+    public void save(Integer dealPostId, List<MultipartFile> files) throws Exception{
         DealPost dealPost=dealPostRepository.findById(dealPostId)
                 .orElseThrow(() -> new NoSuchElementException("no such dealPost ID:"+dealPostId));
         List<DealPostImage> dealPostImages=dealPost.getDealPostImages();
@@ -43,11 +49,15 @@ public class FileHandler {
             else continue; // 다른 확장자는 저장안함
 
             // 중복방지를 위해 나노시간을 추가
-            String fileName=multipartFile.getOriginalFilename()+System.nanoTime()+originFileExtension;
+            simpleDateFormat=new SimpleDateFormat("yyyyMMdd");
+            String nowTime=simpleDateFormat.format(new Date());
+            String fileName= nowTime+"_"+System.nanoTime()+originFileExtension;
             // 이미지 엔티티 생성
             DealPostImage dealPostImage=DealPostImage.builder()
                     .dealId(dealPostId)
                     .path(fileName).build();
+            dealPostImage.setDealPost(dealPost);
+            dealPostImageRepository.save(dealPostImage);
             // 이미지를 리스트에 추가
             dealPostImages.add(dealPostImage);
 

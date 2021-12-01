@@ -33,4 +33,8 @@ public class DealPostImage {
         this.path=path;
         this.dealId=dealId;
     }
+
+    public void setDealPost(DealPost dealPost){
+        this.dealPost=dealPost;
+    }
 }

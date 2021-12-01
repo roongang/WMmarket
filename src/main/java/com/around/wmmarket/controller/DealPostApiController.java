@@ -4,6 +4,7 @@ import com.around.wmmarket.controller.dto.DealPostSaveRequestDto;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -15,27 +16,23 @@ import java.io.IOException;
 import java.util.List;
 
 // TODO : @AuthenticationPrincipal adapter 패턴으로 감싸야하는가 의문
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 public class DealPostApiController {
     private final DealPostService dealPostService;
 
     @PostMapping("/api/v1/test")
-    public ResponseEntity<?> test(@RequestPart List<MultipartFile> images) throws IOException {
-        String rootPath= FileSystemView.getFileSystemView().getHomeDirectory().toString();
-        String basePath= rootPath+"/"+"Image";
-        for(MultipartFile image:images){
-            String originalFilename=image.getOriginalFilename();
-            File dest=new File(basePath+originalFilename);
-            image.transferTo(dest);
-        }
-        return ResponseEntity.ok("image saved");
+    public ResponseEntity<?> test(@ModelAttribute DealPostSaveRequestDto requestDto) throws Exception {
+        log.info(requestDto.getTitle());
+        if(!requestDto.getMultipartFiles().isEmpty()) log.info("multifile not empty");
+        return ResponseEntity.ok("test success");
     }
 
     @PostMapping("/api/v1/dealPost")
-    public ResponseEntity<?> save(@AuthenticationPrincipal SignedUser signedUser,@RequestBody DealPostSaveRequestDto requestDto,@RequestBody List<MultipartFile> multipartFiles) throws Exception{
+    public ResponseEntity<?> save(@AuthenticationPrincipal SignedUser signedUser,@ModelAttribute DealPostSaveRequestDto requestDto) throws Exception{
         if(signedUser==null) return ResponseEntity.badRequest().body("no user");
-        dealPostService.save(signedUser,requestDto,multipartFiles);
+        dealPostService.save(signedUser,requestDto);
         return ResponseEntity.ok().body("save success");
     }
 }
