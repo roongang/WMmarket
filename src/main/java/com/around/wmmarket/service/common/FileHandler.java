@@ -33,9 +33,8 @@ public class FileHandler {
         // 절대경로
         String absPath=new File("").getAbsolutePath()+File.separator+File.separator;
         // 저장할 세부경로
-        String dirPath="dealPostImages"+File.separator;
+        String dirPath="images"+File.separator+File.separator+"dealPostImages"+File.separator;
         File dir=new File(dirPath);
-        // 디렉토리가 존재하지 않으면 생성
         if(!dir.exists()) dir.mkdirs();
 
         for(MultipartFile multipartFile:files){
