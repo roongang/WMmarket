@@ -10,9 +10,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.filechooser.FileSystemView;
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 // TODO : @AuthenticationPrincipal adapter 패턴으로 감싸야하는가 의문
@@ -22,17 +19,10 @@ import java.util.List;
 public class DealPostApiController {
     private final DealPostService dealPostService;
 
-    @PostMapping("/api/v1/test")
-    public ResponseEntity<?> test(@ModelAttribute DealPostSaveRequestDto requestDto) throws Exception {
-        log.info(requestDto.getTitle());
-        if(!requestDto.getMultipartFiles().isEmpty()) log.info("multifile not empty");
-        return ResponseEntity.ok("test success");
-    }
-
     @PostMapping("/api/v1/dealPost")
-    public ResponseEntity<?> save(@AuthenticationPrincipal SignedUser signedUser,@ModelAttribute DealPostSaveRequestDto requestDto) throws Exception{
+    public ResponseEntity<?> save(@AuthenticationPrincipal SignedUser signedUser,@ModelAttribute DealPostSaveRequestDto requestDto,@RequestPart List<MultipartFile> multipartFiles) throws Exception{
         if(signedUser==null) return ResponseEntity.badRequest().body("no user");
-        dealPostService.save(signedUser,requestDto);
+        dealPostService.save(signedUser,requestDto,multipartFiles);
         return ResponseEntity.ok().body("save success");
     }
 }

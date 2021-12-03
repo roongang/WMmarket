@@ -24,7 +24,7 @@ public class DealPostService {
     private final DealPostRepository dealPostRepository;
     private final FileHandler fileHandler;
 
-    public void save(SignedUser signedUser,DealPostSaveRequestDto requestDto) throws Exception{
+    public void save(SignedUser signedUser,DealPostSaveRequestDto requestDto,List<MultipartFile> multipartFiles) throws Exception{
         User user = userRepository.findByEmail(signedUser.getUsername())
                 .orElseThrow(()->new UsernameNotFoundException("not found : "+signedUser.getUsername()));
         DealPost dealPost = DealPost.builder()
@@ -35,6 +35,6 @@ public class DealPostService {
                 .content(requestDto.getContent())
                 .dealState(requestDto.getDealState()).build();
         dealPostRepository.save(dealPost);
-        if(!CollectionUtils.isEmpty(requestDto.getMultipartFiles())) fileHandler.save(dealPost.getId(),requestDto.getMultipartFiles());
+        if(!CollectionUtils.isEmpty(multipartFiles)) fileHandler.save(dealPost.getId(),multipartFiles);
     }
 }

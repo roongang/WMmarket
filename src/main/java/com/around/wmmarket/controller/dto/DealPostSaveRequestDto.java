@@ -16,5 +16,5 @@ public class DealPostSaveRequestDto {
     private Integer price;
     private String content;
     private DealState dealState;
-    private List<MultipartFile> multipartFiles;
+    //private List<MultipartFile> multipartFiles;
 }
