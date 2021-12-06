@@ -11,6 +11,11 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -33,8 +38,13 @@ public class FileHandler {
         // 절대경로
         String absPath=new File("").getAbsolutePath()+File.separator+File.separator;
         // 저장할 세부경로
-        String dirPath="images"+File.separator+File.separator+"dealPostImages"+File.separator;
-        File dir=new File(dirPath);
+        String resourcePath="src"+File.separator+File.separator
+                +"main"+File.separator+File.separator
+                +"resources"+File.separator+File.separator;
+        String dirPath=resourcePath
+                +"images"+File.separator+File.separator
+                +"dealPostImages"+File.separator;
+        File dir=new File(absPath+dirPath);
         if(!dir.exists()) dir.mkdirs();
 
         for(MultipartFile multipartFile:files){
@@ -54,18 +64,28 @@ public class FileHandler {
             // 이미지 엔티티 생성
             DealPostImage dealPostImage=DealPostImage.builder()
                     .dealId(dealPostId)
-                    .path(fileName).build();
+                    .name(fileName).build();
             dealPostImage.setDealPost(dealPost);
             dealPostImageRepository.save(dealPostImage);
             // 이미지를 리스트에 추가
             dealPostImages.add(dealPostImage);
 
-            // 물리적 저장
-            File file=new File(absPath+dirPath+File.separator+fileName);
-            multipartFile.transferTo(file);
-            // 읽기 쓰기 권한 설정
-            file.setReadable(true);
-            file.setWritable(true);
+            // transferTo 방식
+            /*File file=new File(absPath+dirPath+File.separator+fileName);
+            multipartFile.transferTo(file);*/
+            // getBytes 방식
+            write(multipartFile,Paths.get(absPath+dirPath),fileName);
+        }
+    }
+
+    public void write(MultipartFile multipartFile, Path dir,String fileName) {
+        Path filepath = Paths.get(dir.toString(), fileName);
+        try (OutputStream os = Files.newOutputStream(filepath)) {
+            os.write(multipartFile.getBytes());
+            os.flush();
+            os.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

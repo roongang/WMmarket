@@ -41,6 +41,10 @@ dependencies {
     implementation('org.springframework.session:spring-session-jdbc')
     // spring security
     implementation('org.springframework.boot:spring-boot-starter-security')
+    // file upload
+    implementation('commons-fileupload:commons-fileupload:1.4')
+    implementation('commons-io:commons-io:2.4')
+    implementation('org.apache.tika:tika-core:1.22')
     // test security (권한을 필요로하는 api 호출을 위한)
     testImplementation('org.springframework.security:spring-security-test')
     // test

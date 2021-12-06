@@ -1,4 +1,4 @@
-package com.around.wmmarket.controller.dto;
+package com.around.wmmarket.controller.dto.User;
 
 import lombok.Builder;
 import lombok.Getter;

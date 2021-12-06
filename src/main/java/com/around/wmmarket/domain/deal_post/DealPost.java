@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -72,5 +73,14 @@ public class DealPost extends BaseTimeEntity {
     public void prePersist(){
         this.pullingCnt=(this.pullingCnt==null)?0:this.pullingCnt;
         this.pullingDate=(this.pullingDate==null)?LocalDateTime.now():this.pullingDate;
+    }
+
+    public List<MultipartFile> getMultipartFiles() throws Exception{
+        List<MultipartFile> multipartFiles=new ArrayList<>();
+        for(DealPostImage dealPostImage:dealPostImages){
+            MultipartFile multipartFile=dealPostImage.getMultipartFile();
+            multipartFiles.add(multipartFile);
+        }
+        return multipartFiles;
     }
 }

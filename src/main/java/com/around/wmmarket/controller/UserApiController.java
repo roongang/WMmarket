@@ -1,10 +1,9 @@
 package com.around.wmmarket.controller;
 
-import com.around.wmmarket.controller.dto.UserGetResponseDto;
-import com.around.wmmarket.controller.dto.UserSaveRequestDto;
-import com.around.wmmarket.controller.dto.UserSigninRequestDto;
+import com.around.wmmarket.controller.dto.User.UserGetResponseDto;
+import com.around.wmmarket.controller.dto.User.UserSaveRequestDto;
+import com.around.wmmarket.controller.dto.User.UserSigninRequestDto;
 import com.around.wmmarket.domain.user.SignedUser;
-import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.service.user.CustomUserDetailsService;
 import com.around.wmmarket.service.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.servlet.http.HttpSession;
 
