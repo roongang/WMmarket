@@ -40,14 +40,12 @@ public class DealPostImage {
     private Integer dealId;
 
     @Builder
-    public DealPostImage(String name,Integer dealId){
+    public DealPostImage(String name,Integer dealId,DealPost dealPost){
         this.name=name;
         this.dealId=dealId;
-    }
-
-    public void setDealPost(DealPost dealPost){
         this.dealPost=dealPost;
     }
+
     public MultipartFile getMultipartFile() throws Exception{
         String absPath=new File("").getAbsolutePath()+File.separator;
         String path=absPath+"images"+File.separator+File.separator+"dealPostImages"+File.separator;

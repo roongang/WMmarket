@@ -1,6 +1,7 @@
 package com.around.wmmarket.controller;
 
 import com.around.wmmarket.controller.dto.DealPostImage.DealPostImageSaveRequestDto;
+import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.dealPost.DealPostService;
@@ -19,6 +20,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,8 +37,18 @@ public class DealPostImageController {
         if(!dealPostService.isDealPostAuthor(signedUser,requestDto.getDealPostId())){
             return ResponseEntity.badRequest().body("게시글의 작성자가 아닙니다.");
         }
-        dealPostImageService.save(requestDto.getDealPostId(),requestDto.getFiles());
+        DealPost dealPost=dealPostService.getDealPost(requestDto.getDealPostId());
+        dealPostImageService.save(dealPost,requestDto.getFiles());
         return ResponseEntity.ok().body("save success");
+    }
+    @DeleteMapping("/api/v1/dealPostImage")
+    public ResponseEntity<?> delete(@AuthenticationPrincipal SignedUser signedUser,@RequestParam Integer dealPostImageId) throws Exception{
+        // signedUser 와 dealPostId 의 email 비교
+        if(!dealPostService.isDealPostAuthor(signedUser,dealPostImageId)){
+            return ResponseEntity.badRequest().body("게시글의 작성자가 아닙니다.");
+        }
+        dealPostImageService.delete(dealPostImageId);
+        return ResponseEntity.ok().body("delete success");
     }
 
     @GetMapping("/api/v1/dealPostImage")
@@ -53,7 +65,6 @@ public class DealPostImageController {
                 +"dealPostImages"+File.separator;
         String fileName=dealPostImage.getName();
         String path=filePath+fileName;
-        log.info("path:"+path);
         Resource resource=resourceLoader.getResource("file:"+absPath+resourcePath+path);
         File file=resource.getFile();
         String mediaType=tika.detect(file);
@@ -68,27 +79,4 @@ public class DealPostImageController {
                 .body(resource);
     }
 
-    @GetMapping("/test/file")
-    public ResponseEntity<?> testFile(@RequestParam String name) throws Exception{
-        //Resource resource=resourceLoader.getResource("classpath:"+name);
-        // 절대경로
-        String absPath=new File("").getAbsolutePath()+File.separator;
-        // 저장할 세부경로
-        String resourcePath="src"+File.separator
-                +"main"+File.separator
-                +"resources"+File.separator;
-        Resource resource=resourceLoader.getResource("file:"+absPath+resourcePath+name);
-        log.info("path:"+name);
-        File file=resource.getFile();
-        String mediaType=tika.detect(file);
-
-        HttpHeaders headers=new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\""+resource.getFilename()+"\"");
-        headers.add(HttpHeaders.CONTENT_TYPE,mediaType);
-        headers.add(HttpHeaders.CONTENT_LENGTH,String.valueOf(file.length()));
-
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(resource);
-    }
 }

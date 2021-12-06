@@ -34,11 +34,12 @@ public class DealPostService {
                 .price(requestDto.getPrice())
                 .content(requestDto.getContent())
                 .dealState(requestDto.getDealState()).build();
-        dealPostRepository.save(dealPost);
-        dealPostImageService.save(dealPost.getId(),requestDto.getFiles());
+        dealPostRepository.save(dealPost); // dealPostId가 저장되어야 생김
+        if(!requestDto.getFiles().isEmpty()) dealPostImageService.save(dealPost,requestDto.getFiles());
     }
 
-    public DealPostGetResponseDto get(Integer id) {
+    // TODO : service 메소드 이름을 이렇게 지어야하나
+    public DealPostGetResponseDto getDealPostGetResponseDto(Integer id) {
         DealPost dealPost=dealPostRepository.findById(id)
                 .orElseThrow(()->new NoSuchElementException("해당 게시글이 없습니다. id:"+id));
         return DealPostGetResponseDto.builder()
@@ -49,6 +50,10 @@ public class DealPostService {
                 .content(dealPost.getContent())
                 .dealState(dealPost.getDealState())
                 .build();
+    }
+    public DealPost getDealPost(Integer id){
+        return dealPostRepository.findById(id)
+                .orElseThrow(()->new NoSuchElementException("해당 게시글이 없습니다. id:"+id));
     }
 
     public boolean isDealPostAuthor(SignedUser signedUser,Integer dealPostId){

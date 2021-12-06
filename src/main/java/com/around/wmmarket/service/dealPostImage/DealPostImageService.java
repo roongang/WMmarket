@@ -18,12 +18,22 @@ public class DealPostImageService {
     private final FileHandler fileHandler;
     private final DealPostImageRepository dealPostImageRepository;
 
-    public void save(Integer dealPostId, List<MultipartFile> files) throws Exception{
+    public void save(DealPost dealPost, List<MultipartFile> files) throws Exception{
         if(files.isEmpty()) return;
-        fileHandler.save(dealPostId,files);
+        List<DealPostImage> dealPostImages=fileHandler.parseFileInfo(dealPost,files);
+        for(DealPostImage dealPostImage:dealPostImages){
+            dealPostImageRepository.save(dealPostImage);
+            dealPost.getDealPostImages().add(dealPostImage);
+        }
     }
     public DealPostImage get(Integer dealPostImageId) {
         return dealPostImageRepository.findById(dealPostImageId)
                 .orElseThrow(()->new NoSuchElementException("해당 이미지가 없습니다. id:"+dealPostImageId));
+    }
+
+    public void delete(Integer dealPostImageId) throws Exception{
+        DealPostImage dealPostImage=dealPostImageRepository.findById(dealPostImageId)
+                .orElseThrow(()->new NoSuchElementException("해당 거래글 이미지가 없습니다. id:"+dealPostImageId));
+        dealPostImageRepository.delete(dealPostImage);
     }
 }

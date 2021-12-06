@@ -28,7 +28,7 @@ public class DealPostApiController {
 
     @GetMapping("/api/v1/dealPost")
     public ResponseEntity<?> get(@RequestParam Integer dealPostId) throws Exception{
-        DealPostGetResponseDto responseDto=dealPostService.get(dealPostId);
+        DealPostGetResponseDto responseDto=dealPostService.getDealPostGetResponseDto(dealPostId);
         return ResponseEntity.ok().body(responseDto);
     }
 

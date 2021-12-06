@@ -48,7 +48,6 @@ public class DealPost extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer pullingCnt;
 
-    // TODO : dealState 는 입력상태가 정해져 있으므로 ENUM 으로 하는게 맞지 않을까?
     @Column(nullable = false)
     private DealState dealState;
 

@@ -1,9 +1,7 @@
 package com.around.wmmarket.service.common;
 
 import com.around.wmmarket.domain.deal_post.DealPost;
-import com.around.wmmarket.domain.deal_post.DealPostRepository;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
-import com.around.wmmarket.domain.deal_post_image.DealPostImageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -17,24 +15,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
 @Component
 public class FileHandler {
-    private final DealPostRepository dealPostRepository;
-    private final DealPostImageRepository dealPostImageRepository;
     private SimpleDateFormat simpleDateFormat;
 
-    public void save(Integer dealPostId, List<MultipartFile> files) throws Exception{
-        DealPost dealPost=dealPostRepository.findById(dealPostId)
-                .orElseThrow(() -> new NoSuchElementException("no such dealPost ID:"+dealPostId));
-        List<DealPostImage> dealPostImages=dealPost.getDealPostImages();
+    public List<DealPostImage> parseFileInfo(DealPost dealPost, List<MultipartFile> files) throws Exception{
+        List<DealPostImage> dealPostImages=new ArrayList<>();
 
-        if(CollectionUtils.isEmpty(files)) return;
+        if(CollectionUtils.isEmpty(files)) return null;
         // 절대경로
         String absPath=new File("").getAbsolutePath()+File.separator+File.separator;
         // 저장할 세부경로
@@ -63,10 +56,9 @@ public class FileHandler {
             String fileName= nowTime+"_"+System.nanoTime()+originFileExtension;
             // 이미지 엔티티 생성
             DealPostImage dealPostImage=DealPostImage.builder()
-                    .dealId(dealPostId)
-                    .name(fileName).build();
-            dealPostImage.setDealPost(dealPost);
-            dealPostImageRepository.save(dealPostImage);
+                    .dealId(dealPost.getId())
+                    .name(fileName)
+                    .dealPost(dealPost).build();
             // 이미지를 리스트에 추가
             dealPostImages.add(dealPostImage);
 
@@ -76,6 +68,7 @@ public class FileHandler {
             // getBytes 방식
             write(multipartFile,Paths.get(absPath+dirPath),fileName);
         }
+        return dealPostImages;
     }
 
     public void write(MultipartFile multipartFile, Path dir,String fileName) {
