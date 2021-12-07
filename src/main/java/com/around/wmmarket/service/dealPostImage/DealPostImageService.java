@@ -24,7 +24,6 @@ public class DealPostImageService {
         List<DealPostImage> dealPostImages=fileHandler.parseFileInfo(dealPost,files);
         for(DealPostImage dealPostImage:dealPostImages){
             dealPostImageRepository.save(dealPostImage);
-            System.out.println("####### add image ####### ");
             dealPost.getDealPostImages().add(dealPostImage);
         }
     }
