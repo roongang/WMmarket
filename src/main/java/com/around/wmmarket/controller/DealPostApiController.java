@@ -2,6 +2,8 @@ package com.around.wmmarket.controller;
 
 import com.around.wmmarket.controller.dto.DealPost.DealPostGetResponseDto;
 import com.around.wmmarket.controller.dto.DealPost.DealPostSaveRequestDto;
+import com.around.wmmarket.controller.dto.DealPost.DealPostUpdateRequestDto;
+import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import lombok.RequiredArgsConstructor;
@@ -36,5 +38,28 @@ public class DealPostApiController {
     public ResponseEntity<?> getImages(@RequestParam Integer dealPostId){
         List<Integer> images=dealPostService.getImages(dealPostId);
         return ResponseEntity.ok().body(images);
+    }
+
+    @PutMapping("/api/v1/dealPost")
+    public ResponseEntity<?> update(@AuthenticationPrincipal SignedUser signedUser, @RequestBody DealPostUpdateRequestDto requestDto){
+        // check
+        if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
+        DealPost dealPost=dealPostService.getDealPost(requestDto.getDealPostId());
+        if(!dealPost.getUser().getEmail().equals(signedUser.getName())) return ResponseEntity.badRequest().body("게시글 작성자가 아닙니다.");
+
+        dealPostService.update(requestDto);
+        DealPostGetResponseDto responseDto=dealPostService.getDealPostGetResponseDto(requestDto.getDealPostId());
+        return ResponseEntity.ok().body(responseDto);
+    }
+
+    @DeleteMapping("/api/v1/dealPost")
+    public ResponseEntity<?> delete(@AuthenticationPrincipal SignedUser signedUser,@RequestParam Integer dealPostId) throws Exception{
+        // check
+        if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
+        DealPost dealPost=dealPostService.getDealPost(dealPostId);
+        if(!dealPost.getUser().getEmail().equals(signedUser.getName())) return ResponseEntity.badRequest().body("게시글 작성자가 아닙니다.");
+
+        dealPostService.delete(dealPost);
+        return ResponseEntity.ok().body("delete success");
     }
 }

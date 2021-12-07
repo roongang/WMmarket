@@ -4,6 +4,7 @@ import com.around.wmmarket.controller.dto.DealPostImage.DealPostImageSaveRequest
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
 import com.around.wmmarket.domain.user.SignedUser;
+import com.around.wmmarket.service.common.Constants;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.dealPostImage.DealPostImageService;
 import lombok.NonNull;
@@ -19,7 +20,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.NoSuchElementException;
 
 @Slf4j
@@ -31,8 +34,10 @@ public class DealPostImageController {
     private final ResourceLoader resourceLoader;
     private final Tika tika=new Tika();
 
+    @Transactional
     @PostMapping("/api/v1/dealPostImage")
     public ResponseEntity<?> save(@AuthenticationPrincipal SignedUser signedUser, @ModelAttribute DealPostImageSaveRequestDto requestDto) throws Exception{
+        if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         // signedUser 와 dealPostId 의 email 비교
         if(!dealPostService.isDealPostAuthor(signedUser,requestDto.getDealPostId())){
             return ResponseEntity.badRequest().body("게시글의 작성자가 아닙니다.");
@@ -41,10 +46,14 @@ public class DealPostImageController {
         dealPostImageService.save(dealPost,requestDto.getFiles());
         return ResponseEntity.ok().body("save success");
     }
+
+    @Transactional
     @DeleteMapping("/api/v1/dealPostImage")
     public ResponseEntity<?> delete(@AuthenticationPrincipal SignedUser signedUser,@RequestParam Integer dealPostImageId) throws Exception{
+        if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         // signedUser 와 dealPostId 의 email 비교
-        if(!dealPostService.isDealPostAuthor(signedUser,dealPostImageId)){
+        DealPostImage dealPostImage=dealPostImageService.get(dealPostImageId);
+        if(!dealPostService.isDealPostAuthor(signedUser,dealPostImage.getDealPost().getId())){
             return ResponseEntity.badRequest().body("게시글의 작성자가 아닙니다.");
         }
         dealPostImageService.delete(dealPostImageId);
@@ -54,18 +63,8 @@ public class DealPostImageController {
     @GetMapping("/api/v1/dealPostImage")
     public ResponseEntity<?> get(@RequestParam Integer dealPostImageId) throws Exception{
         DealPostImage dealPostImage=dealPostImageService.get(dealPostImageId);
-        // 절대경로
-        String absPath=new File("").getAbsolutePath()+File.separator;
-        // 저장할 세부경로
-        String resourcePath="src"+File.separator
-                +"main"+File.separator
-                +"resources"+File.separator;
-
-        String filePath="images"+File.separator
-                +"dealPostImages"+File.separator;
         String fileName=dealPostImage.getName();
-        String path=filePath+fileName;
-        Resource resource=resourceLoader.getResource("file:"+absPath+resourcePath+path);
+        Resource resource=resourceLoader.getResource("file:"+ Paths.get(Constants.dealPostImagePath.toString(),fileName));
         File file=resource.getFile();
         String mediaType=tika.detect(file);
 

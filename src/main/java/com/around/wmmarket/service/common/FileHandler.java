@@ -27,17 +27,12 @@ public class FileHandler {
     public List<DealPostImage> parseFileInfo(DealPost dealPost, List<MultipartFile> files) throws Exception{
         List<DealPostImage> dealPostImages=new ArrayList<>();
 
-        if(CollectionUtils.isEmpty(files)) return null;
-        // 절대경로
-        String absPath=new File("").getAbsolutePath()+File.separator+File.separator;
-        // 저장할 세부경로
-        String resourcePath="src"+File.separator+File.separator
-                +"main"+File.separator+File.separator
-                +"resources"+File.separator+File.separator;
-        String dirPath=resourcePath
+        if(files==null||CollectionUtils.isEmpty(files)) return null;
+        /*String dirPath=resourcePath
                 +"images"+File.separator+File.separator
                 +"dealPostImages"+File.separator;
-        File dir=new File(absPath+dirPath);
+        */
+        File dir=Constants.dealPostImagePath.toFile();
         if(!dir.exists()) dir.mkdirs();
 
         for(MultipartFile multipartFile:files){
@@ -56,7 +51,6 @@ public class FileHandler {
             String fileName= nowTime+"_"+System.nanoTime()+originFileExtension;
             // 이미지 엔티티 생성
             DealPostImage dealPostImage=DealPostImage.builder()
-                    .dealId(dealPost.getId())
                     .name(fileName)
                     .dealPost(dealPost).build();
             // 이미지를 리스트에 추가
@@ -66,13 +60,13 @@ public class FileHandler {
             /*File file=new File(absPath+dirPath+File.separator+fileName);
             multipartFile.transferTo(file);*/
             // getBytes 방식
-            write(multipartFile,Paths.get(absPath+dirPath),fileName);
+            write(multipartFile,Constants.dealPostImagePath,fileName);
         }
         return dealPostImages;
     }
 
     public void write(MultipartFile multipartFile, Path dir,String fileName) {
-        Path filepath = Paths.get(dir.toString(), fileName);
+        Path filepath = Paths.get(dir.toString(),fileName);
         try (OutputStream os = Files.newOutputStream(filepath)) {
             os.write(multipartFile.getBytes());
             os.flush();
@@ -80,5 +74,9 @@ public class FileHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    public void delete(Path dir,String fileName) throws Exception{
+        File file=Paths.get(dir.toString(),fileName).toFile();
+        if(!file.delete()) throw new Exception("delete fail! path:"+Paths.get(dir.toString(),fileName));
     }
 }

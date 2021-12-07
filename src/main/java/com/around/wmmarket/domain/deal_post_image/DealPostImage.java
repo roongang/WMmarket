@@ -36,30 +36,9 @@ public class DealPostImage {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private Integer dealId;
-
     @Builder
-    public DealPostImage(String name,Integer dealId,DealPost dealPost){
+    public DealPostImage(String name,DealPost dealPost){
         this.name=name;
-        this.dealId=dealId;
         this.dealPost=dealPost;
-    }
-
-    public MultipartFile getMultipartFile() throws Exception{
-        String absPath=new File("").getAbsolutePath()+File.separator;
-        String path=absPath+"images"+File.separator+File.separator+"dealPostImages"+File.separator;
-        String name=this.name;
-        File file=new File(path+name);
-        FileItem fileItem=new DiskFileItem(name,
-                Files.probeContentType(file.toPath()),
-                false,
-                file.getName(),
-                (int)file.length(),
-                file.getParentFile());
-        InputStream input =new FileInputStream(file);
-        OutputStream output= fileItem.getOutputStream();
-        IOUtils.copy(input,output);
-        return new CommonsMultipartFile(fileItem);
     }
 }

@@ -43,16 +43,16 @@ public class DealPost extends BaseTimeEntity {
     private String content;
 
     @Column(nullable = false)
-    private LocalDateTime pullingDate;
-
-    @Column(nullable = false)
-    private Integer pullingCnt;
-
-    @Column(nullable = false)
     private DealState dealState;
 
     @OneToMany(mappedBy = "dealPost")
     private List<DealPostImage> dealPostImages = new ArrayList<>();
+
+    @Column(nullable = false)
+    private LocalDateTime pullingDate;
+
+    @Column(nullable = false)
+    private Integer pullingCnt;
 
     @OneToOne(mappedBy = "dealPost")
     private DealSuccess dealSuccess;
@@ -74,12 +74,10 @@ public class DealPost extends BaseTimeEntity {
         this.pullingDate=(this.pullingDate==null)?LocalDateTime.now():this.pullingDate;
     }
 
-    public List<MultipartFile> getMultipartFiles() throws Exception{
-        List<MultipartFile> multipartFiles=new ArrayList<>();
-        for(DealPostImage dealPostImage:dealPostImages){
-            MultipartFile multipartFile=dealPostImage.getMultipartFile();
-            multipartFiles.add(multipartFile);
-        }
-        return multipartFiles;
-    }
+    // setter
+    public void setCategory(Category category){this.category=category;}
+    public void setTitle(String title){this.title=title;}
+    public void setPrice(Integer price){this.price=price;}
+    public void setContent(String content){this.content=content;}
+    public void setDealState(DealState dealState){this.dealState=dealState;}
 }

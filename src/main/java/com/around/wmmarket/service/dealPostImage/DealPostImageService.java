@@ -4,6 +4,7 @@ import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
 import com.around.wmmarket.domain.deal_post_image.DealPostImageRepository;
+import com.around.wmmarket.service.common.Constants;
 import com.around.wmmarket.service.common.FileHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class DealPostImageService {
         List<DealPostImage> dealPostImages=fileHandler.parseFileInfo(dealPost,files);
         for(DealPostImage dealPostImage:dealPostImages){
             dealPostImageRepository.save(dealPostImage);
+            System.out.println("####### add image ####### ");
             dealPost.getDealPostImages().add(dealPostImage);
         }
     }
@@ -34,6 +36,8 @@ public class DealPostImageService {
     public void delete(Integer dealPostImageId) throws Exception{
         DealPostImage dealPostImage=dealPostImageRepository.findById(dealPostImageId)
                 .orElseThrow(()->new NoSuchElementException("해당 거래글 이미지가 없습니다. id:"+dealPostImageId));
+        // 물리적인 삭제
+        fileHandler.delete(Constants.dealPostImagePath,dealPostImage.getName());
         dealPostImageRepository.delete(dealPostImage);
     }
 }

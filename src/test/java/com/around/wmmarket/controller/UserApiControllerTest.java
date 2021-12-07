@@ -70,7 +70,7 @@ public class UserApiControllerTest {
 
     /////////////////////////////////////////////////////////////////////////// TEST
     @Test
-    public void UserSave() throws Exception{
+    public void userSave() throws Exception{
         // given
         String testEmail="test_email";
         String testPassword="test_password";
@@ -98,7 +98,7 @@ public class UserApiControllerTest {
     }
 
     @Test
-    public void UserSignIn() throws Exception{
+    public void userSignIn() throws Exception{
         // given
         String testEmail="test_email2";
         String testPassword="test_password2";
@@ -130,7 +130,7 @@ public class UserApiControllerTest {
     }
 
     @Test
-    public void UserExist() throws Exception{
+    public void userExist() throws Exception{
         // given
         String testEmail="test_email3";
         String testPassword="test_password3";

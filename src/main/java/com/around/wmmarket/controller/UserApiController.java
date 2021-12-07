@@ -18,6 +18,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,7 +27,6 @@ public class UserApiController {
     private final UserService userService;
     private final CustomUserDetailsService customUserDetailsService;
     private final AuthenticationManager authenticationManager;
-    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/api/v1/user")
     public ResponseEntity<?> save(@RequestBody UserSaveRequestDto requestDto){
@@ -35,6 +35,7 @@ public class UserApiController {
         return ResponseEntity.ok().body("회원가입 성공");
     }
 
+    @Transactional
     @PostMapping("/api/v1/user/signIn")
     public ResponseEntity<?> signIn(@RequestBody UserSigninRequestDto requestDto, HttpSession session){
         // 이미 로그인한 유저면 반환

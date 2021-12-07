@@ -2,6 +2,7 @@ package com.around.wmmarket.service.dealPost;
 
 import com.around.wmmarket.controller.dto.DealPost.DealPostGetResponseDto;
 import com.around.wmmarket.controller.dto.DealPost.DealPostSaveRequestDto;
+import com.around.wmmarket.controller.dto.DealPost.DealPostUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -24,6 +26,7 @@ public class DealPostService {
     private final DealPostRepository dealPostRepository;
     private final DealPostImageService dealPostImageService;
 
+    @Transactional
     public void save(SignedUser signedUser,DealPostSaveRequestDto requestDto) throws Exception{
         User user = userRepository.findByEmail(signedUser.getUsername())
                 .orElseThrow(()->new UsernameNotFoundException("not found : "+signedUser.getUsername()));
@@ -34,8 +37,8 @@ public class DealPostService {
                 .price(requestDto.getPrice())
                 .content(requestDto.getContent())
                 .dealState(requestDto.getDealState()).build();
-        dealPostRepository.save(dealPost); // dealPostId가 저장되어야 생김
-        if(!requestDto.getFiles().isEmpty()) dealPostImageService.save(dealPost,requestDto.getFiles());
+        if(requestDto.getFiles()!=null) dealPostImageService.save(dealPost,requestDto.getFiles());
+        dealPostRepository.save(dealPost);
     }
 
     // TODO : service 메소드 이름을 이렇게 지어야하나
@@ -71,5 +74,25 @@ public class DealPostService {
             images.add(dealPostImage.getId());
         }
         return images;
+    }
+
+    @Transactional
+    public void update(DealPostUpdateRequestDto requestDto){
+        DealPost dealPost=dealPostRepository.findById(requestDto.getDealPostId())
+                .orElseThrow(()->new NoSuchElementException("해당 게시글이 없습니다. id:"+requestDto.getDealPostId()));
+        if(requestDto.getCategory()!=null) dealPost.setCategory(requestDto.getCategory());
+        if(requestDto.getTitle()!=null) dealPost.setTitle(requestDto.getTitle());
+        if(requestDto.getPrice()!=null) dealPost.setPrice(requestDto.getPrice());
+        if(requestDto.getContent()!=null) dealPost.setContent(requestDto.getContent());
+        if(requestDto.getDealState()!=null) dealPost.setDealState(requestDto.getDealState());
+    }
+
+    @Transactional
+    public void delete(DealPost dealPost) throws Exception{
+        // TODO : 연관관계가 추가된다면 로직을 추가해야함
+        for(DealPostImage dealPostImage:dealPost.getDealPostImages()){
+            dealPostImageService.delete(dealPostImage.getId());
+        }
+        dealPostRepository.delete(dealPost);
     }
 }
