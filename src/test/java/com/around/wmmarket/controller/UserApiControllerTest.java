@@ -1,7 +1,7 @@
 package com.around.wmmarket.controller;
 
-import com.around.wmmarket.controller.dto.UserSaveRequestDto;
-import com.around.wmmarket.controller.dto.UserSigninRequestDto;
+import com.around.wmmarket.controller.dto.User.UserSaveRequestDto;
+import com.around.wmmarket.controller.dto.User.UserSigninRequestDto;
 import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
@@ -22,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -57,6 +58,7 @@ public class UserApiControllerTest {
         mvc = MockMvcBuilders
                 .webAppContextSetup(context)
                 .apply(springSecurity())
+                .alwaysDo(MockMvcResultHandlers.print())
                 .build();
         session = new MockHttpSession();
     }
@@ -68,7 +70,7 @@ public class UserApiControllerTest {
 
     /////////////////////////////////////////////////////////////////////////// TEST
     @Test
-    public void UserSave() throws Exception{
+    public void userSave() throws Exception{
         // given
         String testEmail="test_email";
         String testPassword="test_password";
@@ -96,7 +98,7 @@ public class UserApiControllerTest {
     }
 
     @Test
-    public void UserSignIn() throws Exception{
+    public void userSignIn() throws Exception{
         // given
         String testEmail="test_email2";
         String testPassword="test_password2";
@@ -128,7 +130,7 @@ public class UserApiControllerTest {
     }
 
     @Test
-    public void UserExist() throws Exception{
+    public void userExist() throws Exception{
         // given
         String testEmail="test_email3";
         String testPassword="test_password3";

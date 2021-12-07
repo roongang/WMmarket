@@ -1,10 +1,9 @@
 package com.around.wmmarket.controller;
 
-import com.around.wmmarket.controller.dto.UserGetResponseDto;
-import com.around.wmmarket.controller.dto.UserSaveRequestDto;
-import com.around.wmmarket.controller.dto.UserSigninRequestDto;
+import com.around.wmmarket.controller.dto.User.UserGetResponseDto;
+import com.around.wmmarket.controller.dto.User.UserSaveRequestDto;
+import com.around.wmmarket.controller.dto.User.UserSigninRequestDto;
 import com.around.wmmarket.domain.user.SignedUser;
-import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.service.user.CustomUserDetailsService;
 import com.around.wmmarket.service.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +16,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,7 +27,6 @@ public class UserApiController {
     private final UserService userService;
     private final CustomUserDetailsService customUserDetailsService;
     private final AuthenticationManager authenticationManager;
-    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/api/v1/user")
     public ResponseEntity<?> save(@RequestBody UserSaveRequestDto requestDto){
@@ -37,6 +35,7 @@ public class UserApiController {
         return ResponseEntity.ok().body("회원가입 성공");
     }
 
+    @Transactional
     @PostMapping("/api/v1/user/signIn")
     public ResponseEntity<?> signIn(@RequestBody UserSigninRequestDto requestDto, HttpSession session){
         // 이미 로그인한 유저면 반환

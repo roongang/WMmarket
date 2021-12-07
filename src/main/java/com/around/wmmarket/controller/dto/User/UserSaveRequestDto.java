@@ -1,4 +1,4 @@
-package com.around.wmmarket.controller.dto;
+package com.around.wmmarket.controller.dto.User;
 
 import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.User;

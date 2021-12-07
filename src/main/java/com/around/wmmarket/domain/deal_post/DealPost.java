@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -42,22 +43,22 @@ public class DealPost extends BaseTimeEntity {
     private String content;
 
     @Column(nullable = false)
+    private DealState dealState;
+
+    @OneToMany(mappedBy = "dealPost")
+    private List<DealPostImage> dealPostImages = new ArrayList<>();
+
+    @Column(nullable = false)
     private LocalDateTime pullingDate;
 
     @Column(nullable = false)
     private Integer pullingCnt;
 
-    @Column(nullable = false)
-    private Character dealState;
-
-    @OneToMany(mappedBy = "dealPost")
-    List<DealPostImage> dealPostImages = new ArrayList<>();
-
     @OneToOne(mappedBy = "dealPost")
     private DealSuccess dealSuccess;
 
     @Builder
-    public DealPost(User user,Category category,String title,Integer price,String content,Character dealState){
+    public DealPost(User user,Category category,String title,Integer price,String content,DealState dealState){
         this.user=user;
         this.category=category;
         this.title=title;
@@ -65,4 +66,18 @@ public class DealPost extends BaseTimeEntity {
         this.content=content;
         this.dealState=dealState;
     }
+    
+    // 영속화전 전처리
+    @PrePersist
+    public void prePersist(){
+        this.pullingCnt=(this.pullingCnt==null)?0:this.pullingCnt;
+        this.pullingDate=(this.pullingDate==null)?LocalDateTime.now():this.pullingDate;
+    }
+
+    // setter
+    public void setCategory(Category category){this.category=category;}
+    public void setTitle(String title){this.title=title;}
+    public void setPrice(Integer price){this.price=price;}
+    public void setContent(String content){this.content=content;}
+    public void setDealState(DealState dealState){this.dealState=dealState;}
 }

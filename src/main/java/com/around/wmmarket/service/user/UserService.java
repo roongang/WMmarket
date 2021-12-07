@@ -1,7 +1,7 @@
 package com.around.wmmarket.service.user;
 
-import com.around.wmmarket.controller.dto.UserGetResponseDto;
-import com.around.wmmarket.controller.dto.UserSaveRequestDto;
+import com.around.wmmarket.controller.dto.User.UserGetResponseDto;
+import com.around.wmmarket.controller.dto.User.UserSaveRequestDto;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import javax.transaction.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +17,7 @@ public class UserService{
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
+    @Transactional
     public void save(UserSaveRequestDto requestDto){
         User user = User.builder()
                 .email(requestDto.getEmail())

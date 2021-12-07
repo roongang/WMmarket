@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
+// TODO : signed user 위치 변경필요
 @Getter
 @RequiredArgsConstructor
 public class SignedUser implements UserDetails {
