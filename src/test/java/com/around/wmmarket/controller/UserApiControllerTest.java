@@ -2,13 +2,13 @@ package com.around.wmmarket.controller;
 
 import com.around.wmmarket.controller.dto.User.UserSaveRequestDto;
 import com.around.wmmarket.controller.dto.User.UserSigninRequestDto;
+import com.around.wmmarket.controller.dto.User.UserUpdateRequestDto;
 import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,20 +18,24 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.transaction.AfterTransaction;
+import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
@@ -41,18 +45,26 @@ public class UserApiControllerTest {
     @LocalServerPort int port;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private WebApplicationContext context;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     private MockHttpSession session;
-
     private MockMvc mvc;
+    private User user;
 
+    @BeforeTransaction
+    public void makeUser(){
+        user = User.builder()
+                .email("user@email")
+                .password(passwordEncoder.encode("password"))
+                .nickname("nickname")
+                .role(Role.USER).build();
+        userRepository.save(user);
+    }
     @Before
     public void setup(){
         mvc = MockMvcBuilders
@@ -63,7 +75,7 @@ public class UserApiControllerTest {
         session = new MockHttpSession();
     }
 
-    @After
+    @AfterTransaction
     public void tearDown(){
         userRepository.deleteAll();
     }
@@ -145,12 +157,6 @@ public class UserApiControllerTest {
                 .build());
         String url = "http://localhost:"+port+"/api/v1/user/isExist";
         // when
-        /// 존재하는 User 일때
-        /*MvcResult ret1 = mvc.perform(get(url)
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(new ObjectMapper().writeValueAsString(testEmail)))
-                .andExpect(status().isOk())
-                .andReturn();*/
         MvcResult ret1 = mvc.perform(get(url)
                 .param("email",testEmail))
                 .andExpect(status().isOk())
@@ -164,5 +170,42 @@ public class UserApiControllerTest {
         // then
         assertThat(ret1.getResponse().getContentAsString()).isEqualTo("true");
         assertThat(ret2.getResponse().getContentAsString()).isEqualTo("false");
+    }
+
+    @Test
+    @Transactional
+    @WithUserDetails(value = "user@email")
+    public void userUpdate() throws Exception{
+        // given
+        UserUpdateRequestDto requestDto= UserUpdateRequestDto.builder()
+                .password("update_password")
+                .nickname("update_nickname")
+                .build();
+        String url="http://localhost:"+port+"/api/v1/user";
+        // when
+        mvc.perform(put(url)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(new ObjectMapper().writeValueAsString(requestDto))
+        ).andExpect(status().isOk());
+        // then
+        User updateUser=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user:user@email not found"));
+        assertThat(passwordEncoder.matches("update_password", updateUser.getPassword())).isTrue();
+        assertThat(updateUser.getNickname()).isEqualTo("update_nickname");
+    }
+
+    @Test
+    @Transactional
+    @WithUserDetails(value = "user@email")
+    public void userDeleteTest() throws Exception{
+        // given
+        String url="http://localhost:"+port+"/api/v1/user";
+        // when
+        mvc.perform(delete(url)
+                .session(session)
+        ).andExpect(status().isOk());
+        // then
+        assertThat(userRepository.findAll().isEmpty()).isTrue();
+        assertThat(session.isInvalid()).isTrue();
     }
 }

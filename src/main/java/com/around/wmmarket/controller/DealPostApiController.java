@@ -45,7 +45,7 @@ public class DealPostApiController {
         // check
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         DealPost dealPost=dealPostService.getDealPost(requestDto.getDealPostId());
-        if(!dealPost.getUser().getEmail().equals(signedUser.getName())) return ResponseEntity.badRequest().body("게시글 작성자가 아닙니다.");
+        if(!dealPost.getUser().getEmail().equals(signedUser.getUsername())) return ResponseEntity.badRequest().body("게시글 작성자가 아닙니다.");
 
         dealPostService.update(requestDto);
         DealPostGetResponseDto responseDto=dealPostService.getDealPostGetResponseDto(requestDto.getDealPostId());
@@ -57,7 +57,7 @@ public class DealPostApiController {
         // check
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         DealPost dealPost=dealPostService.getDealPost(dealPostId);
-        if(!dealPost.getUser().getEmail().equals(signedUser.getName())) return ResponseEntity.badRequest().body("게시글 작성자가 아닙니다.");
+        if(!dealPost.getUser().getEmail().equals(signedUser.getUsername())) return ResponseEntity.badRequest().body("게시글 작성자가 아닙니다.");
 
         dealPostService.delete(dealPost);
         return ResponseEntity.ok().body("delete success");
