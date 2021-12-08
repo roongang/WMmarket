@@ -24,31 +24,18 @@ import java.util.List;
 public class FileHandler {
     private SimpleDateFormat simpleDateFormat;
 
+    // for dealPostImage
     public List<DealPostImage> parseFileInfo(DealPost dealPost, List<MultipartFile> files) throws Exception{
         List<DealPostImage> dealPostImages=new ArrayList<>();
 
         if(files==null||CollectionUtils.isEmpty(files)) return null;
-        /*String dirPath=resourcePath
-                +"images"+File.separator+File.separator
-                +"dealPostImages"+File.separator;
-        */
+
         File dir=Constants.dealPostImagePath.toFile();
         if(!dir.exists()) dir.mkdirs();
 
         for(MultipartFile multipartFile:files){
-            String originFileExtension;
-            String contentType=multipartFile.getContentType();
-            // 확장자명이 없으면 패스
-            if(ObjectUtils.isEmpty(contentType)) continue;
-            // 확장자 처리
-            if(contentType.contains("image/jpeg")) originFileExtension=".jpg";
-            else if(contentType.contains("image/png")) originFileExtension=".png";
-            else continue; // 다른 확장자는 저장안함
-
-            // 중복방지를 위해 나노시간을 추가
-            simpleDateFormat=new SimpleDateFormat("yyyyMMdd");
-            String nowTime=simpleDateFormat.format(new Date());
-            String fileName= nowTime+"_"+System.nanoTime()+originFileExtension;
+            if(!isPossibleExtension(multipartFile)) continue;
+            String fileName=getRandomFileName(multipartFile);
             // 이미지 엔티티 생성
             DealPostImage dealPostImage=DealPostImage.builder()
                     .name(fileName)
@@ -56,13 +43,54 @@ public class FileHandler {
             // 이미지를 리스트에 추가
             dealPostImages.add(dealPostImage);
 
-            // transferTo 방식
-            /*File file=new File(absPath+dirPath+File.separator+fileName);
-            multipartFile.transferTo(file);*/
             // getBytes 방식
-            write(multipartFile,Constants.dealPostImagePath,fileName);
+            write(multipartFile,dir.toPath(),fileName);
         }
         return dealPostImages;
+    }
+
+    public String parseUserImage(MultipartFile image){
+        if(image.isEmpty()) return null;
+        // mkdir
+        File dir=Constants.userImagePath.toFile();
+        if(!dir.exists()) dir.mkdirs();
+        // extension check
+        if(!isPossibleExtension(image)) return null;
+        String fileName=getRandomFileName(image);
+        // write
+        write(image,dir.toPath(),fileName);
+        return fileName;
+    }
+
+    private boolean isPossibleExtension(MultipartFile multipartFile){
+        String contentType=multipartFile.getContentType();
+
+        // 확장자명이 없으면 패스
+        if(ObjectUtils.isEmpty(contentType)) return false;
+        // 확장자 처리
+        if(contentType.contains("image/jpeg")) return true;
+        else if(contentType.contains("image/png")) return true;
+        else return false;
+    }
+
+    private String getFileExtension(MultipartFile multipartFile){
+        String fileExtension=null;
+        String contentType=multipartFile.getContentType();
+        // 확장자명이 없으면 패스
+        if(ObjectUtils.isEmpty(contentType)) return null;
+        // 확장자 처리
+        if(contentType.contains("image/jpeg")) fileExtension=".jpg";
+        else if(contentType.contains("image/png")) fileExtension=".png";
+
+        return fileExtension;
+    }
+
+    private String getRandomFileName(MultipartFile multipartFile){
+        String fileExtension=getFileExtension(multipartFile);
+        // 중복방지를 위해 나노시간을 추가
+        simpleDateFormat=new SimpleDateFormat("yyyyMMdd");
+        String nowTime=simpleDateFormat.format(new Date());
+        return nowTime+"_"+System.nanoTime()+fileExtension;
     }
 
     public void write(MultipartFile multipartFile, Path dir,String fileName) {

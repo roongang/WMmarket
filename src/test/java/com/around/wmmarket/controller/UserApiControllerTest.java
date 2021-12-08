@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +32,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.transaction.Transactional;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -88,19 +90,16 @@ public class UserApiControllerTest {
         String testPassword="test_password";
         String testNickname="test_nickname";
         Role testRole=Role.USER;
-        UserSaveRequestDto requestDto = UserSaveRequestDto.builder()
-                .email(testEmail)
-                .password(testPassword)
-                .nickname(testNickname)
-                .role(testRole)
-                .build();
+        MockMultipartFile image= new MockMultipartFile("image","img.jpg","image/jpeg","img".getBytes(StandardCharsets.UTF_8));
         String url = "http://localhost:"+port+"/api/v1/user";
         // when
-        mvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(new ObjectMapper().writeValueAsString(requestDto)))
-            .andExpect(status().isOk());
-        log.info("request : "+new ObjectMapper().writeValueAsString(requestDto));
+        mvc.perform(multipart(url)
+                .file(image)
+                .param("email",testEmail)
+                .param("password",testPassword)
+                .param("nickname",testNickname)
+                .param("role","USER")
+        ).andExpect(status().isOk());
         // then
         List<User> allUser = userRepository.findAll();
         assertThat(allUser.get(0).getEmail()).isEqualTo(testEmail);
@@ -208,4 +207,5 @@ public class UserApiControllerTest {
         assertThat(userRepository.findAll().isEmpty()).isTrue();
         assertThat(session.isInvalid()).isTrue();
     }
+    // TODO : userGetTest 가 빠져있네
 }

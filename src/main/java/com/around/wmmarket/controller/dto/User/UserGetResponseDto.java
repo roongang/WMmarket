@@ -9,7 +9,6 @@ import lombok.*;
 public class UserGetResponseDto {
     // password 빠져있음
     private String email;
-    private String image;
     private String nickname;
     private Role role;
     private String city_1;
