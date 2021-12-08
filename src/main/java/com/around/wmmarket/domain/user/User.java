@@ -37,6 +37,7 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false, length=100)
     private String nickname;
 
+    // TODO : 권한도 List 로 가져야함
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length=50)
     private Role role;
@@ -92,4 +93,14 @@ public class User extends BaseTimeEntity {
         this.isAuth=isAuth;
         this.code=code;
     }
+
+    // setter
+    public void setPassword(String password){this.password=password;}
+    public void setImage(String image){this.image=image;}
+    public void setNickname(String nickname){this.nickname=nickname;}
+    public void setRole(Role role){this.role=role;}
+    public void setCity_1(String city_1){this.city_1=city_1;}
+    public void setTown_1(String town_1){this.town_1=town_1;}
+    public void setCity_2(String city_2){this.city_2=city_2;}
+    public void setTown_2(String town_2){this.town_2=town_2;}
 }

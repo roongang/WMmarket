@@ -1,14 +1,14 @@
 package com.around.wmmarket.controller.dto.User;
 
 import com.around.wmmarket.domain.user.Role;
-import com.around.wmmarket.domain.user.User;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
 @Builder
-public class UserSaveRequestDto {
-    private String email;
+public class UserUpdateRequestDto {
     private String password;
     private String image;
     private String nickname;

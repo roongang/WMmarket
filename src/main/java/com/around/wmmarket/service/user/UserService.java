@@ -2,6 +2,8 @@ package com.around.wmmarket.service.user;
 
 import com.around.wmmarket.controller.dto.User.UserGetResponseDto;
 import com.around.wmmarket.controller.dto.User.UserSaveRequestDto;
+import com.around.wmmarket.controller.dto.User.UserUpdateRequestDto;
+import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,10 @@ public class UserService{
                 .image(requestDto.getImage())
                 .nickname(requestDto.getNickname())
                 .role(requestDto.getRole())
+                .city_1(requestDto.getCity_1())
+                .town_1(requestDto.getTown_1())
+                .city_2(requestDto.getCity_2())
+                .town_2(requestDto.getTown_2())
                 .build();
         userRepository.save(user);
     }
@@ -36,7 +42,6 @@ public class UserService{
     public UserGetResponseDto getUser(String email){
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email));
-        System.out.println(user.getEmail());
         return UserGetResponseDto.builder()
                 .email(user.getEmail())
                 .image(user.getImage())
@@ -49,5 +54,26 @@ public class UserService{
                 .isAuth(user.getIsAuth())
                 .code(user.getCode())
                 .build();
+    }
+
+    @Transactional
+    public void update(String email, UserUpdateRequestDto requestDto) throws Exception{
+        User user=userRepository.findByEmail(email)
+                .orElseThrow(()->new UsernameNotFoundException("해당 유저가 존재하지 않습니다. email:"+email));
+        if(requestDto.getPassword()!=null) user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
+        if(requestDto.getImage()!=null) user.setImage(requestDto.getImage());
+        if(requestDto.getNickname()!=null) user.setNickname(requestDto.getNickname());
+        if(requestDto.getRole()!=null) user.setRole(requestDto.getRole());
+        if(requestDto.getCity_1()!=null) user.setCity_1(requestDto.getCity_1());
+        if(requestDto.getTown_1()!=null) user.setTown_1(requestDto.getTown_1());
+        if(requestDto.getCity_2()!=null) user.setCity_2(requestDto.getCity_2());
+        if(requestDto.getTown_2()!=null) user.setTown_2(requestDto.getTown_2());
+    }
+
+    @Transactional
+    public void delete(String email){
+        User user=userRepository.findByEmail(email)
+                .orElseThrow(()->new UsernameNotFoundException("해당 유저가 존재하지 않습니다. email:"+email));
+        userRepository.delete(user);
     }
 }
