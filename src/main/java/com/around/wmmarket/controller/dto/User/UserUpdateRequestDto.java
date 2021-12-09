@@ -10,7 +10,6 @@ import lombok.Getter;
 @Builder
 public class UserUpdateRequestDto {
     private String password;
-    private String image;
     private String nickname;
     private Role role;
     private String city_1;
