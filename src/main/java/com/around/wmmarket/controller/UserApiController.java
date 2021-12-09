@@ -87,12 +87,12 @@ public class UserApiController {
     }
 
     @GetMapping("/api/v1/user/isExist")
-    public ResponseEntity<Boolean> checkDuplicate(@RequestParam String email){
+    public ResponseEntity<Boolean> isExist(@RequestParam String email){
         return ResponseEntity.ok().body(userService.isExist(email));
     }
 
     @GetMapping("/api/v1/user")
-    public ResponseEntity<?> getUser(@RequestParam String email){
+    public ResponseEntity<?> get(@RequestParam String email){
         if(!userService.isExist(email)) return ResponseEntity.badRequest().body("유저가 존재하지 않습니다.");
         UserGetResponseDto responseDto = userService.getUser(email);
         return ResponseEntity.ok().body(responseDto);
@@ -134,6 +134,7 @@ public class UserApiController {
 
         HttpHeaders headers=new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\""+resource.getFilename()+"\"");
+
         headers.add(HttpHeaders.CONTENT_TYPE,mediaType);
         headers.add(HttpHeaders.CONTENT_LENGTH,String.valueOf(file.length()));
 
