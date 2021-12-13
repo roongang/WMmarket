@@ -98,7 +98,8 @@ public class DealPostService {
             }
             // dealSuccess 저장, ? -> DONE
             if(dealPost.getDealState()!=DealState.DONE
-                    && requestDto.getDealState()==DealState.DONE){
+                    && requestDto.getDealState()==DealState.DONE
+                    && buyer!=null){
                 dealPost.setDealSuccess(dealSuccessRepository.save(DealSuccess.builder()
                         .buyer(buyer)
                         .dealPost(dealPost)
@@ -107,6 +108,7 @@ public class DealPostService {
             // dealSuccess 수정, DONE && buyerId -> ?
             else if(dealPost.getDealState()==DealState.DONE
                     && requestDto.getDealState()==DealState.DONE
+                    && buyer!=null
                     && !Objects.equals(dealPost.getDealSuccess().getBuyer(), buyer)){
                 DealSuccess dealSuccess=dealSuccessRepository.findById(dealPost.getId())
                         .orElseThrow(()->new NoSuchElementException("해당 게시글 완료가 존재하지 않습니다. dealPost id:"+dealPost.getId()));
