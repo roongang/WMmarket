@@ -104,7 +104,6 @@ public class DealPostApiControllerTest {
         requestDto.setTitle("title");
         requestDto.setPrice(1000);
         requestDto.setContent("content");
-        requestDto.setDealState(DealState.ONGOING);
         String url = "http://localhost:"+port+"/api/v1/dealPost";
         // when
         mvc.perform(multipart(url)
@@ -114,8 +113,9 @@ public class DealPostApiControllerTest {
                 .param("title",requestDto.getTitle())
                 .param("price",requestDto.getPrice().toString())
                 .param("content",requestDto.getContent())
-                .param("dealState",requestDto.getDealState().toString())
-        ).andExpect(status().isOk()); // then
+        ).andExpect(status().isOk());
+        // then
+        assertThat(dealPostRepository.findAll()).isNotNull();
     }
 
     @Test

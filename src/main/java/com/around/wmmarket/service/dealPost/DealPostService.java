@@ -41,7 +41,7 @@ public class DealPostService {
                 .title(requestDto.getTitle())
                 .price(requestDto.getPrice())
                 .content(requestDto.getContent())
-                .dealState(requestDto.getDealState()).build();
+                .dealState(DealState.ONGOING).build();
         if(requestDto.getFiles()!=null) dealPostImageService.save(dealPost,requestDto.getFiles());
         dealPostRepository.save(dealPost);
     }

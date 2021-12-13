@@ -15,6 +15,5 @@ public class DealPostSaveRequestDto {
     private String title;
     private Integer price;
     private String content;
-    private DealState dealState;
-    private List<MultipartFile> files; // TODO : files 로 이름 바꾸자
+    private List<MultipartFile> files;
 }
