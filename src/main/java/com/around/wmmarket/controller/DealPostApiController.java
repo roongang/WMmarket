@@ -6,6 +6,7 @@ import com.around.wmmarket.controller.dto.DealPost.DealPostUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.dealPost.DealPostService;
+import com.around.wmmarket.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import java.util.List;
 @RestController
 public class DealPostApiController {
     private final DealPostService dealPostService;
+    private final UserService userService;
 
     @PostMapping("/api/v1/dealPost")
     public ResponseEntity<?> save(@AuthenticationPrincipal SignedUser signedUser,@ModelAttribute DealPostSaveRequestDto requestDto) throws Exception{
@@ -46,6 +48,8 @@ public class DealPostApiController {
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         DealPost dealPost=dealPostService.getDealPost(requestDto.getDealPostId());
         if(!dealPost.getUser().getEmail().equals(signedUser.getUsername())) return ResponseEntity.badRequest().body("게시글 작성자가 아닙니다.");
+        if(requestDto.getBuyerId()!=null
+                && userService.getUserEmail(requestDto.getBuyerId()).equals(signedUser.getUsername())) return ResponseEntity.badRequest().body("구매자와 판매자가 일치할 수 없습니다.");
 
         dealPostService.update(requestDto);
         DealPostGetResponseDto responseDto=dealPostService.getDealPostGetResponseDto(requestDto.getDealPostId());

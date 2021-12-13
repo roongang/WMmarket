@@ -60,6 +60,12 @@ public class UserService{
                 .build();
     }
 
+    public String getUserEmail(int userId){
+        User user=userRepository.findById(userId)
+                .orElseThrow(()->new UsernameNotFoundException("해당 유저가 존재하지 않습니다 id:"+userId));
+        return user.getEmail();
+    }
+
     @Transactional
     public void update(String email, UserUpdateRequestDto requestDto) throws Exception{
         User user=userRepository.findByEmail(email)

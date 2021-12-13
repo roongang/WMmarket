@@ -6,9 +6,11 @@ import com.around.wmmarket.domain.deal_post.Category;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
 import com.around.wmmarket.domain.deal_post.DealState;
+import com.around.wmmarket.domain.deal_success.DealSuccessRepository;
 import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
+import com.around.wmmarket.service.dealPost.DealPostService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -19,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -49,10 +52,16 @@ public class DealPostApiControllerTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    // repo
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private DealPostRepository dealPostRepository;
+    @Autowired
+    private DealSuccessRepository dealSuccessRepository;
+    // service
+    @Autowired
+    private DealPostService dealPostService;
 
     private MockMvc mvc;
 
@@ -95,7 +104,6 @@ public class DealPostApiControllerTest {
         requestDto.setTitle("title");
         requestDto.setPrice(1000);
         requestDto.setContent("content");
-        requestDto.setDealState(DealState.ONGOING);
         String url = "http://localhost:"+port+"/api/v1/dealPost";
         // when
         mvc.perform(multipart(url)
@@ -105,8 +113,9 @@ public class DealPostApiControllerTest {
                 .param("title",requestDto.getTitle())
                 .param("price",requestDto.getPrice().toString())
                 .param("content",requestDto.getContent())
-                .param("dealState",requestDto.getDealState().toString())
-        ).andExpect(status().isOk()); // then
+        ).andExpect(status().isOk());
+        // then
+        assertThat(dealPostRepository.findAll()).isNotNull();
     }
 
     @Test
@@ -163,6 +172,142 @@ public class DealPostApiControllerTest {
         assertThat(dealPost.getCategory()).isEqualTo(Category.B);
         assertThat(dealPost.getContent()).isEqualTo("update_content");
         assertThat(dealPost.getDealState()).isEqualTo(DealState.DONE);
+    }
+
+    @Test
+    @Transactional
+    @WithUserDetails(value = "user@email")
+    public void dealPostUpdateSuccessSaveTest() throws Exception{
+        // given
+        dealPostRepository.save(DealPost.builder()
+                .user(user)
+                .category(Category.A)
+                .title("title")
+                .price(1000)
+                .content("content")
+                .dealState(DealState.ONGOING).build());
+        int dealPostId=dealPostRepository.findAll().get(0).getId();
+
+        userRepository.save(User.builder()
+                .email("user@email2")
+                .password(passwordEncoder.encode("password"))
+                .nickname("nickname")
+                .role(Role.USER).build());
+        User user2=userRepository.findByEmail("user@email2")
+                .orElseThrow(()->new UsernameNotFoundException("user@email2 없음"));
+
+        DealPostUpdateRequestDto requestDto=DealPostUpdateRequestDto.builder()
+                .dealPostId(dealPostId)
+                .category(Category.B)
+                .content("update_content")
+                .buyerId(user2.getId())
+                .dealState(DealState.DONE).build();
+        String url = "http://localhost:"+port+"/api/v1/dealPost";
+        // when
+        mvc.perform(put(url)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(new ObjectMapper().writeValueAsString(requestDto)))
+                .andExpect(status().isOk());
+        // then
+        assertThat(dealSuccessRepository.findAll().get(0).getBuyer()).isEqualTo(user2);
+    }
+
+    @Test
+    @Transactional
+    @WithUserDetails(value = "user@email")
+    public void dealPostUpdateSuccessUpdateTest() throws Exception{
+        // given
+        dealPostRepository.save(DealPost.builder()
+                .user(user)
+                .category(Category.A)
+                .title("title")
+                .price(1000)
+                .content("content")
+                .dealState(DealState.ONGOING).build());
+        int dealPostId=dealPostRepository.findAll().get(0).getId();
+
+        userRepository.save(User.builder()
+                .email("user@email2")
+                .password(passwordEncoder.encode("password"))
+                .nickname("nickname")
+                .role(Role.USER).build());
+        User user2=userRepository.findByEmail("user@email2")
+                .orElseThrow(()->new UsernameNotFoundException("user@email2 없음"));
+        userRepository.save(User.builder()
+                .email("user@email3")
+                .password(passwordEncoder.encode("password"))
+                .nickname("nickname")
+                .role(Role.USER).build());
+        User user3=userRepository.findByEmail("user@email3")
+                .orElseThrow(()->new UsernameNotFoundException("user@email3 없음"));
+
+        DealPostUpdateRequestDto requestDto2=DealPostUpdateRequestDto.builder()
+                .dealPostId(dealPostId)
+                .category(Category.B)
+                .content("update_content")
+                .buyerId(user2.getId())
+                .dealState(DealState.DONE).build();
+        dealPostService.update(requestDto2);
+
+        DealPostUpdateRequestDto requestDto=DealPostUpdateRequestDto.builder()
+                .dealPostId(dealPostId)
+                .category(Category.B)
+                .content("update_content")
+                .buyerId(user3.getId())
+                .dealState(DealState.DONE).build();
+        String url = "http://localhost:"+port+"/api/v1/dealPost";
+        // when
+        mvc.perform(put(url)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(new ObjectMapper().writeValueAsString(requestDto)))
+                .andExpect(status().isOk());
+        // then
+        assertThat(dealSuccessRepository.findAll().get(0).getBuyer()).isEqualTo(user3);
+    }
+
+    @Test
+    @Transactional
+    @WithUserDetails(value = "user@email")
+    public void dealPostUpdateSuccessDeleteTest() throws Exception{
+        // given
+        dealPostRepository.save(DealPost.builder()
+                .user(user)
+                .category(Category.A)
+                .title("title")
+                .price(1000)
+                .content("content")
+                .dealState(DealState.ONGOING).build());
+        int dealPostId=dealPostRepository.findAll().get(0).getId();
+
+        userRepository.save(User.builder()
+                .email("user@email2")
+                .password(passwordEncoder.encode("password"))
+                .nickname("nickname")
+                .role(Role.USER).build());
+        User user2=userRepository.findByEmail("user@email2")
+                .orElseThrow(()->new UsernameNotFoundException("user@email2 없음"));
+
+        DealPostUpdateRequestDto requestDto2=DealPostUpdateRequestDto.builder()
+                .dealPostId(dealPostId)
+                .category(Category.B)
+                .content("update_content")
+                .buyerId(user2.getId())
+                .dealState(DealState.DONE).build();
+        dealPostService.update(requestDto2);
+
+        DealPostUpdateRequestDto requestDto=DealPostUpdateRequestDto.builder()
+                .dealPostId(dealPostId)
+                .category(Category.B)
+                .content("update_content")
+                .dealState(DealState.ONGOING).build();
+        String url = "http://localhost:"+port+"/api/v1/dealPost";
+        // when
+        mvc.perform(put(url)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(new ObjectMapper().writeValueAsString(requestDto)))
+                .andExpect(status().isOk());
+        // then
+        assertThat(dealSuccessRepository.findAll().isEmpty()).isTrue();
     }
 
     @Test
