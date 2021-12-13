@@ -5,7 +5,10 @@ import com.around.wmmarket.controller.dto.DealPost.DealPostSaveRequestDto;
 import com.around.wmmarket.controller.dto.DealPost.DealPostUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
+import com.around.wmmarket.domain.deal_post.DealState;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
+import com.around.wmmarket.domain.deal_success.DealSuccess;
+import com.around.wmmarket.domain.deal_success.DealSuccessRepository;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
@@ -18,6 +21,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +29,7 @@ public class DealPostService {
     private final UserRepository userRepository;
     private final DealPostRepository dealPostRepository;
     private final DealPostImageService dealPostImageService;
+    private final DealSuccessRepository dealSuccessRepository;
 
     @Transactional
     public void save(SignedUser signedUser,DealPostSaveRequestDto requestDto) throws Exception{
@@ -84,7 +89,39 @@ public class DealPostService {
         if(requestDto.getTitle()!=null) dealPost.setTitle(requestDto.getTitle());
         if(requestDto.getPrice()!=null) dealPost.setPrice(requestDto.getPrice());
         if(requestDto.getContent()!=null) dealPost.setContent(requestDto.getContent());
-        if(requestDto.getDealState()!=null) dealPost.setDealState(requestDto.getDealState());
+        // dealState 변경
+        if(requestDto.getDealState()!=null){
+            User buyer = null;
+            if(requestDto.getBuyerId()!=null){
+                buyer=userRepository.findById(requestDto.getBuyerId())
+                        .orElseThrow(()->new NoSuchElementException("해당 유저가 없습니다 id:"+requestDto.getBuyerId()));
+            }
+            // dealSuccess 저장, ? -> DONE
+            if(dealPost.getDealState()!=DealState.DONE
+                    && requestDto.getDealState()==DealState.DONE){
+                dealPost.setDealSuccess(dealSuccessRepository.save(DealSuccess.builder()
+                        .buyer(buyer)
+                        .dealPost(dealPost)
+                        .build()));
+            }
+            // dealSuccess 수정, DONE && buyerId -> ?
+            else if(dealPost.getDealState()==DealState.DONE
+                    && requestDto.getDealState()==DealState.DONE
+                    && !Objects.equals(dealPost.getDealSuccess().getBuyer(), buyer)){
+                DealSuccess dealSuccess=dealSuccessRepository.findById(dealPost.getId())
+                        .orElseThrow(()->new NoSuchElementException("해당 게시글 완료가 존재하지 않습니다. dealPost id:"+dealPost.getId()));
+                dealSuccess.setBuyer(buyer);
+            }
+            // dealSuccess 삭제, DONE -> ?
+            else if(dealPost.getDealState()==DealState.DONE
+                    && requestDto.getDealState()!=DealState.DONE){
+                DealSuccess dealSuccess=dealSuccessRepository.findById(dealPost.getId())
+                        .orElseThrow(()->new NoSuchElementException("해당 게시글 완료가 존재하지 않습니다. dealPost id:"+dealPost.getId()));
+                dealSuccessRepository.delete(dealSuccess);
+                dealPost.setDealSuccess(null);
+            }
+            dealPost.setDealState(requestDto.getDealState());
+        }
     }
 
     @Transactional

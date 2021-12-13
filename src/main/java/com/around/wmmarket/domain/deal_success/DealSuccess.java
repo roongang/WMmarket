@@ -17,21 +17,24 @@ import javax.persistence.*;
 public class DealSuccess extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer dealPostId;
 
     @ManyToOne
     @JoinColumn(name = "BUYER_ID")
     private User buyer;
 
-    // MapsId 대신 바로 ID를 쓰면 동등성 비교를 처리해야함.
+    // dealPost 와 1:1 식별관계임
     @MapsId
     @OneToOne
     @JoinColumn(name = "DEAL_POST_ID")
     private DealPost dealPost;
 
     @Builder
-    public DealSuccess(User buyer){
+    public DealSuccess(DealPost dealPost,User buyer) {
+        this.dealPost=dealPost;
         this.buyer=buyer;
     }
+
+    // setter
+    public void setBuyer(User buyer) {this.buyer=buyer;}
 }

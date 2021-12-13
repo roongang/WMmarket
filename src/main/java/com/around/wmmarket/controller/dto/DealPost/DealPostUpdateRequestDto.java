@@ -15,5 +15,6 @@ public class DealPostUpdateRequestDto {
     private String title;
     private Integer price;
     private String content;
+    private Integer buyerId;
     private DealState dealState;
 }
