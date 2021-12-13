@@ -94,7 +94,7 @@ public class UserApiController {
     @GetMapping("/api/v1/user")
     public ResponseEntity<?> get(@RequestParam String email){
         if(!userService.isExist(email)) return ResponseEntity.badRequest().body("유저가 존재하지 않습니다.");
-        UserGetResponseDto responseDto = userService.getUser(email);
+        UserGetResponseDto responseDto = userService.getUserResponseDto(email);
         return ResponseEntity.ok().body(responseDto);
     }
 
@@ -107,7 +107,7 @@ public class UserApiController {
 
         // update
         userService.update(signedUser.getUsername(),requestDto);
-        UserGetResponseDto responseDto=userService.getUser(signedUser.getUsername());
+        UserGetResponseDto responseDto=userService.getUserResponseDto(signedUser.getUsername());
         return ResponseEntity.ok().body(responseDto);
     }
     // delete

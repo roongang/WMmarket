@@ -70,7 +70,7 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "seller")
     List<MannerReview> mannerReviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "seller")
+    @OneToMany(mappedBy = "dealPost")
     List<DealReview> dealReviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
