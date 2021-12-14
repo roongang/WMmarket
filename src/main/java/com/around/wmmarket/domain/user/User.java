@@ -62,22 +62,27 @@ public class User extends BaseTimeEntity {
 
     // 관계 매핑
     @OneToMany(mappedBy = "user")
-    List<Notification> notifications = new ArrayList<>();
+    private List<Notification> notifications = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    List<Keyword> keywords = new ArrayList<>();
+    private List<Keyword> keywords = new ArrayList<>();
 
     @OneToMany(mappedBy = "seller")
-    List<MannerReview> mannerReviews = new ArrayList<>();
+    private List<MannerReview> mannerReviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "dealPost")
-    List<DealReview> dealReviews = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    List<DealPost> dealPosts = new ArrayList<>();
+    @OneToMany(mappedBy = "seller")
+    private List<DealReview> sellDealReviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "buyer")
-    List<DealSuccess> dealSuccesses = new ArrayList<>();
+    private List<DealReview> buyDealReviews = new ArrayList<>();
+
+    // TODO : dealPosts add 로직 추가
+    @OneToMany(mappedBy = "user")
+    private List<DealPost> dealPosts = new ArrayList<>();
+
+    // TODO : dealSuccesses add 로직 추가
+    @OneToMany(mappedBy = "buyer")
+    private List<DealSuccess> dealSuccesses = new ArrayList<>();
 
     @Builder
     public User(String email,String password,String image,String nickname,Role role,String city_1,String town_1,String city_2,String town_2,int isAuth,String code){

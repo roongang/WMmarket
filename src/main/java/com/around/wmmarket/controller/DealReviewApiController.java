@@ -1,8 +1,11 @@
 package com.around.wmmarket.controller;
 
 import com.around.wmmarket.controller.dto.DealReview.DealReviewSaveRequestDto;
+import com.around.wmmarket.controller.dto.DealReview.DealReviewUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealState;
+import com.around.wmmarket.domain.deal_review.DealReview;
+import com.around.wmmarket.domain.deal_review.DealReviewRepository;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.dealReview.DealReviewService;
@@ -11,11 +14,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.NoSuchElementException;
+
 @RequiredArgsConstructor
 @RestController
 public class DealReviewApiController {
     private final DealPostService dealPostService;
     private final DealReviewService dealReviewService;
+    private final DealReviewRepository dealReviewRepository;
 
     @PostMapping("/api/v1/dealReview")
     public ResponseEntity<?> save(@AuthenticationPrincipal SignedUser signedUser, @RequestBody DealReviewSaveRequestDto requestDto) throws Exception{
@@ -35,5 +41,29 @@ public class DealReviewApiController {
     @GetMapping("/api/v1/dealReview")
     public ResponseEntity<?> get(@RequestParam Integer dealReviewId) throws Exception{
         return ResponseEntity.ok().body(dealReviewService.getResponseDto(dealReviewId));
+    }
+
+    @PutMapping("/api/v1/dealReview")
+    public ResponseEntity<?> update(@AuthenticationPrincipal SignedUser signedUser,@RequestBody DealReviewUpdateRequestDto requestDto){
+        // check signedUser
+        if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
+        DealReview dealReview=dealReviewRepository.findById(requestDto.getDealReviewId())
+                .orElseThrow(()->new NoSuchElementException("해당 리뷰글이 없습니다. reviewId:"+requestDto.getDealReviewId()));
+        if(!dealReview.getBuyer().getEmail().equals(signedUser.getUsername())) return ResponseEntity.badRequest().body("리뷰 작성자가 아닙니다.");
+        // update
+        dealReviewService.update(requestDto);
+        return ResponseEntity.ok().body("update success");
+    }
+
+    @DeleteMapping("/api/v1/dealReview")
+    public ResponseEntity<?> delete(@AuthenticationPrincipal SignedUser signedUser,@RequestParam Integer dealReviewId) throws Exception{
+        // check signedUser
+        if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
+        DealReview dealReview=dealReviewRepository.findById(dealReviewId)
+                .orElseThrow(()->new NoSuchElementException("해당 리뷰글이 없습니다. reviewId:"+dealReviewId));
+        if(!dealReview.getBuyer().getEmail().equals(signedUser.getUsername())) return ResponseEntity.badRequest().body("리뷰 작성자가 아닙니다.");
+        // delete
+        dealReviewService.delete(dealReviewId);
+        return ResponseEntity.ok().body("delete success");
     }
 }

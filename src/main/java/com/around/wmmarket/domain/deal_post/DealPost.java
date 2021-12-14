@@ -2,6 +2,7 @@ package com.around.wmmarket.domain.deal_post;
 
 import com.around.wmmarket.domain.BaseTimeEntity;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
+import com.around.wmmarket.domain.deal_review.DealReview;
 import com.around.wmmarket.domain.deal_success.DealSuccess;
 import com.around.wmmarket.domain.user.User;
 import lombok.AccessLevel;
@@ -56,6 +57,9 @@ public class DealPost extends BaseTimeEntity {
 
     @OneToOne(mappedBy = "dealPost")
     private DealSuccess dealSuccess;
+
+    @OneToMany(mappedBy = "dealPost")
+    private List<DealReview> dealReviews = new ArrayList<>();
 
     @Builder
     public DealPost(User user,Category category,String title,Integer price,String content,DealState dealState){
