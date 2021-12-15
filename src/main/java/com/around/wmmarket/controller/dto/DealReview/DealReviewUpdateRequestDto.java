@@ -1,9 +1,11 @@
 package com.around.wmmarket.controller.dto.DealReview;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
-@Setter
+@AllArgsConstructor
+@Builder
 @Getter
 public class DealReviewUpdateRequestDto {
     private Integer dealReviewId;
