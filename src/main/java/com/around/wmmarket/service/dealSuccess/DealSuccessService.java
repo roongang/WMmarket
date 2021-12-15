@@ -24,6 +24,7 @@ public class DealSuccessService {
                 .orElseThrow(()->new NoSuchElementException("해당 게시글 완료가 존재하지 않습니다. dealPost id:"+dealPostId));
     }
     public void delete(DealSuccess dealSuccess){
+        dealSuccess.deleteRelation();
         dealSuccessRepository.delete(dealSuccess);
     }
 }

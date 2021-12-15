@@ -127,8 +127,10 @@ public class DealPostService {
     public void delete(DealPost dealPost) throws Exception{
         // TODO : 연관관계가 추가된다면 로직을 추가해야함
         for(DealPostImage dealPostImage:dealPost.getDealPostImages()){
+            dealPostImage.deleteRelation();
             dealPostImageService.delete(dealPostImage.getId());
         }
+        dealPost.deleteRelation();
         dealPostRepository.delete(dealPost);
     }
 }

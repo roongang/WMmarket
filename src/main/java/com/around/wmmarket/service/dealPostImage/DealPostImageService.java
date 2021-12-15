@@ -24,10 +24,7 @@ public class DealPostImageService {
     public void save(DealPost dealPost, List<MultipartFile> files) throws Exception{
         if(files.isEmpty()) return;
         List<DealPostImage> dealPostImages=fileHandler.parseFileInfo(dealPost,files);
-        for(DealPostImage dealPostImage:dealPostImages){
-            dealPostImageRepository.save(dealPostImage);
-            dealPost.getDealPostImages().add(dealPostImage);
-        }
+        dealPostImageRepository.saveAll(dealPostImages);
     }
     public DealPostImage get(Integer dealPostImageId) {
         return dealPostImageRepository.findById(dealPostImageId)
@@ -40,6 +37,7 @@ public class DealPostImageService {
                 .orElseThrow(()->new NoSuchElementException("해당 거래글 이미지가 없습니다. id:"+dealPostImageId));
         // 물리적인 삭제
         fileHandler.delete(Constants.dealPostImagePath,dealPostImage.getName());
+        dealPostImage.deleteRelation();
         dealPostImageRepository.delete(dealPostImage);
     }
 }
