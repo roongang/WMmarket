@@ -31,10 +31,24 @@ public class DealSuccess extends BaseTimeEntity {
 
     @Builder
     public DealSuccess(DealPost dealPost,User buyer) {
-        this.dealPost=dealPost;
-        this.buyer=buyer;
+        setDealPost(dealPost);
+        setBuyer(buyer);
     }
 
     // setter
-    public void setBuyer(User buyer) {this.buyer=buyer;}
+    public void setBuyer(User buyer) {
+        if(this.buyer!=null) this.buyer.getDealSuccesses().remove(this);
+        this.buyer=buyer;
+        buyer.getDealSuccesses().add(this);
+    }
+    public void setDealPost(DealPost dealPost){
+        if(this.dealPost!=null) this.dealPost.setDealSuccess(null);
+        this.dealPost=dealPost;
+        dealPost.setDealSuccess(this);
+    }
+    // delete
+    public void deleteRelation(){
+        if(this.buyer!=null) this.buyer.getDealSuccesses().remove(this);
+        if(this.dealPost!=null) this.dealPost.setDealSuccess(null);
+    }
 }

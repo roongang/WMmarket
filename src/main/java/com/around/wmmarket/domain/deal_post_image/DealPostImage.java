@@ -39,6 +39,16 @@ public class DealPostImage {
     @Builder
     public DealPostImage(String name,DealPost dealPost){
         this.name=name;
+        setDealPost(dealPost);
+    }
+    // setter
+    public void setDealPost(DealPost dealPost){
+        if(this.dealPost!=null) this.dealPost.getDealPostImages().remove(this);
         this.dealPost=dealPost;
+        dealPost.getDealPostImages().add(this);
+    }
+    // delete
+    public void deleteRelation(){
+        if(this.dealPost!=null) this.dealPost.getDealPostImages().remove(this);
     }
 }

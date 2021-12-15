@@ -92,6 +92,7 @@ public class UserService{
     public void delete(String email){
         User user=userRepository.findByEmail(email)
                 .orElseThrow(()->new UsernameNotFoundException("해당 유저가 존재하지 않습니다. email:"+email));
+        user.deleteRelation();
         userRepository.delete(user);
     }
 

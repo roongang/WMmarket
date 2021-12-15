@@ -63,7 +63,7 @@ public class DealPost extends BaseTimeEntity {
 
     @Builder
     public DealPost(User user,Category category,String title,Integer price,String content,DealState dealState){
-        this.user=user;
+        setUser(user);
         this.category=category;
         this.title=title;
         this.price=price;
@@ -79,10 +79,20 @@ public class DealPost extends BaseTimeEntity {
     }
 
     // setter
+    public void setUser(User user){
+        // 기존 관계 제거
+        if(this.user!=null) this.user.getDealPosts().remove(this);
+        this.user=user;
+        user.getDealPosts().add(this);
+    }
     public void setCategory(Category category){this.category=category;}
     public void setTitle(String title){this.title=title;}
     public void setPrice(Integer price){this.price=price;}
     public void setContent(String content){this.content=content;}
     public void setDealState(DealState dealState){this.dealState=dealState;}
     public void setDealSuccess(DealSuccess dealSuccess){this.dealSuccess=dealSuccess;}
+    // delete
+    public void deleteRelation(){
+        if(this.user!=null) this.user.getDealPosts().remove(this);
+    }
 }
