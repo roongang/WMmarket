@@ -70,6 +70,7 @@ public class DealPostImageApiControllerTest {
 
     @BeforeTransaction
     public void makeUser(){
+        if(userRepository.existsByEmail("user@email")) return;
         user = User.builder()
                 .email("user@email")
                 .password(passwordEncoder.encode("password"))
@@ -97,7 +98,7 @@ public class DealPostImageApiControllerTest {
 
     @AfterTransaction
     public void tearDown(){
-        // TODO : 이미지 삭제하는거 추가하자.
+        // repo
         dealPostImageRepository.deleteAll();
         dealPostRepository.deleteAll();
         userRepository.deleteAll();

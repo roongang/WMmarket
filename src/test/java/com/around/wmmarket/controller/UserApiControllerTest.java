@@ -31,7 +31,6 @@ import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -70,6 +69,7 @@ public class UserApiControllerTest {
 
     @BeforeTransaction
     public void makeUser(){
+        if(userRepository.existsByEmail("user@email")) return;
         user = User.builder()
                 .email("user@email")
                 .password(passwordEncoder.encode("password"))

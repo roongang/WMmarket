@@ -28,7 +28,7 @@ import java.util.NoSuchElementException;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-public class DealPostImageController {
+public class DealPostImageApiController {
     private final DealPostImageService dealPostImageService;
     private final DealPostService dealPostService;
     private final ResourceLoader resourceLoader;

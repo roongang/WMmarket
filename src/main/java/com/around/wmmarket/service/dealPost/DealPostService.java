@@ -13,6 +13,8 @@ import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.service.dealPostImage.DealPostImageService;
+import com.around.wmmarket.service.dealSuccess.DealSuccessService;
+import com.around.wmmarket.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -26,15 +28,16 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class DealPostService {
-    private final UserRepository userRepository;
+    // repo
     private final DealPostRepository dealPostRepository;
+    // service
+    private final UserService userService;
     private final DealPostImageService dealPostImageService;
-    private final DealSuccessRepository dealSuccessRepository;
+    private final DealSuccessService dealSuccessService;
 
     @Transactional
     public void save(SignedUser signedUser,DealPostSaveRequestDto requestDto) throws Exception{
-        User user = userRepository.findByEmail(signedUser.getUsername())
-                .orElseThrow(()->new UsernameNotFoundException("not found : "+signedUser.getUsername()));
+        User user = userService.getUser(signedUser.getUsername());
         DealPost dealPost = DealPost.builder()
                 .user(user)
                 .category(requestDto.getCategory())
@@ -91,35 +94,29 @@ public class DealPostService {
         if(requestDto.getContent()!=null) dealPost.setContent(requestDto.getContent());
         // dealState 변경
         if(requestDto.getDealState()!=null){
+            // TODO : dealSuccess service 따로 구현!!
             User buyer = null;
             if(requestDto.getBuyerId()!=null){
-                buyer=userRepository.findById(requestDto.getBuyerId())
-                        .orElseThrow(()->new NoSuchElementException("해당 유저가 없습니다 id:"+requestDto.getBuyerId()));
+                buyer=userService.getUser(requestDto.getBuyerId());
             }
             // dealSuccess 저장, ? -> DONE
             if(dealPost.getDealState()!=DealState.DONE
                     && requestDto.getDealState()==DealState.DONE
                     && buyer!=null){
-                dealPost.setDealSuccess(dealSuccessRepository.save(DealSuccess.builder()
-                        .buyer(buyer)
-                        .dealPost(dealPost)
-                        .build()));
+                dealPost.setDealSuccess(dealSuccessService.save(buyer,dealPost));
             }
             // dealSuccess 수정, DONE && buyerId -> ?
             else if(dealPost.getDealState()==DealState.DONE
                     && requestDto.getDealState()==DealState.DONE
                     && buyer!=null
                     && !Objects.equals(dealPost.getDealSuccess().getBuyer(), buyer)){
-                DealSuccess dealSuccess=dealSuccessRepository.findById(dealPost.getId())
-                        .orElseThrow(()->new NoSuchElementException("해당 게시글 완료가 존재하지 않습니다. dealPost id:"+dealPost.getId()));
+                DealSuccess dealSuccess=dealSuccessService.findById(dealPost.getId());
                 dealSuccess.setBuyer(buyer);
             }
             // dealSuccess 삭제, DONE -> ?
             else if(dealPost.getDealState()==DealState.DONE
                     && requestDto.getDealState()!=DealState.DONE){
-                DealSuccess dealSuccess=dealSuccessRepository.findById(dealPost.getId())
-                        .orElseThrow(()->new NoSuchElementException("해당 게시글 완료가 존재하지 않습니다. dealPost id:"+dealPost.getId()));
-                dealSuccessRepository.delete(dealSuccess);
+                dealSuccessService.delete(dealSuccessService.findById(dealPost.getId()));
                 dealPost.setDealSuccess(null);
             }
             dealPost.setDealState(requestDto.getDealState());

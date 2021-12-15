@@ -44,7 +44,7 @@ public class UserService{
         return userRepository.existsByEmail(email);
     }
 
-    public UserGetResponseDto getUser(String email){
+    public UserGetResponseDto getUserResponseDto(String email){
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email));
         return UserGetResponseDto.builder()
@@ -58,6 +58,15 @@ public class UserService{
                 .isAuth(user.getIsAuth())
                 .code(user.getCode())
                 .build();
+    }
+
+    public User getUser(String email){
+        return userRepository.findByEmail(email)
+                .orElseThrow(()->new UsernameNotFoundException("해당 유저가 존재하지 않습니다. email:"+email));
+    }
+    public User getUser(Integer userId){
+        return userRepository.findById(userId)
+                .orElseThrow(()->new UsernameNotFoundException("해당 유저가 존재하지 않습니다. id:"+userId));
     }
 
     public String getUserEmail(int userId){

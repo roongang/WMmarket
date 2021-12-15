@@ -69,6 +69,7 @@ public class DealPostApiControllerTest {
 
     @BeforeTransaction
     public void makeUser(){
+        if(userRepository.existsByEmail("user@email")) return;
         user = User.builder()
                 .email("user@email")
                 .password(passwordEncoder.encode("password"))
@@ -86,6 +87,8 @@ public class DealPostApiControllerTest {
     }
     @AfterTransaction
     public void tearDown(){
+        // repo delete
+        dealSuccessRepository.deleteAll();
         dealPostRepository.deleteAll();
         userRepository.deleteAll();
     }
