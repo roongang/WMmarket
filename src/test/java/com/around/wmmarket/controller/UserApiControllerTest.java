@@ -69,6 +69,7 @@ public class UserApiControllerTest {
 
     @BeforeTransaction
     public void makeUser(){
+        if(userRepository.existsByEmail("user@email")) return;
         user = User.builder()
                 .email("user@email")
                 .password(passwordEncoder.encode("password"))

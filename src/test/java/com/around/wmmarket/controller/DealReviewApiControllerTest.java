@@ -71,6 +71,7 @@ public class DealReviewApiControllerTest {
     */
     @BeforeTransaction
     public void setting(){
+        if(userRepository.existsByEmail("user1_email")) return;
         User user1= User.builder()
                 .email("user1_email")
                 .password(passwordEncoder.encode("user1_pw"))
@@ -111,6 +112,10 @@ public class DealReviewApiControllerTest {
 
     @AfterTransaction
     public void tearDown(){
+        dealReviewRepository.deleteAll();
+        dealSuccessRepository.deleteAll();
+        dealPostRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
