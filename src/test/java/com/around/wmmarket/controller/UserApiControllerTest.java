@@ -1,8 +1,7 @@
 package com.around.wmmarket.controller;
 
-import com.around.wmmarket.controller.dto.User.UserSaveRequestDto;
-import com.around.wmmarket.controller.dto.User.UserSigninRequestDto;
-import com.around.wmmarket.controller.dto.User.UserUpdateRequestDto;
+import com.around.wmmarket.controller.dto.user.UserSigninRequestDto;
+import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
 import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;

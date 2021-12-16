@@ -1,4 +1,4 @@
-package com.around.wmmarket.controller.dto.DealPostImage;
+package com.around.wmmarket.controller.dto.dealPostImage;
 
 import lombok.Getter;
 import lombok.Setter;

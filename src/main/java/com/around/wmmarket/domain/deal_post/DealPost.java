@@ -5,6 +5,7 @@ import com.around.wmmarket.domain.deal_post_image.DealPostImage;
 import com.around.wmmarket.domain.deal_review.DealReview;
 import com.around.wmmarket.domain.deal_success.DealSuccess;
 import com.around.wmmarket.domain.user.User;
+import com.around.wmmarket.domain.user_like.UserLike;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -60,6 +61,9 @@ public class DealPost extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "dealPost")
     private List<DealReview> dealReviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "dealPost")
+    private List<UserLike> userLikes = new ArrayList<>();
 
     @Builder
     public DealPost(User user,Category category,String title,Integer price,String content,DealState dealState){

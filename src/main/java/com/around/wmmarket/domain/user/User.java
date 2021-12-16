@@ -7,6 +7,7 @@ import com.around.wmmarket.domain.deal_success.DealSuccess;
 import com.around.wmmarket.domain.keyword.Keyword;
 import com.around.wmmarket.domain.manner_review.MannerReview;
 import com.around.wmmarket.domain.notification.Notification;
+import com.around.wmmarket.domain.user_like.UserLike;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -61,12 +62,15 @@ public class User extends BaseTimeEntity {
     private String code;
 
     // 관계 매핑
+    // not yet
     @OneToMany(mappedBy = "user")
     private List<Notification> notifications = new ArrayList<>();
 
+    // not yet
     @OneToMany(mappedBy = "user")
     private List<Keyword> keywords = new ArrayList<>();
 
+    // not yet
     @OneToMany(mappedBy = "seller")
     private List<MannerReview> mannerReviews = new ArrayList<>();
 
@@ -76,13 +80,14 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "buyer")
     private List<DealReview> buyDealReviews = new ArrayList<>();
 
-    // TODO : dealPosts add 로직 추가
     @OneToMany(mappedBy = "user")
     private List<DealPost> dealPosts = new ArrayList<>();
 
-    // TODO : dealSuccesses add 로직 추가
     @OneToMany(mappedBy = "buyer")
     private List<DealSuccess> dealSuccesses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<UserLike> userLikes = new ArrayList<>();
 
     @Builder
     public User(String email,String password,String image,String nickname,Role role,String city_1,String town_1,String city_2,String town_2,int isAuth,String code){

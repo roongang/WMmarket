@@ -1,7 +1,7 @@
 package com.around.wmmarket.service.dealReview;
 
-import com.around.wmmarket.controller.dto.DealReview.DealReviewGetResponseDto;
-import com.around.wmmarket.controller.dto.DealReview.DealReviewUpdateRequestDto;
+import com.around.wmmarket.controller.dto.dealReview.DealReviewGetResponseDto;
+import com.around.wmmarket.controller.dto.dealReview.DealReviewUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_review.DealReview;
 import com.around.wmmarket.domain.deal_review.DealReviewRepository;
