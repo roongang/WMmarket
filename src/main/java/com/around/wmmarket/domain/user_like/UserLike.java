@@ -12,9 +12,9 @@ import java.io.Serializable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "user_like")
 @Entity
-public class UserLike extends BaseTimeEntity {
+public class UserLike extends BaseTimeEntity implements Serializable{
     @EmbeddedId
-    private UserLikeId userLikeId;
+    private UserLikeId userLikeId=new UserLikeId();
 
     @MapsId("userId")
     @ManyToOne
@@ -48,5 +48,18 @@ public class UserLike extends BaseTimeEntity {
     public void deleteRelation(){
         if(this.user!=null) this.user.getUserLikes().remove(this);
         if(this.dealPost!=null) this.dealPost.getUserLikes().remove(this);
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(this==o) return true;
+        if(!(o instanceof UserLike)) return false;
+        UserLike userLike=(UserLike) o;
+        return this.getUserLikeId().equals(userLike.getUserLikeId());
+    }
+
+    @Override
+    public int hashCode(){
+        return this.getUserLikeId().hashCode()*31;
     }
 }

@@ -1,15 +1,13 @@
 package com.around.wmmarket.domain.user_like;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
