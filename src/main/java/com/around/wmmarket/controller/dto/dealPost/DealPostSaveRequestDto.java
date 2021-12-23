@@ -1,7 +1,6 @@
-package com.around.wmmarket.controller.dto.DealPost;
+package com.around.wmmarket.controller.dto.dealPost;
 
 import com.around.wmmarket.domain.deal_post.Category;
-import com.around.wmmarket.domain.deal_post.DealState;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;

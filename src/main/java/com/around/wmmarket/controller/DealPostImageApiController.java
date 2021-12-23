@@ -1,18 +1,15 @@
 package com.around.wmmarket.controller;
 
-import com.around.wmmarket.controller.dto.DealPostImage.DealPostImageSaveRequestDto;
+import com.around.wmmarket.controller.dto.dealPostImage.DealPostImageSaveRequestDto;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.common.Constants;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.dealPostImage.DealPostImageService;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
-import org.apache.tika.mime.MediaType;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
@@ -23,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.NoSuchElementException;
 
 @Slf4j
 @RequiredArgsConstructor

@@ -1,6 +1,5 @@
 package com.around.wmmarket.controller;
 
-import com.around.wmmarket.controller.dto.DealPostImage.DealPostImageSaveRequestDto;
 import com.around.wmmarket.domain.deal_post.Category;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
@@ -32,7 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;

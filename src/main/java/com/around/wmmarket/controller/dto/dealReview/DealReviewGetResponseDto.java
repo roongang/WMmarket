@@ -1,4 +1,4 @@
-package com.around.wmmarket.controller.dto.DealReview;
+package com.around.wmmarket.controller.dto.dealReview;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

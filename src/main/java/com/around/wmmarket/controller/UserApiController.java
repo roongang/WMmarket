@@ -1,13 +1,15 @@
 package com.around.wmmarket.controller;
 
-import com.around.wmmarket.controller.dto.User.UserGetResponseDto;
-import com.around.wmmarket.controller.dto.User.UserSaveRequestDto;
-import com.around.wmmarket.controller.dto.User.UserSigninRequestDto;
-import com.around.wmmarket.controller.dto.User.UserUpdateRequestDto;
+import com.around.wmmarket.controller.dto.user.UserGetResponseDto;
+import com.around.wmmarket.controller.dto.user.UserSaveRequestDto;
+import com.around.wmmarket.controller.dto.user.UserSigninRequestDto;
+import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
 import com.around.wmmarket.domain.user.SignedUser;
+import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.service.common.Constants;
 import com.around.wmmarket.service.user.CustomUserDetailsService;
 import com.around.wmmarket.service.user.UserService;
+import com.around.wmmarket.service.userLike.UserLikeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
@@ -21,7 +23,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,6 +39,8 @@ import java.nio.file.Paths;
 public class UserApiController {
     private final UserService userService;
     private final CustomUserDetailsService customUserDetailsService;
+    private final UserLikeService userLikeService;
+
     private final AuthenticationManager authenticationManager;
     private final ResourceLoader resourceLoader;
     private final Tika tika=new Tika();
@@ -162,5 +165,26 @@ public class UserApiController {
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         userService.deleteImage(signedUser.getUsername());
         return ResponseEntity.ok().body("user image delete success");
+    }
+
+    // userLike
+    @PostMapping("/api/v1/user/like")
+    public ResponseEntity<?> saveLike(@AuthenticationPrincipal SignedUser signedUser, @RequestParam Integer dealPostId) throws Exception{
+        if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
+        userLikeService.save(signedUser.getUsername(),dealPostId);
+        return ResponseEntity.ok().body("save success");
+    }
+
+    @GetMapping("/api/v1/user/likes")
+    public ResponseEntity<?> getLikes(@RequestParam Integer userId){
+        return ResponseEntity.ok().body(userService.getLikesDealPostId(userId));
+    }
+
+    @DeleteMapping("/api/v1/user/like")
+    public ResponseEntity<?> deleteLike(@AuthenticationPrincipal SignedUser signedUser,@RequestParam Integer dealPostId) throws Exception{
+        if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
+        User user=userService.getUser(signedUser.getUsername());
+        userService.deleteLike(user.getId(),dealPostId);
+        return ResponseEntity.ok().body("delete success");
     }
 }

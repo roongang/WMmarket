@@ -1,13 +1,17 @@
 package com.around.wmmarket.service.user;
 
-import com.around.wmmarket.controller.dto.User.UserGetResponseDto;
-import com.around.wmmarket.controller.dto.User.UserSaveRequestDto;
-import com.around.wmmarket.controller.dto.User.UserUpdateRequestDto;
-import com.around.wmmarket.domain.user.SignedUser;
+import com.around.wmmarket.controller.dto.user.UserGetResponseDto;
+import com.around.wmmarket.controller.dto.user.UserSaveRequestDto;
+import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
+import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
+import com.around.wmmarket.domain.user_like.UserLike;
+import com.around.wmmarket.domain.user_like.UserLikeId;
+import com.around.wmmarket.domain.user_like.UserLikeRepository;
 import com.around.wmmarket.service.common.Constants;
 import com.around.wmmarket.service.common.FileHandler;
+import com.around.wmmarket.service.userLike.UserLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,12 +19,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserService{
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final UserLikeService userLikeService;
     private final FileHandler fileHandler;
 
     @Transactional
@@ -115,5 +122,18 @@ public class UserService{
                 .orElseThrow(()->new UsernameNotFoundException("해당 유저가 존재하지 않습니다. email:"+email));
         if(user.getImage()!=null) fileHandler.delete(Constants.userImagePath,user.getImage());
         user.setImage(null);
+    }
+
+    public List<Integer> getLikesDealPostId(Integer userId){
+        User user=getUser(userId);
+        List<Integer> dealPostIds=new ArrayList<>();
+        for(UserLike userLike:user.getUserLikes()){
+            dealPostIds.add(userLike.getDealPost().getId());
+        }
+        return dealPostIds;
+    }
+
+    public void deleteLike(Integer userId,Integer dealPostId){
+        userLikeService.delete(userId,dealPostId);
     }
 }

@@ -1,9 +1,16 @@
 package com.around.wmmarket.domain.user_like;
 
+import lombok.*;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Embeddable
 public class UserLikeId implements Serializable {
     @Column(name = "USER_ID")

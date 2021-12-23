@@ -1,12 +1,17 @@
 package com.around.wmmarket.controller;
 
-import com.around.wmmarket.controller.dto.User.UserSaveRequestDto;
-import com.around.wmmarket.controller.dto.User.UserSigninRequestDto;
-import com.around.wmmarket.controller.dto.User.UserUpdateRequestDto;
+import com.around.wmmarket.controller.dto.user.UserSigninRequestDto;
+import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
+import com.around.wmmarket.domain.deal_post.Category;
+import com.around.wmmarket.domain.deal_post.DealPost;
+import com.around.wmmarket.domain.deal_post.DealPostRepository;
+import com.around.wmmarket.domain.deal_post.DealState;
 import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
+import com.around.wmmarket.domain.user_like.UserLike;
+import com.around.wmmarket.domain.user_like.UserLikeRepository;
 import com.around.wmmarket.service.common.FileHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +62,10 @@ public class UserApiControllerTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private DealPostRepository dealPostRepository;
+    @Autowired
+    private UserLikeRepository userLikeRepository;
+    @Autowired
     private FileHandler fileHandler;
 
     @Autowired
@@ -78,7 +87,7 @@ public class UserApiControllerTest {
         image=fileHandler.parseUserImage(new MockMultipartFile("image","img.jpg","image/jpeg","img".getBytes(StandardCharsets.UTF_8)));
         user.setImage(image);
         userRepository.save(user);
-        userRepository.save(user = User.builder()
+        userRepository.save(User.builder()
                 .email("deleteUser@email")
                 .password(passwordEncoder.encode("password"))
                 .nickname("nickname")
@@ -283,7 +292,104 @@ public class UserApiControllerTest {
         mvc.perform(delete(url))
                 .andExpect(status().isOk());
         // then
-        assertThat(user.getImage()).isNull();
-        user.setImage(fileHandler.parseUserImage(new MockMultipartFile("image","img.jpg","image/jpeg","img".getBytes(StandardCharsets.UTF_8))));
+        User testUser=userRepository.findByEmail("user@email")
+                        .orElseThrow(()->new UsernameNotFoundException("user@email not found"));
+        assertThat(testUser.getImage()).isNull();
+    }
+
+    // userLike
+    @Test
+    @Transactional
+    @WithUserDetails(value = "user@email")
+    public void userLikeSaveTest() throws Exception{
+        // given
+        dealPostRepository.save(DealPost.builder()
+                .user(user)
+                .price(1000)
+                .content("content")
+                .title("title")
+                .category(Category.A)
+                .dealState(DealState.ONGOING).build());
+        DealPost dealPost=dealPostRepository.findAll().get(0);
+
+        String url="http://localhost"+port+"/api/v1/user/like";
+        // when
+        mvc.perform(post(url)
+                .param("dealPostId",dealPost.getId().toString()))
+                .andExpect(status().isOk());
+        // then
+        user=userRepository.findByEmail("user@email")
+                        .orElseThrow(()->new UsernameNotFoundException("user@email"));
+        log.info("likes num:"+user.getUserLikes().size());
+        assertThat(userLikeRepository.findAll().isEmpty()).isFalse();
+    }
+
+    @Test
+    @Transactional
+    public void userLikesGetTest() throws Exception{
+        // given
+        // save dealPost & like
+        user=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user@email"));
+        dealPostRepository.save(DealPost.builder()
+                .user(user)
+                .price(1000)
+                .content("content")
+                .title("title")
+                .category(Category.A)
+                .dealState(DealState.ONGOING).build());
+        DealPost dealPost=dealPostRepository.findAll().get(0);
+
+        userLikeRepository.save(UserLike.builder()
+                .user(user)
+                .dealPost(dealPost)
+                .build());
+
+        String url="http://localhost"+port+"/api/v1/user/likes";
+        // when
+        MvcResult result=mvc.perform(get(url)
+                .param("userId",user.getId().toString()))
+                .andExpect(status().isOk())
+                .andReturn();
+        // then
+        user=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user@email"));
+        log.info("likes num:"+user.getUserLikes().size());
+        log.info("result:"+result.getResponse().getContentAsString());
+        assertThat(result.getResponse().getContentAsString()).contains(dealPost.getId().toString());
+    }
+
+    @Test
+    @Transactional
+    @WithUserDetails(value = "user@email")
+    public void userLikesDeleteTest() throws Exception{
+        // given
+        // save dealPost & like
+        user=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user@email"));
+        dealPostRepository.save(DealPost.builder()
+                .user(user)
+                .price(1000)
+                .content("content")
+                .title("title")
+                .category(Category.A)
+                .dealState(DealState.ONGOING).build());
+        DealPost dealPost=dealPostRepository.findAll().get(0);
+
+        userLikeRepository.save(UserLike.builder()
+                .user(user)
+                .dealPost(dealPost)
+                .build());
+
+        String url="http://localhost"+port+"/api/v1/user/like";
+        // when
+        mvc.perform(delete(url)
+                        .param("dealPostId",dealPost.getId().toString()))
+                .andExpect(status().isOk());
+        // then
+        user=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user@email"));
+        log.info("userLike size:"+user.getUserLikes().size());
+        assertThat(user.getUserLikes().isEmpty()).isTrue();
     }
 }
