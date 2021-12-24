@@ -45,7 +45,7 @@ public class DealPostImage {
     public void setDealPost(DealPost dealPost){
         if(this.dealPost!=null) this.dealPost.getDealPostImages().remove(this);
         this.dealPost=dealPost;
-        dealPost.getDealPostImages().add(this);
+        if(dealPost!=null) dealPost.getDealPostImages().add(this);
     }
     // delete
     public void deleteRelation(){

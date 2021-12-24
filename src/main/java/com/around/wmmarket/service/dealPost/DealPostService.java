@@ -50,14 +50,15 @@ public class DealPostService {
     public DealPostGetResponseDto getDealPostGetResponseDto(Integer id) {
         DealPost dealPost=dealPostRepository.findById(id)
                 .orElseThrow(()->new NoSuchElementException("해당 게시글이 없습니다. id:"+id));
-        return DealPostGetResponseDto.builder()
-                .userEmail(dealPost.getUser().getEmail())
+        DealPostGetResponseDto responseDto=DealPostGetResponseDto.builder()
                 .category(dealPost.getCategory())
                 .title(dealPost.getTitle())
                 .price(dealPost.getPrice())
                 .content(dealPost.getContent())
                 .dealState(dealPost.getDealState())
                 .build();
+        if(dealPost.getUser()!=null) responseDto.setUserEmail(dealPost.getUser().getEmail());
+        return responseDto;
     }
     public DealPost getDealPost(Integer id){
         return dealPostRepository.findById(id)
@@ -67,6 +68,7 @@ public class DealPostService {
     public boolean isDealPostAuthor(SignedUser signedUser,Integer dealPostId){
         DealPost dealPost=dealPostRepository.findById(dealPostId)
                 .orElseThrow(()->new NoSuchElementException("해당 게시글이 없습니다. id:"+dealPostId));
+        if(dealPost.getUser()==null) throw new IllegalArgumentException("해당 dealPost 에 user 가 존재하지 않습니다.");
         return signedUser.getUsername().equals(dealPost.getUser().getEmail());
     }
 

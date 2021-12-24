@@ -4,6 +4,7 @@ import com.around.wmmarket.domain.deal_post.Category;
 import com.around.wmmarket.domain.deal_post.DealState;
 import lombok.*;
 
+@Setter
 @Getter
 @AllArgsConstructor
 @Builder

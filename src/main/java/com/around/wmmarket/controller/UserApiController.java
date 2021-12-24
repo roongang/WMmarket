@@ -177,6 +177,7 @@ public class UserApiController {
 
     @GetMapping("/api/v1/user/likes")
     public ResponseEntity<?> getLikes(@RequestParam Integer userId){
+        if(!userService.isExist(userId)) return ResponseEntity.badRequest().body("해당 유저가 존재하지 않습니다.");
         return ResponseEntity.ok().body(userService.getLikesDealPostId(userId));
     }
 

@@ -48,17 +48,17 @@ public class DealReview extends BaseTimeEntity {
         // 기존 관계 제거
         if(this.buyer!=null) this.buyer.getBuyDealReviews().remove(this);
         this.buyer=buyer;
-        buyer.getBuyDealReviews().add(this);
+        if(buyer!=null) buyer.getBuyDealReviews().add(this);
     }
     public void setSeller(User seller){
         if(this.seller!=null) this.seller.getSellDealReviews().remove(this);
         this.seller=seller;
-        seller.getSellDealReviews().add(this);
+        if(seller!=null) seller.getSellDealReviews().add(this);
     }
     public void setDealPost(DealPost dealPost){
         if(this.dealPost!=null) this.dealPost.getDealReviews().remove(this);
         this.dealPost=dealPost;
-        dealPost.getDealReviews().add(this);
+        if(dealPost!=null) dealPost.getDealReviews().add(this);
     }
     public void setContent(String content){this.content=content;}
 

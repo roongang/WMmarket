@@ -39,12 +39,12 @@ public class DealSuccess extends BaseTimeEntity {
     public void setBuyer(User buyer) {
         if(this.buyer!=null) this.buyer.getDealSuccesses().remove(this);
         this.buyer=buyer;
-        buyer.getDealSuccesses().add(this);
+        if(buyer!=null) buyer.getDealSuccesses().add(this);
     }
     public void setDealPost(DealPost dealPost){
         if(this.dealPost!=null) this.dealPost.setDealSuccess(null);
         this.dealPost=dealPost;
-        dealPost.setDealSuccess(this);
+        if(dealPost!=null) dealPost.setDealSuccess(this);
     }
     // delete
     public void deleteRelation(){

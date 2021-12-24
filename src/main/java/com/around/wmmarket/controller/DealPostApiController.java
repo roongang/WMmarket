@@ -44,10 +44,11 @@ public class DealPostApiController {
 
     @PutMapping("/api/v1/dealPost")
     public ResponseEntity<?> update(@AuthenticationPrincipal SignedUser signedUser, @RequestBody DealPostUpdateRequestDto requestDto){
-        // check
+        // TODO : 너무너무 더럽다 다시 정리해야할듯!
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         DealPost dealPost=dealPostService.getDealPost(requestDto.getDealPostId());
-        if(!dealPost.getUser().getEmail().equals(signedUser.getUsername())) return ResponseEntity.badRequest().body("게시글 작성자가 아닙니다.");
+        if(dealPost.getUser()==null||!dealPost.getUser().getEmail().equals(signedUser.getUsername())) return ResponseEntity.badRequest().body("게시글 작성자가 아닙니다.");
+        if(requestDto.getBuyerId()!=null&&!userService.isExist(requestDto.getBuyerId())) return ResponseEntity.badRequest().body("구매자가 존재하지 않습니다.");
         if(requestDto.getBuyerId()!=null
                 && userService.getUserEmail(requestDto.getBuyerId()).equals(signedUser.getUsername())) return ResponseEntity.badRequest().body("구매자와 판매자가 일치할 수 없습니다.");
 
@@ -61,7 +62,7 @@ public class DealPostApiController {
         // check
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         DealPost dealPost=dealPostService.getDealPost(dealPostId);
-        if(!dealPost.getUser().getEmail().equals(signedUser.getUsername())) return ResponseEntity.badRequest().body("게시글 작성자가 아닙니다.");
+        if(dealPost.getUser()==null||!dealPost.getUser().getEmail().equals(signedUser.getUsername())) return ResponseEntity.badRequest().body("게시글 작성자가 아닙니다.");
 
         dealPostService.delete(dealPost);
         return ResponseEntity.ok().body("delete success");
