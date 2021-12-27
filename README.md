@@ -1,5 +1,5 @@
 # DEV SERVER
-## [서버링크](https://wm-market.herokuapp.com/)
+## 서버링크 (https://wm-market.herokuapp.com/)
 - paas 형태인 heroku 사용
 - 연결이 24시간 인건 아니라서 최초 접속시 딜레이 생길 수 있음
 
