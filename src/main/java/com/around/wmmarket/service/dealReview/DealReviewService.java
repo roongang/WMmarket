@@ -35,14 +35,15 @@ public class DealReviewService {
     public DealReviewGetResponseDto getResponseDto(Integer dealReviewId){
         DealReview dealReview=dealReviewRepository.findById(dealReviewId)
                 .orElseThrow(()->new NoSuchElementException("해당 리뷰글이 없습니다. dealReviewId:"+dealReviewId));
-        return DealReviewGetResponseDto.builder()
-                .sellerId(dealReview.getSeller().getId())
-                .buyerId(dealReview.getBuyer().getId())
+        DealReviewGetResponseDto responseDto=DealReviewGetResponseDto.builder()
                 .content(dealReview.getContent())
                 .createdDate(dealReview.getCreatedDate())
                 .modifiedDate(dealReview.getModifiedDate())
                 .dealPostId(dealReview.getDealPost().getId())
                 .build();
+        if(dealReview.getBuyer()!=null) responseDto.setBuyerId(dealReview.getBuyer().getId());
+        if(dealReview.getSeller()!=null) responseDto.setSellerId(dealReview.getSeller().getId());
+        return responseDto;
     }
 
     public void update(DealReviewUpdateRequestDto requestDto){

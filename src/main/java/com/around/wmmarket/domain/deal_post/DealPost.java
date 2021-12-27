@@ -87,7 +87,7 @@ public class DealPost extends BaseTimeEntity {
         // 기존 관계 제거
         if(this.user!=null) this.user.getDealPosts().remove(this);
         this.user=user;
-        user.getDealPosts().add(this);
+        if(user!=null) user.getDealPosts().add(this);
     }
     public void setCategory(Category category){this.category=category;}
     public void setTitle(String title){this.title=title;}

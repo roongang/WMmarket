@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Getter
@@ -86,7 +87,8 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "buyer")
     private List<DealSuccess> dealSuccesses = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
+    // 부모가 사라지면 자식(userLike)도 같이 사라짐
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<UserLike> userLikes = new ArrayList<>();
 
     @Builder
@@ -114,7 +116,13 @@ public class User extends BaseTimeEntity {
     public void setCity_2(String city_2){this.city_2=city_2;}
     public void setTown_2(String town_2){this.town_2=town_2;}
     // delete
-    public void deleteRelation(){
+    @PreRemove
+    public void makeChildNull(){
         // not yet
+        // make child fk null
+        while(!this.sellDealReviews.isEmpty()) this.sellDealReviews.get(this.sellDealReviews.size()-1).setSeller(null);
+        while(!this.buyDealReviews.isEmpty()) this.buyDealReviews.get(this.buyDealReviews.size()-1).setBuyer(null);
+        while(!this.dealPosts.isEmpty()) this.dealPosts.get(this.dealPosts.size()-1).setUser(null);
+        while(!this.dealSuccesses.isEmpty()) this.dealSuccesses.get(this.dealSuccesses.size()-1).setBuyer(null);
     }
 }

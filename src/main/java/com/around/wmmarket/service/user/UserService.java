@@ -50,6 +50,7 @@ public class UserService{
     public boolean isExist(String email){
         return userRepository.existsByEmail(email);
     }
+    public boolean isExist(Integer id) { return userRepository.existsById(id); }
 
     public UserGetResponseDto getUserResponseDto(String email){
         User user = userRepository.findByEmail(email)
@@ -99,7 +100,6 @@ public class UserService{
     public void delete(String email){
         User user=userRepository.findByEmail(email)
                 .orElseThrow(()->new UsernameNotFoundException("해당 유저가 존재하지 않습니다. email:"+email));
-        user.deleteRelation();
         userRepository.delete(user);
     }
 
