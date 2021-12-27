@@ -1,4 +1,4 @@
-package com.around.wmmarket.service.common;
+package com.around.wmmarket.common;
 
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;

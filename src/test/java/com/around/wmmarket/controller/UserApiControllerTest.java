@@ -12,7 +12,7 @@ import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.domain.user_like.UserLike;
 import com.around.wmmarket.domain.user_like.UserLikeRepository;
-import com.around.wmmarket.service.common.FileHandler;
+import com.around.wmmarket.common.FileHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;

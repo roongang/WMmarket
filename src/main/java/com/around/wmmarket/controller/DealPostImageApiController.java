@@ -4,7 +4,7 @@ import com.around.wmmarket.controller.dto.dealPostImage.DealPostImageSaveRequest
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
 import com.around.wmmarket.domain.user.SignedUser;
-import com.around.wmmarket.service.common.Constants;
+import com.around.wmmarket.common.Constants;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.dealPostImage.DealPostImageService;
 import lombok.RequiredArgsConstructor;
