@@ -32,7 +32,7 @@ public class DealPostApiController {
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         dealPostService.save(signedUser,requestDto);
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .message("거래글 삽입 성공했습니다.").build());
     }
 
@@ -40,7 +40,7 @@ public class DealPostApiController {
     public ResponseEntity<?> get(@RequestParam Integer dealPostId) throws Exception{
         DealPostGetResponseDto responseDto=dealPostService.getDealPostGetResponseDto(dealPostId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .data(responseDto).build());
     }
 
@@ -48,7 +48,7 @@ public class DealPostApiController {
     public ResponseEntity<?> getImages(@RequestParam Integer dealPostId){
         List<Integer> images=dealPostService.getImages(dealPostId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .message("거래글 리스트 반환 성공했습니다.")
                 .data(images).build());
     }
@@ -66,7 +66,7 @@ public class DealPostApiController {
         dealPostService.update(requestDto);
         DealPostGetResponseDto responseDto=dealPostService.getDealPostGetResponseDto(requestDto.getDealPostId());
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .message("거래글 수정 성공했습니다.")
                 .data(responseDto).build());
     }
@@ -80,7 +80,7 @@ public class DealPostApiController {
 
         dealPostService.delete(dealPost);
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .message("거래글 삭제 성공했습니다.")
                 .build());
     }

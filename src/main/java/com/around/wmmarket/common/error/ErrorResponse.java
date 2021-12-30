@@ -18,14 +18,14 @@ import java.util.stream.Collectors;
 public class ErrorResponse {
     private LocalDateTime timestamp;
     private String message;
-    private HttpStatus status;
+    private Integer status;
     private String code;
     private List<FieldError> errors; // validation 용
 
     private ErrorResponse(ErrorCode errorCode,List<FieldError> errors){
         this.timestamp=LocalDateTime.now();
         this.message=errorCode.getMessage();
-        this.status=errorCode.getStatus();
+        this.status=errorCode.getStatus().value();
         this.code=errorCode.getCode();
         this.errors=errors;
     }
@@ -33,7 +33,7 @@ public class ErrorResponse {
     private ErrorResponse(ErrorCode errorCode){
         this.timestamp=LocalDateTime.now();
         this.message=errorCode.getMessage();
-        this.status=errorCode.getStatus();
+        this.status=errorCode.getStatus().value();
         this.code=errorCode.getCode();
         this.errors=new ArrayList<>(); // [] 이 돼야함
     }
@@ -41,7 +41,7 @@ public class ErrorResponse {
     private ErrorResponse(ErrorCode errorCode,String message){
         this.timestamp=LocalDateTime.now();
         this.message=message;
-        this.status=errorCode.getStatus();
+        this.status=errorCode.getStatus().value();
         this.code=errorCode.getCode();
         this.errors=new ArrayList<>();
     }

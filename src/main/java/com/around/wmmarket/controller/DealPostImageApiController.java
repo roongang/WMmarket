@@ -47,7 +47,7 @@ public class DealPostImageApiController {
         DealPost dealPost=dealPostService.getDealPost(requestDto.getDealPostId());
         dealPostImageService.save(dealPost,requestDto.getFiles());
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .message("거래글 이미지 삽입 성공했습니다.")
                 .build());
     }
@@ -63,7 +63,7 @@ public class DealPostImageApiController {
         }
         dealPostImageService.delete(dealPostImageId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .message("거래글 이미지 삭제 성공했습니다.")
                 .build());
     }
@@ -82,8 +82,8 @@ public class DealPostImageApiController {
         headers.add(HttpHeaders.CONTENT_LENGTH,String.valueOf(file.length()));
 
         return ResponseHandler.toResponse(ResourceResponse.builder()
-                .httpStatus(HttpStatus.OK)
-                .httpHeaders(headers)
+                .status(HttpStatus.OK)
+                .headers(headers)
                 .message("거래글 이미지 반환 성공했습니다.")
                 .resource(resource).build());
     }

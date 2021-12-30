@@ -39,7 +39,7 @@ public class DealReviewApiController {
         dealReviewService.save(signedUser.getUsername(),requestDto.getContent(),dealPost);
 
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .message("거래글 리뷰 삽입 성공했습니다.")
                 .build());
     }
@@ -47,7 +47,7 @@ public class DealReviewApiController {
     @GetMapping("/api/v1/dealReview")
     public ResponseEntity<?> get(@RequestParam Integer dealReviewId) throws Exception{
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .message("거래글 리뷰 반환 성공했습니다.")
                 .data(dealReviewService.getResponseDto(dealReviewId)).build());
     }
@@ -62,7 +62,7 @@ public class DealReviewApiController {
         // update
         dealReviewService.update(requestDto);
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .message("거래글 리뷰 수정 성공했습니다.")
                 .build());
     }
@@ -77,7 +77,7 @@ public class DealReviewApiController {
         // delete
         dealReviewService.delete(dealReviewId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .message("거래글 리뷰 삭제 성공했습니다.")
                 .build());
      }

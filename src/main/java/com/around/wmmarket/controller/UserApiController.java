@@ -57,7 +57,7 @@ public class UserApiController {
         userService.save(requestDto);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .message("유저 회원가입 성공했습니다.")
-                .httpStatus(HttpStatus.OK).build());
+                .status(HttpStatus.OK).build());
     }
 
     // TODO : 분산환경을 위해 쿠키방식 생각
@@ -82,7 +82,7 @@ public class UserApiController {
         // 세션에 컨텍스트 저장
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,SecurityContextHolder.getContext());
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                        .httpStatus(HttpStatus.OK)
+                        .status(HttpStatus.OK)
                         .message("유저 로그인 성공했습니다.").build());
     }
 
@@ -90,7 +90,7 @@ public class UserApiController {
     @GetMapping("/api/v1/user/isExist")
     public ResponseEntity<Object> isExist(@RequestParam String email){
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .data(userService.isExist(email)).build());
     }
 
@@ -98,7 +98,7 @@ public class UserApiController {
     public ResponseEntity<Object> get(@RequestParam String email){
         UserGetResponseDto responseDto = userService.getUserResponseDto(email);
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .message("유저 반환 성공했습니다.")
                 .data(responseDto).build());
     }
@@ -114,7 +114,7 @@ public class UserApiController {
         userService.update(signedUser.getUsername(),requestDto);
         UserGetResponseDto responseDto=userService.getUserResponseDto(signedUser.getUsername());
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .message("유저 수정 성공했습니다.")
                 .data(responseDto).build());
     }
@@ -128,7 +128,7 @@ public class UserApiController {
         userService.delete(signedUser.getUsername());
         session.invalidate();
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .message("유저 삭제 성공했습니다.")
                 .build());
     }
@@ -154,8 +154,8 @@ public class UserApiController {
         headers.add(HttpHeaders.CONTENT_LENGTH,String.valueOf(file.length()));
 
         return ResponseHandler.toResponse(ResourceResponse.builder()
-                .httpStatus(HttpStatus.OK)
-                .httpHeaders(headers)
+                .status(HttpStatus.OK)
+                .headers(headers)
                 .message("유저 이미지 반환 성공했였습니다.")
                 .resource(resource).build());
     }
@@ -168,7 +168,7 @@ public class UserApiController {
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         userService.updateImage(signedUser.getUsername(),file);
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .message("유저 이미지 수정 성공했습니다.")
                 .build());
     }
@@ -181,7 +181,7 @@ public class UserApiController {
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         userService.deleteImage(signedUser.getUsername());
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .message("유저 이미지 삭제 성공했습니다.")
                 .build());
     }
@@ -193,7 +193,7 @@ public class UserApiController {
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         userLikeService.save(signedUser.getUsername(),dealPostId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .message("유저 좋아요 삽입 성공하였습니다.")
                 .build());
     }
@@ -201,7 +201,7 @@ public class UserApiController {
     @GetMapping("/api/v1/user/likes")
     public ResponseEntity<Object> getLikes(@RequestParam Integer userId){
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .message("유저 좋아요 리스트 반환 성공했습니다.")
                 .data(userService.getLikesDealPostId(userId)).build());
     }
@@ -212,7 +212,7 @@ public class UserApiController {
         User user=userService.getUser(signedUser.getUsername());
         userService.deleteLike(user.getId(),dealPostId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
+                .status(HttpStatus.OK)
                 .message("유저 좋아요 삭제 성공했습니다.")
                 .build());
     }
