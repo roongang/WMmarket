@@ -44,8 +44,7 @@ public class UserService{
                 .city_2(requestDto.getCity_2())
                 .town_2(requestDto.getTown_2())
                 .build();
-        String image= fileHandler.parseUserImage(requestDto.getImage());
-        if(image!=null) user.setImage(image);
+        if(requestDto.getImage()!=null) user.setImage(fileHandler.parseUserImage(requestDto.getImage()));
         userRepository.save(user);
     }
 
