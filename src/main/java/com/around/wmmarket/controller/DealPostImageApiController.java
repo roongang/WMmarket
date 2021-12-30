@@ -1,5 +1,10 @@
 package com.around.wmmarket.controller;
 
+import com.around.wmmarket.common.ResourceResponse;
+import com.around.wmmarket.common.ResponseHandler;
+import com.around.wmmarket.common.SuccessResponse;
+import com.around.wmmarket.common.error.CustomException;
+import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.dealPostImage.DealPostImageSaveRequestDto;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
@@ -13,6 +18,7 @@ import org.apache.tika.Tika;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +46,10 @@ public class DealPostImageApiController {
         }
         DealPost dealPost=dealPostService.getDealPost(requestDto.getDealPostId());
         dealPostImageService.save(dealPost,requestDto.getFiles());
-        return ResponseEntity.ok().body("save success");
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .httpStatus(HttpStatus.OK)
+                .message("거래글 이미지 삽입 성공했습니다.")
+                .build());
     }
 
     @Transactional
@@ -50,10 +59,13 @@ public class DealPostImageApiController {
         // signedUser 와 dealPostId 의 email 비교
         DealPostImage dealPostImage=dealPostImageService.get(dealPostImageId);
         if(!dealPostService.isDealPostAuthor(signedUser,dealPostImage.getDealPost().getId())){
-            return ResponseEntity.badRequest().body("게시글의 작성자가 아닙니다.");
+            throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEALPOST);
         }
         dealPostImageService.delete(dealPostImageId);
-        return ResponseEntity.ok().body("delete success");
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .httpStatus(HttpStatus.OK)
+                .message("거래글 이미지 삭제 성공했습니다.")
+                .build());
     }
 
     @GetMapping("/api/v1/dealPostImage")
@@ -69,9 +81,11 @@ public class DealPostImageApiController {
         headers.add(HttpHeaders.CONTENT_TYPE,mediaType);
         headers.add(HttpHeaders.CONTENT_LENGTH,String.valueOf(file.length()));
 
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(resource);
+        return ResponseHandler.toResponse(ResourceResponse.builder()
+                .httpStatus(HttpStatus.OK)
+                .httpHeaders(headers)
+                .message("거래글 이미지 반환 성공했습니다.")
+                .resource(resource).build());
     }
 
 }

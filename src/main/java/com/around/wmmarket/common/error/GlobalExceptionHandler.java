@@ -10,9 +10,16 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-    @ExceptionHandler(value = { CustomException.class })
+    @ExceptionHandler(CustomException.class)
     protected ResponseEntity<Object> handlerCustomException(CustomException e){
-        log.error("handlerCustomException throw CustomException : {}",e.getErrorCode());
-        return ResponseHandler.toResponse(e.getErrorCode());
+        log.error("CustomException : {}",e.getErrorCode());
+        return ResponseHandler.toResponse(ErrorResponse.of(e.getErrorCode()));
+    }
+
+    // other exception
+    @ExceptionHandler(Exception.class)
+    protected ResponseEntity<Object> otherException(Exception e){
+        log.error("other exception : {}",e.toString());
+        return ResponseHandler.toResponse(ErrorResponse.of(ErrorCode.UNDEFINED_ERROR,e.toString()));
     }
 }

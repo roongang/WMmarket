@@ -183,8 +183,8 @@ public class UserApiControllerTest {
                 .andReturn();
 
         // then
-        assertThat(ret1.getResponse().getContentAsString()).isEqualTo("true");
-        assertThat(ret2.getResponse().getContentAsString()).isEqualTo("false");
+        assertThat(ret1.getResponse().getContentAsString()).contains("true");
+        assertThat(ret2.getResponse().getContentAsString()).contains("false");
     }
 
     @Test

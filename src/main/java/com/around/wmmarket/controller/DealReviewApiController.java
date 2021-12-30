@@ -1,5 +1,7 @@
 package com.around.wmmarket.controller;
 
+import com.around.wmmarket.common.ResponseHandler;
+import com.around.wmmarket.common.SuccessResponse;
 import com.around.wmmarket.controller.dto.dealReview.DealReviewSaveRequestDto;
 import com.around.wmmarket.controller.dto.dealReview.DealReviewUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.DealPost;
@@ -10,6 +12,7 @@ import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.dealReview.DealReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -35,12 +38,18 @@ public class DealReviewApiController {
 
         dealReviewService.save(signedUser.getUsername(),requestDto.getContent(),dealPost);
 
-        return ResponseEntity.ok().body("save success");
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .httpStatus(HttpStatus.OK)
+                .message("거래글 리뷰 삽입 성공했습니다.")
+                .build());
     }
 
     @GetMapping("/api/v1/dealReview")
     public ResponseEntity<?> get(@RequestParam Integer dealReviewId) throws Exception{
-        return ResponseEntity.ok().body(dealReviewService.getResponseDto(dealReviewId));
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .httpStatus(HttpStatus.OK)
+                .message("거래글 리뷰 반환 성공했습니다.")
+                .data(dealReviewService.getResponseDto(dealReviewId)).build());
     }
 
     @PutMapping("/api/v1/dealReview")
@@ -52,7 +61,10 @@ public class DealReviewApiController {
         if(dealReview.getBuyer()==null||!dealReview.getBuyer().getEmail().equals(signedUser.getUsername())) return ResponseEntity.badRequest().body("리뷰 작성자가 아닙니다.");
         // update
         dealReviewService.update(requestDto);
-        return ResponseEntity.ok().body("update success");
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .httpStatus(HttpStatus.OK)
+                .message("거래글 리뷰 수정 성공했습니다.")
+                .build());
     }
 
     @DeleteMapping("/api/v1/dealReview")
@@ -64,6 +76,9 @@ public class DealReviewApiController {
         if(dealReview.getBuyer()==null||!dealReview.getBuyer().getEmail().equals(signedUser.getUsername())) return ResponseEntity.badRequest().body("리뷰 작성자가 아닙니다.");
         // delete
         dealReviewService.delete(dealReviewId);
-        return ResponseEntity.ok().body("delete success");
-    }
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .httpStatus(HttpStatus.OK)
+                .message("거래글 리뷰 삭제 성공했습니다.")
+                .build());
+     }
 }
