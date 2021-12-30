@@ -1,5 +1,8 @@
 package com.around.wmmarket.controller;
 
+import com.around.wmmarket.common.ResourceResponse;
+import com.around.wmmarket.common.ResponseHandler;
+import com.around.wmmarket.common.SuccessResponse;
 import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostSaveRequestDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostUpdateRequestDto;
@@ -9,6 +12,7 @@ import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -27,19 +31,26 @@ public class DealPostApiController {
     public ResponseEntity<?> save(@AuthenticationPrincipal SignedUser signedUser,@ModelAttribute DealPostSaveRequestDto requestDto) throws Exception{
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         dealPostService.save(signedUser,requestDto);
-        return ResponseEntity.ok().body("save success");
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("거래글 삽입 성공했습니다.").build());
     }
 
     @GetMapping("/api/v1/dealPost")
     public ResponseEntity<?> get(@RequestParam Integer dealPostId) throws Exception{
         DealPostGetResponseDto responseDto=dealPostService.getDealPostGetResponseDto(dealPostId);
-        return ResponseEntity.ok().body(responseDto);
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .data(responseDto).build());
     }
 
     @GetMapping("/api/v1/dealPost/images")
     public ResponseEntity<?> getImages(@RequestParam Integer dealPostId){
         List<Integer> images=dealPostService.getImages(dealPostId);
-        return ResponseEntity.ok().body(images);
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("거래글 리스트 반환 성공했습니다.")
+                .data(images).build());
     }
 
     @PutMapping("/api/v1/dealPost")
@@ -54,7 +65,10 @@ public class DealPostApiController {
 
         dealPostService.update(requestDto);
         DealPostGetResponseDto responseDto=dealPostService.getDealPostGetResponseDto(requestDto.getDealPostId());
-        return ResponseEntity.ok().body(responseDto);
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("거래글 수정 성공했습니다.")
+                .data(responseDto).build());
     }
 
     @DeleteMapping("/api/v1/dealPost")
@@ -65,6 +79,9 @@ public class DealPostApiController {
         if(dealPost.getUser()==null||!dealPost.getUser().getEmail().equals(signedUser.getUsername())) return ResponseEntity.badRequest().body("게시글 작성자가 아닙니다.");
 
         dealPostService.delete(dealPost);
-        return ResponseEntity.ok().body("delete success");
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("거래글 삭제 성공했습니다.")
+                .build());
     }
 }

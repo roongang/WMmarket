@@ -1,16 +1,15 @@
 package com.around.wmmarket.service.user;
 
+import com.around.wmmarket.common.error.CustomException;
+import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.user.UserGetResponseDto;
 import com.around.wmmarket.controller.dto.user.UserSaveRequestDto;
 import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
-import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.domain.user_like.UserLike;
-import com.around.wmmarket.domain.user_like.UserLikeId;
-import com.around.wmmarket.domain.user_like.UserLikeRepository;
-import com.around.wmmarket.service.common.Constants;
-import com.around.wmmarket.service.common.FileHandler;
+import com.around.wmmarket.common.Constants;
+import com.around.wmmarket.common.FileHandler;
 import com.around.wmmarket.service.userLike.UserLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -32,6 +31,9 @@ public class UserService{
 
     @Transactional
     public void save(UserSaveRequestDto requestDto){
+        // check duplicate user
+        if(isExist(requestDto.getEmail())) throw new CustomException(ErrorCode.DUPLICATE_USER_EMAIL);
+
         User user = User.builder()
                 .email(requestDto.getEmail())
                 .password(passwordEncoder.encode(requestDto.getPassword()))
@@ -54,7 +56,8 @@ public class UserService{
 
     public UserGetResponseDto getUserResponseDto(String email){
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException(email));
+                .orElse(null);
+        if(user==null) return null;
         return UserGetResponseDto.builder()
                 .email(user.getEmail())
                 .nickname(user.getNickname())
@@ -70,23 +73,23 @@ public class UserService{
 
     public User getUser(String email){
         return userRepository.findByEmail(email)
-                .orElseThrow(()->new UsernameNotFoundException("해당 유저가 존재하지 않습니다. email:"+email));
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
     }
     public User getUser(Integer userId){
         return userRepository.findById(userId)
-                .orElseThrow(()->new UsernameNotFoundException("해당 유저가 존재하지 않습니다. id:"+userId));
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
     public String getUserEmail(int userId){
         User user=userRepository.findById(userId)
-                .orElseThrow(()->new UsernameNotFoundException("해당 유저가 존재하지 않습니다 id:"+userId));
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         return user.getEmail();
     }
 
     @Transactional
-    public void update(String email, UserUpdateRequestDto requestDto) throws Exception{
+    public void update(String email, UserUpdateRequestDto requestDto) {
         User user=userRepository.findByEmail(email)
-                .orElseThrow(()->new UsernameNotFoundException("해당 유저가 존재하지 않습니다. email:"+email));
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         if(requestDto.getPassword()!=null) user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         if(requestDto.getNickname()!=null) user.setNickname(requestDto.getNickname());
         if(requestDto.getRole()!=null) user.setRole(requestDto.getRole());
@@ -99,27 +102,30 @@ public class UserService{
     @Transactional
     public void delete(String email){
         User user=userRepository.findByEmail(email)
-                .orElseThrow(()->new UsernameNotFoundException("해당 유저가 존재하지 않습니다. email:"+email));
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         userRepository.delete(user);
     }
 
     public String getImage(String email){
         User user=userRepository.findByEmail(email)
-                .orElseThrow(()->new UsernameNotFoundException("해당 유저가 존재하지 않습니다. email:"+email));
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         return user.getImage();
     }
-    public void updateImage(String email,MultipartFile file) throws Exception{
+    public void updateImage(String email,MultipartFile file) {
+        // check
         User user=userRepository.findByEmail(email)
-                .orElseThrow(()->new UsernameNotFoundException("해당 유저가 존재하지 않습니다. email:"+email));
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        if(file==null) //throw new CustomException(ErrorCode.PARAMETER_NULL);
         // delete remain image
-        deleteImage(email);
+        if(user.getImage()==null) throw new CustomException(ErrorCode.USER_IMAGE_NOT_FOUND);
+        try { deleteImage(email); } catch (Exception e) { throw new CustomException(ErrorCode.DELETE_FAIL); }
         // new image
         String image=fileHandler.parseUserImage(file);
         user.setImage(image);
     }
     public void deleteImage(String email) throws Exception{
         User user=userRepository.findByEmail(email)
-                .orElseThrow(()->new UsernameNotFoundException("해당 유저가 존재하지 않습니다. email:"+email));
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         if(user.getImage()!=null) fileHandler.delete(Constants.userImagePath,user.getImage());
         user.setImage(null);
     }

@@ -12,7 +12,7 @@ import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.domain.user_like.UserLike;
 import com.around.wmmarket.domain.user_like.UserLikeRepository;
-import com.around.wmmarket.service.common.FileHandler;
+import com.around.wmmarket.common.FileHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -183,8 +183,8 @@ public class UserApiControllerTest {
                 .andReturn();
 
         // then
-        assertThat(ret1.getResponse().getContentAsString()).isEqualTo("true");
-        assertThat(ret2.getResponse().getContentAsString()).isEqualTo("false");
+        assertThat(ret1.getResponse().getContentAsString()).contains("true");
+        assertThat(ret2.getResponse().getContentAsString()).contains("false");
     }
 
     @Test

@@ -1,4 +1,4 @@
-package com.around.wmmarket.service.common;
+package com.around.wmmarket.common;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
