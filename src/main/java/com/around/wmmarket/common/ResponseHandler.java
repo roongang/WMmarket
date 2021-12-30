@@ -12,16 +12,9 @@ import java.util.Map;
 
 public class ResponseHandler {
     public static ResponseEntity<Object> toResponse(SuccessResponse response){
-        Map<String,Object> map=new HashMap<>();
-        map.put("timestamp",LocalDateTime.now());
-        map.put("message",response.getMessage()==null?"":response.getMessage());
-        map.put("status",response.getHttpStatus().value());
-        map.put("data",response.getData()==null?new ArrayList<>():response.getData());
-
         return ResponseEntity
                 .status(response.getHttpStatus())
-                .headers(response.getHttpHeaders())
-                .body(map);
+                .body(response);
     }
 
     public static ResponseEntity<Object> toResponse(ErrorResponse errorResponse){

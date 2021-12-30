@@ -6,9 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,12 +16,14 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ErrorResponse {
+    private LocalDateTime timestamp;
     private String message;
     private HttpStatus status;
     private String code;
     private List<FieldError> errors; // validation 용
 
     private ErrorResponse(ErrorCode errorCode,List<FieldError> errors){
+        this.timestamp=LocalDateTime.now();
         this.message=errorCode.getMessage();
         this.status=errorCode.getStatus();
         this.code=errorCode.getCode();
@@ -29,6 +31,7 @@ public class ErrorResponse {
     }
 
     private ErrorResponse(ErrorCode errorCode){
+        this.timestamp=LocalDateTime.now();
         this.message=errorCode.getMessage();
         this.status=errorCode.getStatus();
         this.code=errorCode.getCode();
@@ -36,6 +39,7 @@ public class ErrorResponse {
     }
 
     private ErrorResponse(ErrorCode errorCode,String message){
+        this.timestamp=LocalDateTime.now();
         this.message=message;
         this.status=errorCode.getStatus();
         this.code=errorCode.getCode();

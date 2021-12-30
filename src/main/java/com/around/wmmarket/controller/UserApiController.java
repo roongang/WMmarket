@@ -51,12 +51,6 @@ public class UserApiController {
     private final ResourceLoader resourceLoader;
     private final Tika tika=new Tika();
 
-    /*
-    return ResponseHandler.toResponse(SuccessResponse.builder()
-                .httpStatus(HttpStatus.OK)
-                .message()
-                .data().build());
-    * */
     @Transactional
     @PostMapping("/api/v1/user")
     public ResponseEntity<Object> save(@ModelAttribute UserSaveRequestDto requestDto){
