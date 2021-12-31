@@ -31,6 +31,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
@@ -63,7 +64,7 @@ public class UserApiController {
     // TODO : 분산환경을 위해 쿠키방식 생각
     @Transactional
     @PostMapping("/api/v1/user/signIn")
-    public ResponseEntity<Object> signIn(@RequestBody UserSigninRequestDto requestDto,HttpSession session){
+    public ResponseEntity<Object> signIn(@RequestBody UserSigninRequestDto requestDto,@ApiIgnore HttpSession session){
         // 이미 로그인한 유저면 반환
         if(session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY)!=null){
             throw new CustomException(ErrorCode.DUPLICATE_SIGN_IN); }
