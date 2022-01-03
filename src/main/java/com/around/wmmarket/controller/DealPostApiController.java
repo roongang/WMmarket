@@ -11,12 +11,14 @@ import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.user.UserService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -30,7 +32,7 @@ public class DealPostApiController {
 
     @ApiOperation(value = "거래 글 삽입")
     @PostMapping("/api/v1/dealPost")
-    public ResponseEntity<?> save(@AuthenticationPrincipal SignedUser signedUser,@ModelAttribute DealPostSaveRequestDto requestDto) throws Exception{
+    public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,@ModelAttribute DealPostSaveRequestDto requestDto) throws Exception{
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         dealPostService.save(signedUser,requestDto);
         return ResponseHandler.toResponse(SuccessResponse.builder()
@@ -40,7 +42,9 @@ public class DealPostApiController {
 
     @ApiOperation(value = "거래 글 반환")
     @GetMapping("/api/v1/dealPost")
-    public ResponseEntity<?> get(@RequestParam Integer dealPostId) throws Exception{
+    public ResponseEntity<?> get(
+            @ApiParam(value = "거래 글 아이디",example = "1",required = true)
+            @RequestParam Integer dealPostId) throws Exception{
         DealPostGetResponseDto responseDto=dealPostService.getDealPostGetResponseDto(dealPostId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
@@ -49,7 +53,9 @@ public class DealPostApiController {
 
     @ApiOperation(value = "거래 글 이미지 리스트 반환")
     @GetMapping("/api/v1/dealPost/images")
-    public ResponseEntity<?> getImages(@RequestParam Integer dealPostId){
+    public ResponseEntity<?> getImages(
+            @ApiParam(value = "거래 글 아이디",example = "1",required = true)
+            @RequestParam Integer dealPostId){
         List<Integer> images=dealPostService.getImages(dealPostId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
@@ -59,7 +65,7 @@ public class DealPostApiController {
 
     @ApiOperation(value = "거래 글 수정")
     @PutMapping("/api/v1/dealPost")
-    public ResponseEntity<?> update(@AuthenticationPrincipal SignedUser signedUser, @RequestBody DealPostUpdateRequestDto requestDto){
+    public ResponseEntity<?> update(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser, @RequestBody DealPostUpdateRequestDto requestDto){
         // TODO : 너무너무 더럽다 다시 정리해야할듯!
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         DealPost dealPost=dealPostService.getDealPost(requestDto.getDealPostId());
@@ -78,7 +84,9 @@ public class DealPostApiController {
 
     @ApiOperation(value = "거래 글 삭제")
     @DeleteMapping("/api/v1/dealPost")
-    public ResponseEntity<?> delete(@AuthenticationPrincipal SignedUser signedUser,@RequestParam Integer dealPostId) throws Exception{
+    public ResponseEntity<?> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
+                                    @ApiParam(value = "거래 글 아이디",example = "1",required = true)
+                                    @RequestParam Integer dealPostId) throws Exception{
         // check
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         DealPost dealPost=dealPostService.getDealPost(dealPostId);

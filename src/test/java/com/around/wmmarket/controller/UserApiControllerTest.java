@@ -1,6 +1,6 @@
 package com.around.wmmarket.controller;
 
-import com.around.wmmarket.controller.dto.user.UserSigninRequestDto;
+import com.around.wmmarket.controller.dto.user.UserSignInRequestDto;
 import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.Category;
 import com.around.wmmarket.domain.deal_post.DealPost;
@@ -148,7 +148,7 @@ public class UserApiControllerTest {
                 .role(testRole)
                 .build());
 
-        UserSigninRequestDto requestDto = UserSigninRequestDto.builder()
+        UserSignInRequestDto requestDto = UserSignInRequestDto.builder()
                 .email(testEmail)
                 .password(testPassword)
                 .build();

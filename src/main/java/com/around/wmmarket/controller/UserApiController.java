@@ -7,7 +7,7 @@ import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.user.UserGetResponseDto;
 import com.around.wmmarket.controller.dto.user.UserSaveRequestDto;
-import com.around.wmmarket.controller.dto.user.UserSigninRequestDto;
+import com.around.wmmarket.controller.dto.user.UserSignInRequestDto;
 import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
@@ -17,6 +17,7 @@ import com.around.wmmarket.service.user.UserService;
 import com.around.wmmarket.service.userLike.UserLikeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
@@ -33,6 +34,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
@@ -66,7 +68,7 @@ public class UserApiController {
     @ApiOperation(value = "유저 로그인")
     @Transactional
     @PostMapping("/api/v1/user/signIn")
-    public ResponseEntity<Object> signIn(@RequestBody UserSigninRequestDto requestDto,HttpSession session){
+    public ResponseEntity<Object> signIn(@RequestBody UserSignInRequestDto requestDto,@ApiIgnore HttpSession session){
         // 이미 로그인한 유저면 반환
         if(session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY)!=null){
             throw new CustomException(ErrorCode.DUPLICATE_SIGN_IN); }
@@ -91,7 +93,9 @@ public class UserApiController {
 
     @ApiOperation(value = "유저 반환")
     @GetMapping("/api/v1/user")
-    public ResponseEntity<Object> get(@RequestParam String email){
+    public ResponseEntity<Object> get(
+            @ApiParam(value = "유저 이메일",example = "test_email@gmail.com",required = true)
+            @RequestParam String email){
         UserGetResponseDto responseDto = userService.getUserResponseDto(email);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
@@ -102,7 +106,7 @@ public class UserApiController {
     @ApiOperation(value = "유저 수정")
     @Transactional
     @PutMapping("/api/v1/user")
-    public ResponseEntity<Object> update(@AuthenticationPrincipal SignedUser signedUser, @RequestBody UserUpdateRequestDto requestDto) {
+    public ResponseEntity<Object> update(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser, @RequestBody UserUpdateRequestDto requestDto) {
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
 
@@ -118,7 +122,7 @@ public class UserApiController {
     @ApiOperation(value = "유저 삭제")
     @Transactional
     @DeleteMapping("/api/v1/user")
-    public ResponseEntity<Object> delete(@AuthenticationPrincipal SignedUser signedUser,HttpSession session){
+    public ResponseEntity<Object> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,@ApiIgnore HttpSession session){
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         // delete
@@ -132,7 +136,9 @@ public class UserApiController {
 
     @ApiOperation(value = "유저 이미지 반환")
     @GetMapping("/api/v1/user/image")
-    public ResponseEntity<Object> getImage(@RequestParam String email) {
+    public ResponseEntity<Object> getImage(
+            @ApiParam(value = "유저 이메일",example = "test_email@gmail.com",required = true)
+            @RequestParam String email) {
         if(!userService.isExist(email)) throw new CustomException(ErrorCode.USER_NOT_FOUND);
         String fileName= userService.getImage(email);
         if(fileName==null) throw new CustomException(ErrorCode.USER_IMAGE_NOT_FOUND);
@@ -160,7 +166,9 @@ public class UserApiController {
     @ApiOperation(value = "유저 이미지 수정")
     @Transactional
     @PutMapping("/api/v1/user/image")
-    public ResponseEntity<Object> updateImage(@AuthenticationPrincipal SignedUser signedUser, @RequestPart MultipartFile file) {
+    public ResponseEntity<Object> updateImage(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
+                                              @ApiParam(value = "이미지",allowMultiple = true,required = false)
+                                              @RequestPart MultipartFile file) {
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         userService.updateImage(signedUser.getUsername(),file);
@@ -173,7 +181,7 @@ public class UserApiController {
     @ApiOperation(value = "유저 이미지 삭제")
     @Transactional
     @DeleteMapping("/api/v1/user/image")
-    public ResponseEntity<Object> deleteImage(@AuthenticationPrincipal SignedUser signedUser) throws Exception{
+    public ResponseEntity<Object> deleteImage(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser) throws Exception{
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         userService.deleteImage(signedUser.getUsername());
@@ -185,7 +193,9 @@ public class UserApiController {
 
     @ApiOperation(value = "유저 좋아요 삽입")
     @PostMapping("/api/v1/user/like")
-    public ResponseEntity<Object> saveLike(@AuthenticationPrincipal SignedUser signedUser, @RequestParam Integer dealPostId) {
+    public ResponseEntity<Object> saveLike(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
+                                           @ApiParam(value = "거래 글 아이디",example = "1",required = true)
+                                           @RequestParam Integer dealPostId) {
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         userLikeService.save(signedUser.getUsername(),dealPostId);
@@ -197,7 +207,9 @@ public class UserApiController {
 
     @ApiOperation(value = "유저 좋아요 리스트 반환")
     @GetMapping("/api/v1/user/likes")
-    public ResponseEntity<Object> getLikes(@RequestParam Integer userId){
+    public ResponseEntity<Object> getLikes(
+            @ApiParam(value = "유저 아이디",example = "1",required = true)
+            @RequestParam Integer userId){
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 좋아요 리스트 반환 성공했습니다.")
@@ -206,7 +218,9 @@ public class UserApiController {
 
     @ApiOperation(value = "유저 좋아요 삭제")
     @DeleteMapping("/api/v1/user/like")
-    public ResponseEntity<Object> deleteLike(@AuthenticationPrincipal SignedUser signedUser,@RequestParam Integer dealPostId) {
+    public ResponseEntity<Object> deleteLike(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
+                                             @ApiParam(value = "거래 글 아이디",example = "1",required = true)
+                                             @RequestParam Integer dealPostId) {
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         User user=userService.getUser(signedUser.getUsername());
         userService.deleteLike(user.getId(),dealPostId);
