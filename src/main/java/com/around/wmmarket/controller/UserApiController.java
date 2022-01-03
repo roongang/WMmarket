@@ -15,6 +15,8 @@ import com.around.wmmarket.common.Constants;
 import com.around.wmmarket.service.user.CustomUserDetailsService;
 import com.around.wmmarket.service.user.UserService;
 import com.around.wmmarket.service.userLike.UserLikeService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
@@ -38,7 +40,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-// TODO : User image 처리
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -51,6 +52,7 @@ public class UserApiController {
     private final ResourceLoader resourceLoader;
     private final Tika tika=new Tika();
 
+    @ApiOperation(value = "유저 삽입")
     @Transactional
     @PostMapping("/api/v1/user")
     public ResponseEntity<Object> save(@ModelAttribute UserSaveRequestDto requestDto){
@@ -61,6 +63,7 @@ public class UserApiController {
     }
 
     // TODO : 분산환경을 위해 쿠키방식 생각
+    @ApiOperation(value = "유저 로그인")
     @Transactional
     @PostMapping("/api/v1/user/signIn")
     public ResponseEntity<Object> signIn(@RequestBody UserSigninRequestDto requestDto,HttpSession session){
@@ -86,14 +89,7 @@ public class UserApiController {
                         .message("유저 로그인 성공했습니다.").build());
     }
 
-    // TODO : Deprecated
-    @GetMapping("/api/v1/user/isExist")
-    public ResponseEntity<Object> isExist(@RequestParam String email){
-        return ResponseHandler.toResponse(SuccessResponse.builder()
-                .status(HttpStatus.OK)
-                .data(userService.isExist(email)).build());
-    }
-
+    @ApiOperation(value = "유저 반환")
     @GetMapping("/api/v1/user")
     public ResponseEntity<Object> get(@RequestParam String email){
         UserGetResponseDto responseDto = userService.getUserResponseDto(email);
@@ -103,7 +99,7 @@ public class UserApiController {
                 .data(responseDto).build());
     }
 
-    // put
+    @ApiOperation(value = "유저 수정")
     @Transactional
     @PutMapping("/api/v1/user")
     public ResponseEntity<Object> update(@AuthenticationPrincipal SignedUser signedUser, @RequestBody UserUpdateRequestDto requestDto) {
@@ -118,7 +114,8 @@ public class UserApiController {
                 .message("유저 수정 성공했습니다.")
                 .data(responseDto).build());
     }
-    // delete
+
+    @ApiOperation(value = "유저 삭제")
     @Transactional
     @DeleteMapping("/api/v1/user")
     public ResponseEntity<Object> delete(@AuthenticationPrincipal SignedUser signedUser,HttpSession session){
@@ -133,7 +130,7 @@ public class UserApiController {
                 .build());
     }
 
-    // userImage get
+    @ApiOperation(value = "유저 이미지 반환")
     @GetMapping("/api/v1/user/image")
     public ResponseEntity<Object> getImage(@RequestParam String email) {
         if(!userService.isExist(email)) throw new CustomException(ErrorCode.USER_NOT_FOUND);
@@ -160,7 +157,7 @@ public class UserApiController {
                 .resource(resource).build());
     }
 
-    // userImage put
+    @ApiOperation(value = "유저 이미지 수정")
     @Transactional
     @PutMapping("/api/v1/user/image")
     public ResponseEntity<Object> updateImage(@AuthenticationPrincipal SignedUser signedUser, @RequestPart MultipartFile file) {
@@ -173,7 +170,7 @@ public class UserApiController {
                 .build());
     }
 
-    // userImage delete
+    @ApiOperation(value = "유저 이미지 삭제")
     @Transactional
     @DeleteMapping("/api/v1/user/image")
     public ResponseEntity<Object> deleteImage(@AuthenticationPrincipal SignedUser signedUser) throws Exception{
@@ -186,7 +183,7 @@ public class UserApiController {
                 .build());
     }
 
-    // userLike
+    @ApiOperation(value = "유저 좋아요 삽입")
     @PostMapping("/api/v1/user/like")
     public ResponseEntity<Object> saveLike(@AuthenticationPrincipal SignedUser signedUser, @RequestParam Integer dealPostId) {
         // check
@@ -198,6 +195,7 @@ public class UserApiController {
                 .build());
     }
 
+    @ApiOperation(value = "유저 좋아요 리스트 반환")
     @GetMapping("/api/v1/user/likes")
     public ResponseEntity<Object> getLikes(@RequestParam Integer userId){
         return ResponseHandler.toResponse(SuccessResponse.builder()
@@ -206,6 +204,7 @@ public class UserApiController {
                 .data(userService.getLikesDealPostId(userId)).build());
     }
 
+    @ApiOperation(value = "유저 좋아요 삭제")
     @DeleteMapping("/api/v1/user/like")
     public ResponseEntity<Object> deleteLike(@AuthenticationPrincipal SignedUser signedUser,@RequestParam Integer dealPostId) {
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");

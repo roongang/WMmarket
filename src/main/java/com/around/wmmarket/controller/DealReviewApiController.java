@@ -11,6 +11,7 @@ import com.around.wmmarket.domain.deal_review.DealReviewRepository;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.dealReview.DealReviewService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ public class DealReviewApiController {
     private final DealReviewService dealReviewService;
     private final DealReviewRepository dealReviewRepository;
 
+    @ApiOperation(value = "거래 글 리뷰 삽입")
     @PostMapping("/api/v1/dealReview")
     public ResponseEntity<?> save(@AuthenticationPrincipal SignedUser signedUser, @RequestBody DealReviewSaveRequestDto requestDto) throws Exception{
         // check signedUser
@@ -44,6 +46,7 @@ public class DealReviewApiController {
                 .build());
     }
 
+    @ApiOperation(value = "거래 글 리뷰 반환")
     @GetMapping("/api/v1/dealReview")
     public ResponseEntity<?> get(@RequestParam Integer dealReviewId) throws Exception{
         return ResponseHandler.toResponse(SuccessResponse.builder()
@@ -52,6 +55,7 @@ public class DealReviewApiController {
                 .data(dealReviewService.getResponseDto(dealReviewId)).build());
     }
 
+    @ApiOperation(value = "거래 글 리뷰 수정")
     @PutMapping("/api/v1/dealReview")
     public ResponseEntity<?> update(@AuthenticationPrincipal SignedUser signedUser,@RequestBody DealReviewUpdateRequestDto requestDto){
         // check signedUser
@@ -67,6 +71,7 @@ public class DealReviewApiController {
                 .build());
     }
 
+    @ApiOperation(value = "거래 글 리뷰 삭제")
     @DeleteMapping("/api/v1/dealReview")
     public ResponseEntity<?> delete(@AuthenticationPrincipal SignedUser signedUser,@RequestParam Integer dealReviewId) throws Exception{
         // check signedUser

@@ -12,6 +12,7 @@ import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.common.Constants;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.dealPostImage.DealPostImageService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
@@ -36,6 +37,7 @@ public class DealPostImageApiController {
     private final ResourceLoader resourceLoader;
     private final Tika tika=new Tika();
 
+    @ApiOperation(value = "거래 글 이미지 삽입")
     @Transactional
     @PostMapping("/api/v1/dealPostImage")
     public ResponseEntity<?> save(@AuthenticationPrincipal SignedUser signedUser, @ModelAttribute DealPostImageSaveRequestDto requestDto) throws Exception{
@@ -52,6 +54,7 @@ public class DealPostImageApiController {
                 .build());
     }
 
+    @ApiOperation(value = "거래 글 이미지 삭제")
     @Transactional
     @DeleteMapping("/api/v1/dealPostImage")
     public ResponseEntity<?> delete(@AuthenticationPrincipal SignedUser signedUser,@RequestParam Integer dealPostImageId) throws Exception{
@@ -68,6 +71,7 @@ public class DealPostImageApiController {
                 .build());
     }
 
+    @ApiOperation(value = "거래 글 이미지 반환")
     @GetMapping("/api/v1/dealPostImage")
     public ResponseEntity<?> get(@RequestParam Integer dealPostImageId) throws Exception{
         DealPostImage dealPostImage=dealPostImageService.get(dealPostImageId);

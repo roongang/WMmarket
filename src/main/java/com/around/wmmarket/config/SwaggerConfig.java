@@ -27,7 +27,7 @@ public class SwaggerConfig {
     private ApiInfo apiInfo(){
         return new ApiInfoBuilder()
                 .title("WM Swagger")
-                .description("test WM apis")
+                .description("WM api 를 테스트 해보세요!")
                 .version("1.0")
                 .build();
     }

@@ -10,6 +10,7 @@ import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.user.UserService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ public class DealPostApiController {
     private final DealPostService dealPostService;
     private final UserService userService;
 
+    @ApiOperation(value = "거래 글 삽입")
     @PostMapping("/api/v1/dealPost")
     public ResponseEntity<?> save(@AuthenticationPrincipal SignedUser signedUser,@ModelAttribute DealPostSaveRequestDto requestDto) throws Exception{
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
@@ -36,6 +38,7 @@ public class DealPostApiController {
                 .message("거래글 삽입 성공했습니다.").build());
     }
 
+    @ApiOperation(value = "거래 글 반환")
     @GetMapping("/api/v1/dealPost")
     public ResponseEntity<?> get(@RequestParam Integer dealPostId) throws Exception{
         DealPostGetResponseDto responseDto=dealPostService.getDealPostGetResponseDto(dealPostId);
@@ -44,6 +47,7 @@ public class DealPostApiController {
                 .data(responseDto).build());
     }
 
+    @ApiOperation(value = "거래 글 이미지 리스트 반환")
     @GetMapping("/api/v1/dealPost/images")
     public ResponseEntity<?> getImages(@RequestParam Integer dealPostId){
         List<Integer> images=dealPostService.getImages(dealPostId);
@@ -53,6 +57,7 @@ public class DealPostApiController {
                 .data(images).build());
     }
 
+    @ApiOperation(value = "거래 글 수정")
     @PutMapping("/api/v1/dealPost")
     public ResponseEntity<?> update(@AuthenticationPrincipal SignedUser signedUser, @RequestBody DealPostUpdateRequestDto requestDto){
         // TODO : 너무너무 더럽다 다시 정리해야할듯!
@@ -71,6 +76,7 @@ public class DealPostApiController {
                 .data(responseDto).build());
     }
 
+    @ApiOperation(value = "거래 글 삭제")
     @DeleteMapping("/api/v1/dealPost")
     public ResponseEntity<?> delete(@AuthenticationPrincipal SignedUser signedUser,@RequestParam Integer dealPostId) throws Exception{
         // check
