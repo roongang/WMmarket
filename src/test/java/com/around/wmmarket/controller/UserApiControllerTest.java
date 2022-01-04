@@ -125,7 +125,7 @@ public class UserApiControllerTest {
                 .param("password",testPassword)
                 .param("nickname",testNickname)
                 .param("role","USER")
-        ).andExpect(status().isOk());
+        ).andExpect(status().isCreated());
         // then
         List<User> allUser = userRepository.findAll();
         assertThat(allUser.get(0).getEmail()).isEqualTo(testEmail);
@@ -157,34 +157,13 @@ public class UserApiControllerTest {
         mvc.perform(post(url)
                 .session(session)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(new ObjectMapper().writeValueAsString(requestDto))).andExpect(status().isOk());
+                .content(new ObjectMapper().writeValueAsString(requestDto))).andExpect(status().isCreated());
         // then
         Object object = session.getAttribute("SPRING_SECURITY_CONTEXT");
         SecurityContextImpl context = (SecurityContextImpl) object;
         SignedUser signedUser = (SignedUser) context.getAuthentication().getPrincipal();
         assertThat(testEmail).isEqualTo(signedUser.getUsername());
         assertThat(passwordEncoder.matches(testPassword,signedUser.getPassword())).isTrue();
-    }
-
-    @Test
-    @Transactional
-    public void userExistTest() throws Exception{
-        // given
-        String url = "http://localhost:"+port+"/api/v1/user/isExist";
-        // when
-        MvcResult ret1 = mvc.perform(get(url)
-                .param("email","user@email"))
-                .andExpect(status().isOk())
-                .andReturn();
-        // 존재하지 않는 User 일때
-        MvcResult ret2 = mvc.perform(get(url)
-                .param("email","anotherEmail"))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        // then
-        assertThat(ret1.getResponse().getContentAsString()).contains("true");
-        assertThat(ret2.getResponse().getContentAsString()).contains("false");
     }
 
     @Test
@@ -316,7 +295,7 @@ public class UserApiControllerTest {
         // when
         mvc.perform(post(url)
                 .param("dealPostId",dealPost.getId().toString()))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         // then
         user=userRepository.findByEmail("user@email")
                         .orElseThrow(()->new UsernameNotFoundException("user@email"));
