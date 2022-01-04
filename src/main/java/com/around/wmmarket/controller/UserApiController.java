@@ -68,7 +68,7 @@ public class UserApiController {
     // TODO : 분산환경을 위해 쿠키방식 생각
     @ApiOperation(value = "유저 로그인") // SWAGGER
     @ApiResponses({
-            @ApiResponse(code = 201,message = "set session",response = Cookie.class),
+            @ApiResponse(code = 201,message = "set session"),
     })
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @Transactional
@@ -224,7 +224,7 @@ public class UserApiController {
 
     @ApiOperation(value = "유저 좋아요 리스트 반환") // SWAGGER
     @ApiResponses({
-            @ApiResponse(code = 200,message = "return body : List dealPost",response = ArrayList.class),
+            @ApiResponse(code = 200,message = "return body : List dealPostId",response = ArrayList.class),
     }) // SWAGGER
     @GetMapping("/api/v1/user/likes")
     public ResponseEntity<Object> getLikes(
