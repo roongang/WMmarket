@@ -11,10 +11,17 @@
 
 ---
 
-# API CALL TEST (POST MAN)
+# POST MAN
+- 로컬에서 테스트시에 간편함.
 ## [워크스페이스 링크](https://go.postman.co/workspace/Team-Workspace~5fdacef4-6989-4939-87ec-78d111ab3aec/collection/14335279-7d003794-b445-44e1-90cd-f6b9f6160b71)
 
+### 주의사항
 - request에 이미지 필요시 직접 넣어줘야함.
+---
+# SWAGGER
+- [domain]/swagger-ui.html 로 접근
+- 테스트 용도보단 문서 역할로 사용
+- api call의 설명, 예제, 필수여부가 포함되어있음.
 
 ---
 
