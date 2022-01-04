@@ -12,6 +12,10 @@ import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.common.Constants;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.dealPostImage.DealPostImageService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
@@ -22,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.transaction.Transactional;
 import java.io.File;
@@ -36,9 +41,14 @@ public class DealPostImageApiController {
     private final ResourceLoader resourceLoader;
     private final Tika tika=new Tika();
 
+    @ApiOperation(value = "거래 글 이미지 삽입") // SWAGGER
+    @ApiResponses({
+            @ApiResponse(code = 201, message = "CREATED"),
+    })
+    @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @Transactional
     @PostMapping("/api/v1/dealPostImage")
-    public ResponseEntity<?> save(@AuthenticationPrincipal SignedUser signedUser, @ModelAttribute DealPostImageSaveRequestDto requestDto) throws Exception{
+    public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser, @ModelAttribute DealPostImageSaveRequestDto requestDto) throws Exception{
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         // signedUser 와 dealPostId 의 email 비교
         if(!dealPostService.isDealPostAuthor(signedUser,requestDto.getDealPostId())){
@@ -52,9 +62,12 @@ public class DealPostImageApiController {
                 .build());
     }
 
+    @ApiOperation(value = "거래 글 이미지 삭제") // SWAGGER
     @Transactional
     @DeleteMapping("/api/v1/dealPostImage")
-    public ResponseEntity<?> delete(@AuthenticationPrincipal SignedUser signedUser,@RequestParam Integer dealPostImageId) throws Exception{
+    public ResponseEntity<?> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
+                                    @ApiParam(value = "거래 글 이미지 아이디",example = "1",required = true)
+                                    @RequestParam Integer dealPostImageId) throws Exception{
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         // signedUser 와 dealPostId 의 email 비교
         DealPostImage dealPostImage=dealPostImageService.get(dealPostImageId);
@@ -68,8 +81,14 @@ public class DealPostImageApiController {
                 .build());
     }
 
+    @ApiOperation(value = "거래 글 이미지 반환") // SWAGGER
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "return Image File")
+    }) // SWAGGER
     @GetMapping("/api/v1/dealPostImage")
-    public ResponseEntity<?> get(@RequestParam Integer dealPostImageId) throws Exception{
+    public ResponseEntity<?> get(
+            @ApiParam(value = "거래 글 이미지 아이디",example = "1",required = true)
+            @RequestParam Integer dealPostImageId) throws Exception{
         DealPostImage dealPostImage=dealPostImageService.get(dealPostImageId);
         String fileName=dealPostImage.getName();
         Resource resource=resourceLoader.getResource("file:"+ Paths.get(Constants.dealPostImagePath.toString(),fileName));

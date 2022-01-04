@@ -2,6 +2,7 @@ package com.around.wmmarket.controller;
 
 import com.around.wmmarket.common.ResponseHandler;
 import com.around.wmmarket.common.SuccessResponse;
+import com.around.wmmarket.controller.dto.dealReview.DealReviewGetResponseDto;
 import com.around.wmmarket.controller.dto.dealReview.DealReviewSaveRequestDto;
 import com.around.wmmarket.controller.dto.dealReview.DealReviewUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.DealPost;
@@ -11,11 +12,16 @@ import com.around.wmmarket.domain.deal_review.DealReviewRepository;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.dealReview.DealReviewService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.NoSuchElementException;
 
@@ -26,8 +32,13 @@ public class DealReviewApiController {
     private final DealReviewService dealReviewService;
     private final DealReviewRepository dealReviewRepository;
 
+    @ApiOperation(value = "거래 글 리뷰 삽입") // SWAGGER
+    @ApiResponses({
+            @ApiResponse(code = 201, message = "CREATED"),
+    })
+    @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @PostMapping("/api/v1/dealReview")
-    public ResponseEntity<?> save(@AuthenticationPrincipal SignedUser signedUser, @RequestBody DealReviewSaveRequestDto requestDto) throws Exception{
+    public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser, @RequestBody DealReviewSaveRequestDto requestDto) throws Exception{
         // check signedUser
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         DealPost dealPost=dealPostService.getDealPost(requestDto.getDealPostId());
@@ -44,16 +55,23 @@ public class DealReviewApiController {
                 .build());
     }
 
+    @ApiOperation(value = "거래 글 리뷰 반환") // SWAGGER
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "return data : dealReview info",response = DealReviewGetResponseDto.class)
+    }) // SWAGGER
     @GetMapping("/api/v1/dealReview")
-    public ResponseEntity<?> get(@RequestParam Integer dealReviewId) throws Exception{
+    public ResponseEntity<?> get(
+            @ApiParam(value = "거래 리뷰 아이디",example = "1",required = true)
+            @RequestParam Integer dealReviewId) throws Exception{
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("거래글 리뷰 반환 성공했습니다.")
                 .data(dealReviewService.getResponseDto(dealReviewId)).build());
     }
 
+    @ApiOperation(value = "거래 글 리뷰 수정") // SWAGGER
     @PutMapping("/api/v1/dealReview")
-    public ResponseEntity<?> update(@AuthenticationPrincipal SignedUser signedUser,@RequestBody DealReviewUpdateRequestDto requestDto){
+    public ResponseEntity<?> update(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,@RequestBody DealReviewUpdateRequestDto requestDto){
         // check signedUser
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         DealReview dealReview=dealReviewRepository.findById(requestDto.getDealReviewId())
@@ -67,8 +85,11 @@ public class DealReviewApiController {
                 .build());
     }
 
+    @ApiOperation(value = "거래 글 리뷰 삭제") // SWAGGER
     @DeleteMapping("/api/v1/dealReview")
-    public ResponseEntity<?> delete(@AuthenticationPrincipal SignedUser signedUser,@RequestParam Integer dealReviewId) throws Exception{
+    public ResponseEntity<?> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
+                                    @ApiParam(value = "거래 리뷰 아이디",example = "1",required = true)
+                                    @RequestParam Integer dealReviewId) throws Exception{
         // check signedUser
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         DealReview dealReview=dealReviewRepository.findById(dealReviewId)

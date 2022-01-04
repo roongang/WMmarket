@@ -25,8 +25,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserRepository userRepository;
 
     @Override
-    public void configure(WebSecurity web) throws Exception{
-        web.ignoring().antMatchers("/css/**","/js/**","/static/**","/h2-console/**");
+    public void configure(WebSecurity web) {
+        web.ignoring().antMatchers("/css/**","/js/**","/static/**","/h2-console/**","/swagger-ui.html/**");
     }
     @Override
     protected void configure(HttpSecurity http) throws Exception{
