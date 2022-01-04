@@ -14,6 +14,8 @@ import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.dealPostImage.DealPostImageService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
@@ -40,6 +42,10 @@ public class DealPostImageApiController {
     private final Tika tika=new Tika();
 
     @ApiOperation(value = "거래 글 이미지 삽입")
+    @ApiResponses({
+            @ApiResponse(code = 201, message = "CREATED"),
+    })
+    @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @Transactional
     @PostMapping("/api/v1/dealPostImage")
     public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser, @ModelAttribute DealPostImageSaveRequestDto requestDto) throws Exception{
@@ -76,6 +82,9 @@ public class DealPostImageApiController {
     }
 
     @ApiOperation(value = "거래 글 이미지 반환")
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "return Image File")
+    })
     @GetMapping("/api/v1/dealPostImage")
     public ResponseEntity<?> get(
             @ApiParam(value = "거래 글 이미지 아이디",example = "1",required = true)

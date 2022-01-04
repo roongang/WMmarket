@@ -1,8 +1,6 @@
 package com.around.wmmarket.controller;
 
-import com.around.wmmarket.common.ResourceResponse;
-import com.around.wmmarket.common.SuccessResponse;
-import com.around.wmmarket.common.ResponseHandler;
+import com.around.wmmarket.common.*;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.user.UserGetResponseDto;
@@ -11,13 +9,10 @@ import com.around.wmmarket.controller.dto.user.UserSignInRequestDto;
 import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
-import com.around.wmmarket.common.Constants;
 import com.around.wmmarket.service.user.CustomUserDetailsService;
 import com.around.wmmarket.service.user.UserService;
 import com.around.wmmarket.service.userLike.UserLikeService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
@@ -36,11 +31,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -54,18 +51,26 @@ public class UserApiController {
     private final ResourceLoader resourceLoader;
     private final Tika tika=new Tika();
 
-    @ApiOperation(value = "유저 삽입")
+    @ApiOperation(value = "유저 삽입") // SWAGGER
+    @ApiResponses({
+            @ApiResponse(code = 201, message = "CREATED"),
+    })
+    @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @Transactional
     @PostMapping("/api/v1/user")
     public ResponseEntity<Object> save(@ModelAttribute UserSaveRequestDto requestDto){
         userService.save(requestDto);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .message("유저 회원가입 성공했습니다.")
-                .status(HttpStatus.OK).build());
+                .status(HttpStatus.CREATED).build());
     }
 
     // TODO : 분산환경을 위해 쿠키방식 생각
-    @ApiOperation(value = "유저 로그인")
+    @ApiOperation(value = "유저 로그인") // SWAGGER
+    @ApiResponses({
+            @ApiResponse(code = 201,message = "set session",response = Cookie.class),
+    })
+    @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @Transactional
     @PostMapping("/api/v1/user/signIn")
     public ResponseEntity<Object> signIn(@RequestBody UserSignInRequestDto requestDto,@ApiIgnore HttpSession session){
@@ -87,11 +92,14 @@ public class UserApiController {
         // 세션에 컨텍스트 저장
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,SecurityContextHolder.getContext());
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                        .status(HttpStatus.OK)
+                        .status(HttpStatus.CREATED)
                         .message("유저 로그인 성공했습니다.").build());
     }
 
-    @ApiOperation(value = "유저 반환")
+    @ApiOperation(value = "유저 반환") // SWAGGER
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "return body : user info",response = UserGetResponseDto.class),
+    }) // SWAGGER
     @GetMapping("/api/v1/user")
     public ResponseEntity<Object> get(
             @ApiParam(value = "유저 이메일",example = "test_email@gmail.com",required = true)
@@ -103,7 +111,7 @@ public class UserApiController {
                 .data(responseDto).build());
     }
 
-    @ApiOperation(value = "유저 수정")
+    @ApiOperation(value = "유저 수정") // SWAGGER
     @Transactional
     @PutMapping("/api/v1/user")
     public ResponseEntity<Object> update(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser, @RequestBody UserUpdateRequestDto requestDto) {
@@ -112,14 +120,16 @@ public class UserApiController {
 
         // update
         userService.update(signedUser.getUsername(),requestDto);
-        UserGetResponseDto responseDto=userService.getUserResponseDto(signedUser.getUsername());
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 수정 성공했습니다.")
-                .data(responseDto).build());
+                .build());
     }
 
-    @ApiOperation(value = "유저 삭제")
+    @ApiOperation(value = "유저 삭제") // SWAGGER
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "remove session"),
+    }) // SWAGGER
     @Transactional
     @DeleteMapping("/api/v1/user")
     public ResponseEntity<Object> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,@ApiIgnore HttpSession session){
@@ -134,7 +144,10 @@ public class UserApiController {
                 .build());
     }
 
-    @ApiOperation(value = "유저 이미지 반환")
+    @ApiOperation(value = "유저 이미지 반환") // SWAGGER
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "return Image File"),
+    }) // SWAGGER
     @GetMapping("/api/v1/user/image")
     public ResponseEntity<Object> getImage(
             @ApiParam(value = "유저 이메일",example = "test_email@gmail.com",required = true)
@@ -163,7 +176,7 @@ public class UserApiController {
                 .resource(resource).build());
     }
 
-    @ApiOperation(value = "유저 이미지 수정")
+    @ApiOperation(value = "유저 이미지 수정") // SWAGGER
     @Transactional
     @PutMapping("/api/v1/user/image")
     public ResponseEntity<Object> updateImage(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
@@ -178,7 +191,7 @@ public class UserApiController {
                 .build());
     }
 
-    @ApiOperation(value = "유저 이미지 삭제")
+    @ApiOperation(value = "유저 이미지 삭제") // SWAGGER
     @Transactional
     @DeleteMapping("/api/v1/user/image")
     public ResponseEntity<Object> deleteImage(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser) throws Exception{
@@ -191,7 +204,11 @@ public class UserApiController {
                 .build());
     }
 
-    @ApiOperation(value = "유저 좋아요 삽입")
+    @ApiOperation(value = "유저 좋아요 삽입") // SWAGGER
+    @ApiResponses({
+            @ApiResponse(code = 201,message = "CREATED"),
+    })
+    @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @PostMapping("/api/v1/user/like")
     public ResponseEntity<Object> saveLike(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                            @ApiParam(value = "거래 글 아이디",example = "1",required = true)
@@ -200,12 +217,15 @@ public class UserApiController {
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         userLikeService.save(signedUser.getUsername(),dealPostId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.CREATED)
                 .message("유저 좋아요 삽입 성공하였습니다.")
                 .build());
     }
 
-    @ApiOperation(value = "유저 좋아요 리스트 반환")
+    @ApiOperation(value = "유저 좋아요 리스트 반환") // SWAGGER
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "return body : List dealPost",response = ArrayList.class),
+    }) // SWAGGER
     @GetMapping("/api/v1/user/likes")
     public ResponseEntity<Object> getLikes(
             @ApiParam(value = "유저 아이디",example = "1",required = true)
@@ -216,7 +236,7 @@ public class UserApiController {
                 .data(userService.getLikesDealPostId(userId)).build());
     }
 
-    @ApiOperation(value = "유저 좋아요 삭제")
+    @ApiOperation(value = "유저 좋아요 삭제") // SWAGGER
     @DeleteMapping("/api/v1/user/like")
     public ResponseEntity<Object> deleteLike(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                              @ApiParam(value = "거래 글 아이디",example = "1",required = true)

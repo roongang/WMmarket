@@ -2,6 +2,7 @@ package com.around.wmmarket.controller;
 
 import com.around.wmmarket.common.ResponseHandler;
 import com.around.wmmarket.common.SuccessResponse;
+import com.around.wmmarket.controller.dto.dealReview.DealReviewGetResponseDto;
 import com.around.wmmarket.controller.dto.dealReview.DealReviewSaveRequestDto;
 import com.around.wmmarket.controller.dto.dealReview.DealReviewUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.DealPost;
@@ -13,6 +14,8 @@ import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.dealReview.DealReviewService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +33,10 @@ public class DealReviewApiController {
     private final DealReviewRepository dealReviewRepository;
 
     @ApiOperation(value = "거래 글 리뷰 삽입")
+    @ApiResponses({
+            @ApiResponse(code = 201, message = "CREATED"),
+    })
+    @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @PostMapping("/api/v1/dealReview")
     public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser, @RequestBody DealReviewSaveRequestDto requestDto) throws Exception{
         // check signedUser
@@ -49,6 +56,9 @@ public class DealReviewApiController {
     }
 
     @ApiOperation(value = "거래 글 리뷰 반환")
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "return data : dealReview info",response = DealReviewGetResponseDto.class)
+    })
     @GetMapping("/api/v1/dealReview")
     public ResponseEntity<?> get(
             @ApiParam(value = "거래 리뷰 아이디",example = "1",required = true)
