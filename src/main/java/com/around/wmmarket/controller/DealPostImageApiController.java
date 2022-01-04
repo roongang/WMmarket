@@ -41,7 +41,7 @@ public class DealPostImageApiController {
     private final ResourceLoader resourceLoader;
     private final Tika tika=new Tika();
 
-    @ApiOperation(value = "거래 글 이미지 삽입")
+    @ApiOperation(value = "거래 글 이미지 삽입") // SWAGGER
     @ApiResponses({
             @ApiResponse(code = 201, message = "CREATED"),
     })
@@ -62,7 +62,7 @@ public class DealPostImageApiController {
                 .build());
     }
 
-    @ApiOperation(value = "거래 글 이미지 삭제")
+    @ApiOperation(value = "거래 글 이미지 삭제") // SWAGGER
     @Transactional
     @DeleteMapping("/api/v1/dealPostImage")
     public ResponseEntity<?> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
@@ -81,10 +81,10 @@ public class DealPostImageApiController {
                 .build());
     }
 
-    @ApiOperation(value = "거래 글 이미지 반환")
+    @ApiOperation(value = "거래 글 이미지 반환") // SWAGGER
     @ApiResponses({
             @ApiResponse(code = 200,message = "return Image File")
-    })
+    }) // SWAGGER
     @GetMapping("/api/v1/dealPostImage")
     public ResponseEntity<?> get(
             @ApiParam(value = "거래 글 이미지 아이디",example = "1",required = true)

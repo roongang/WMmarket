@@ -34,7 +34,7 @@ public class DealPostApiController {
     private final DealPostService dealPostService;
     private final UserService userService;
 
-    @ApiOperation(value = "거래 글 삽입")
+    @ApiOperation(value = "거래 글 삽입") // SWAGGER
     @ApiResponses({
             @ApiResponse(code = 201, message = "CREATED"),
     })
@@ -48,7 +48,7 @@ public class DealPostApiController {
                 .message("거래글 삽입 성공했습니다.").build());
     }
 
-    @ApiOperation(value = "거래 글 반환")
+    @ApiOperation(value = "거래 글 반환") // SWAGGER
     @ApiResponses({
             @ApiResponse(code = 200,message = "return body : dealPost info",response = DealPostGetResponseDto.class),
     }) // SWAGGER
@@ -62,7 +62,7 @@ public class DealPostApiController {
                 .data(responseDto).build());
     }
 
-    @ApiOperation(value = "거래 글 이미지 리스트 반환")
+    @ApiOperation(value = "거래 글 이미지 리스트 반환") // SWAGGER
     @ApiResponses({
             @ApiResponse(code = 200,message = "return body : List dealPostImageId",response = ArrayList.class),
     }) // SWAGGER
@@ -77,7 +77,7 @@ public class DealPostApiController {
                 .data(imageIds).build());
     }
 
-    @ApiOperation(value = "거래 글 수정")
+    @ApiOperation(value = "거래 글 수정") // SWAGGER
     @PutMapping("/api/v1/dealPost")
     public ResponseEntity<?> update(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser, @RequestBody DealPostUpdateRequestDto requestDto){
         // TODO : 너무너무 더럽다 다시 정리해야할듯!
@@ -95,7 +95,7 @@ public class DealPostApiController {
                 .build());
     }
 
-    @ApiOperation(value = "거래 글 삭제")
+    @ApiOperation(value = "거래 글 삭제") // SWAGGER
     @DeleteMapping("/api/v1/dealPost")
     public ResponseEntity<?> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                     @ApiParam(value = "거래 글 아이디",example = "1",required = true)

@@ -32,7 +32,7 @@ public class DealReviewApiController {
     private final DealReviewService dealReviewService;
     private final DealReviewRepository dealReviewRepository;
 
-    @ApiOperation(value = "거래 글 리뷰 삽입")
+    @ApiOperation(value = "거래 글 리뷰 삽입") // SWAGGER
     @ApiResponses({
             @ApiResponse(code = 201, message = "CREATED"),
     })
@@ -55,10 +55,10 @@ public class DealReviewApiController {
                 .build());
     }
 
-    @ApiOperation(value = "거래 글 리뷰 반환")
+    @ApiOperation(value = "거래 글 리뷰 반환") // SWAGGER
     @ApiResponses({
             @ApiResponse(code = 200,message = "return data : dealReview info",response = DealReviewGetResponseDto.class)
-    })
+    }) // SWAGGER
     @GetMapping("/api/v1/dealReview")
     public ResponseEntity<?> get(
             @ApiParam(value = "거래 리뷰 아이디",example = "1",required = true)
@@ -69,7 +69,7 @@ public class DealReviewApiController {
                 .data(dealReviewService.getResponseDto(dealReviewId)).build());
     }
 
-    @ApiOperation(value = "거래 글 리뷰 수정")
+    @ApiOperation(value = "거래 글 리뷰 수정") // SWAGGER
     @PutMapping("/api/v1/dealReview")
     public ResponseEntity<?> update(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,@RequestBody DealReviewUpdateRequestDto requestDto){
         // check signedUser
@@ -85,7 +85,7 @@ public class DealReviewApiController {
                 .build());
     }
 
-    @ApiOperation(value = "거래 글 리뷰 삭제")
+    @ApiOperation(value = "거래 글 리뷰 삭제") // SWAGGER
     @DeleteMapping("/api/v1/dealReview")
     public ResponseEntity<?> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                     @ApiParam(value = "거래 리뷰 아이디",example = "1",required = true)
