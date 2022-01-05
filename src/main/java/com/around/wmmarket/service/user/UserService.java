@@ -58,6 +58,24 @@ public class UserService{
                 .orElse(null);
         if(user==null) return null;
         return UserGetResponseDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .role(user.getRole())
+                .city_1(user.getCity_1())
+                .town_1(user.getTown_1())
+                .city_2(user.getCity_2())
+                .town_2(user.getTown_2())
+                .isAuth(user.getIsAuth())
+                .code(user.getCode())
+                .build();
+    }
+    public UserGetResponseDto getUserResponseDto(Integer id){
+        User user = userRepository.findById(id)
+                .orElse(null);
+        if(user==null) return null;
+        return UserGetResponseDto.builder()
+                .id(user.getId())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
                 .role(user.getRole())
@@ -86,8 +104,8 @@ public class UserService{
     }
 
     @Transactional
-    public void update(String email, UserUpdateRequestDto requestDto) {
-        User user=userRepository.findByEmail(email)
+    public void update(Integer id, UserUpdateRequestDto requestDto) {
+        User user=userRepository.findById(id)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         if(requestDto.getPassword()!=null) user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         if(requestDto.getNickname()!=null) user.setNickname(requestDto.getNickname());
@@ -99,31 +117,31 @@ public class UserService{
     }
 
     @Transactional
-    public void delete(String email){
-        User user=userRepository.findByEmail(email)
+    public void delete(Integer id){
+        User user=userRepository.findById(id)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         userRepository.delete(user);
     }
 
-    public String getImage(String email){
-        User user=userRepository.findByEmail(email)
+    public String getImage(Integer id){
+        User user=userRepository.findById(id)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         return user.getImage();
     }
-    public void updateImage(String email,MultipartFile file) {
+    public void updateImage(Integer userId,MultipartFile file) {
         // check
-        User user=userRepository.findByEmail(email)
+        User user=userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         if(file==null) //throw new CustomException(ErrorCode.PARAMETER_NULL);
         // delete remain image
         if(user.getImage()==null) throw new CustomException(ErrorCode.USER_IMAGE_NOT_FOUND);
-        try { deleteImage(email); } catch (Exception e) { throw new CustomException(ErrorCode.DELETE_FAIL); }
+        try { deleteImage(userId); } catch (Exception e) { throw new CustomException(ErrorCode.DELETE_FAIL); }
         // new image
         String image=fileHandler.parseUserImage(file);
         user.setImage(image);
     }
-    public void deleteImage(String email) throws Exception{
-        User user=userRepository.findByEmail(email)
+    public void deleteImage(Integer userId) throws Exception{
+        User user=userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         if(user.getImage()!=null) fileHandler.delete(Constants.userImagePath,user.getImage());
         user.setImage(null);

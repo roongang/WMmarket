@@ -9,6 +9,8 @@ import lombok.*;
 @Getter
 @Builder
 public class UserGetResponseDto {
+    @ApiModelProperty(value = "유저 아이디",example = "1",required = true)
+    private Integer id;
     @ApiModelProperty(value = "유저 이메일",example = "test_email@gmail.com",required = true)
     private String email;
     @ApiModelProperty(value = "유저 닉네임",example = "nickname",required = true)

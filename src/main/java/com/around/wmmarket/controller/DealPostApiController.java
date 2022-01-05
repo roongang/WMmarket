@@ -1,12 +1,10 @@
 package com.around.wmmarket.controller;
 
-import com.around.wmmarket.common.ResourceResponse;
 import com.around.wmmarket.common.ResponseHandler;
 import com.around.wmmarket.common.SuccessResponse;
 import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostSaveRequestDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostUpdateRequestDto;
-import com.around.wmmarket.controller.dto.user.UserGetResponseDto;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.dealPost.DealPostService;
@@ -39,7 +37,7 @@ public class DealPostApiController {
             @ApiResponse(code = 201, message = "CREATED"),
     })
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
-    @PostMapping("/api/v1/deal/post")
+    @PostMapping("/api/v1/dealPost")
     public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,@ModelAttribute DealPostSaveRequestDto requestDto) throws Exception{
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         dealPostService.save(signedUser,requestDto);
@@ -52,7 +50,7 @@ public class DealPostApiController {
     @ApiResponses({
             @ApiResponse(code = 200,message = "return body : dealPost info",response = DealPostGetResponseDto.class),
     }) // SWAGGER
-    @GetMapping("/api/v1/deal/post")
+    @GetMapping("/api/v1/dealPost")
     public ResponseEntity<?> get(
             @ApiParam(value = "거래 글 아이디",example = "1",required = true)
             @RequestParam Integer dealPostId) throws Exception{
@@ -62,23 +60,23 @@ public class DealPostApiController {
                 .data(responseDto).build());
     }
 
-    @ApiOperation(value = "거래 글 이미지들 ID 반환") // SWAGGER
+    @ApiOperation(value = "거래 글 이미지 리스트 반환") // SWAGGER
     @ApiResponses({
             @ApiResponse(code = 200,message = "return body : List dealPostImageId",response = ArrayList.class),
     }) // SWAGGER
-    @GetMapping("/api/v1/deal/post/images/id")
+    @GetMapping("/api/v1/dealPost/images")
     public ResponseEntity<?> getImages(
             @ApiParam(value = "거래 글 아이디",example = "1",required = true)
             @RequestParam Integer dealPostId){
         List<Integer> imageIds=dealPostService.getImages(dealPostId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
-                .message("거래 글 이미지들 ID 반환 성공했습니다.")
+                .message("거래 글 이미지 리스트 반환 성공했습니다.")
                 .data(imageIds).build());
     }
 
     @ApiOperation(value = "거래 글 수정") // SWAGGER
-    @PutMapping("/api/v1/deal/post")
+    @PutMapping("/api/v1/dealPost")
     public ResponseEntity<?> update(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser, @RequestBody DealPostUpdateRequestDto requestDto){
         // TODO : 너무너무 더럽다 다시 정리해야할듯!
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
@@ -96,7 +94,7 @@ public class DealPostApiController {
     }
 
     @ApiOperation(value = "거래 글 삭제") // SWAGGER
-    @DeleteMapping("/api/v1/deal/post")
+    @DeleteMapping("/api/v1/dealPost")
     public ResponseEntity<?> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                     @ApiParam(value = "거래 글 아이디",example = "1",required = true)
                                     @RequestParam Integer dealPostId) throws Exception{
