@@ -47,7 +47,7 @@ public class DealPostImageApiController {
     })
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @Transactional
-    @PostMapping("/api/v1/dealPostImage")
+    @PostMapping("/api/v1/deal/post/image")
     public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser, @ModelAttribute DealPostImageSaveRequestDto requestDto) throws Exception{
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
         // signedUser 와 dealPostId 의 email 비교
@@ -64,7 +64,7 @@ public class DealPostImageApiController {
 
     @ApiOperation(value = "거래 글 이미지 삭제") // SWAGGER
     @Transactional
-    @DeleteMapping("/api/v1/dealPostImage")
+    @DeleteMapping("/api/v1/deal/post/image")
     public ResponseEntity<?> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                     @ApiParam(value = "거래 글 이미지 아이디",example = "1",required = true)
                                     @RequestParam Integer dealPostImageId) throws Exception{
@@ -85,7 +85,7 @@ public class DealPostImageApiController {
     @ApiResponses({
             @ApiResponse(code = 200,message = "return Image File")
     }) // SWAGGER
-    @GetMapping("/api/v1/dealPostImage")
+    @GetMapping("/api/v1/deal/post/image")
     public ResponseEntity<?> get(
             @ApiParam(value = "거래 글 이미지 아이디",example = "1",required = true)
             @RequestParam Integer dealPostImageId) throws Exception{

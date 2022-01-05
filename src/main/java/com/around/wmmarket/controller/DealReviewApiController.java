@@ -37,7 +37,7 @@ public class DealReviewApiController {
             @ApiResponse(code = 201, message = "CREATED"),
     })
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
-    @PostMapping("/api/v1/dealReview")
+    @PostMapping("/api/v1/deal/review")
     public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser, @RequestBody DealReviewSaveRequestDto requestDto) throws Exception{
         // check signedUser
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
@@ -59,7 +59,7 @@ public class DealReviewApiController {
     @ApiResponses({
             @ApiResponse(code = 200,message = "return data : dealReview info",response = DealReviewGetResponseDto.class)
     }) // SWAGGER
-    @GetMapping("/api/v1/dealReview")
+    @GetMapping("/api/v1/deal/review")
     public ResponseEntity<?> get(
             @ApiParam(value = "거래 리뷰 아이디",example = "1",required = true)
             @RequestParam Integer dealReviewId) throws Exception{
@@ -70,7 +70,7 @@ public class DealReviewApiController {
     }
 
     @ApiOperation(value = "거래 글 리뷰 수정") // SWAGGER
-    @PutMapping("/api/v1/dealReview")
+    @PutMapping("/api/v1/deal/review")
     public ResponseEntity<?> update(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,@RequestBody DealReviewUpdateRequestDto requestDto){
         // check signedUser
         if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
@@ -86,7 +86,7 @@ public class DealReviewApiController {
     }
 
     @ApiOperation(value = "거래 글 리뷰 삭제") // SWAGGER
-    @DeleteMapping("/api/v1/dealReview")
+    @DeleteMapping("/api/v1/deal/review")
     public ResponseEntity<?> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                     @ApiParam(value = "거래 리뷰 아이디",example = "1",required = true)
                                     @RequestParam Integer dealReviewId) throws Exception{

@@ -324,7 +324,7 @@ public class UserApiControllerTest {
                 .dealPost(dealPost)
                 .build());
 
-        String url="http://localhost"+port+"/api/v1/user/likes";
+        String url="http://localhost"+port+"/api/v1/user/likes/id";
         // when
         MvcResult result=mvc.perform(get(url)
                 .param("userId",user.getId().toString()))

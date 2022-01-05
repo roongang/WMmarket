@@ -107,7 +107,7 @@ public class DealPostApiControllerTest {
         requestDto.setTitle("title");
         requestDto.setPrice(1000);
         requestDto.setContent("content");
-        String url = "http://localhost:"+port+"/api/v1/dealPost";
+        String url = "http://localhost:"+port+"/api/v1/deal/post";
         // when
         mvc.perform(multipart(url)
                 .file(file1)
@@ -135,7 +135,7 @@ public class DealPostApiControllerTest {
                 .dealState(DealState.ONGOING).build();
         dealPostRepository.save(dealPost);
         int dealPostId=dealPostRepository.findAll().get(0).getId();
-        String url = "http://localhost:"+port+"/api/v1/dealPost";
+        String url = "http://localhost:"+port+"/api/v1/deal/post";
         // when
         MvcResult result=mvc.perform(get(url)
                 .param("dealPostId",Integer.toString(dealPostId)))
@@ -164,7 +164,7 @@ public class DealPostApiControllerTest {
                 .category(Category.B)
                 .content("update_content")
                 .dealState(DealState.DONE).build();
-        String url = "http://localhost:"+port+"/api/v1/dealPost";
+        String url = "http://localhost:"+port+"/api/v1/deal/post";
         // when
         mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -205,7 +205,7 @@ public class DealPostApiControllerTest {
                 .content("update_content")
                 .buyerId(user2.getId())
                 .dealState(DealState.DONE).build();
-        String url = "http://localhost:"+port+"/api/v1/dealPost";
+        String url = "http://localhost:"+port+"/api/v1/deal/post";
         // when
         mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -258,7 +258,7 @@ public class DealPostApiControllerTest {
                 .content("update_content")
                 .buyerId(user3.getId())
                 .dealState(DealState.DONE).build();
-        String url = "http://localhost:"+port+"/api/v1/dealPost";
+        String url = "http://localhost:"+port+"/api/v1/deal/post";
         // when
         mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -303,7 +303,7 @@ public class DealPostApiControllerTest {
                 .category(Category.B)
                 .content("update_content")
                 .dealState(DealState.ONGOING).build();
-        String url = "http://localhost:"+port+"/api/v1/dealPost";
+        String url = "http://localhost:"+port+"/api/v1/deal/post";
         // when
         mvc.perform(put(url)
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -326,7 +326,7 @@ public class DealPostApiControllerTest {
                 .content("content")
                 .dealState(DealState.ONGOING).build());
         int dealPostId=dealPostRepository.findAll().get(0).getId();
-        String url = "http://localhost:"+port+"/api/v1/dealPost";
+        String url = "http://localhost:"+port+"/api/v1/deal/post";
         // when
         mvc.perform(delete(url)
                 .param("dealPostId",Integer.toString(dealPostId)))

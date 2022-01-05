@@ -222,17 +222,17 @@ public class UserApiController {
                 .build());
     }
 
-    @ApiOperation(value = "유저 좋아요 리스트 반환") // SWAGGER
+    @ApiOperation(value = "유저 좋아요들 ID 반환") // SWAGGER
     @ApiResponses({
             @ApiResponse(code = 200,message = "return body : List dealPostId",response = ArrayList.class),
     }) // SWAGGER
-    @GetMapping("/api/v1/user/likes")
+    @GetMapping("/api/v1/user/likes/id")
     public ResponseEntity<Object> getLikes(
             @ApiParam(value = "유저 아이디",example = "1",required = true)
             @RequestParam Integer userId){
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
-                .message("유저 좋아요 리스트 반환 성공했습니다.")
+                .message("유저 좋아요들 ID 반환 성공했습니다.")
                 .data(userService.getLikesDealPostId(userId)).build());
     }
 

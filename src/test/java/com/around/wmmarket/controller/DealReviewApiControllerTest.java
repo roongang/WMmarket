@@ -125,7 +125,7 @@ public class DealReviewApiControllerTest {
         DealReviewSaveRequestDto requestDto=DealReviewSaveRequestDto.builder()
                 .dealPostId(dealPostRepository.findAll().get(0).getId())
                 .content("review_content").build();
-        String url="http://localhost:"+port+"/api/v1/dealReview";
+        String url="http://localhost:"+port+"/api/v1/deal/review";
         // when
         mvc.perform(post(url)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -150,7 +150,7 @@ public class DealReviewApiControllerTest {
                 .build();
         dealReviewRepository.save(dealReview);
 
-        String url="http://localhost:"+port+"/api/v1/dealReview";
+        String url="http://localhost:"+port+"/api/v1/deal/review";
         // when
         MvcResult result=mvc.perform(get(url)
                 .param("dealReviewId",dealReviewRepository.findAll().get(0).getId().toString()))
@@ -180,7 +180,7 @@ public class DealReviewApiControllerTest {
                 .dealReviewId(dealReviewRepository.findAll().get(0).getId())
                 .content("update_review")
                 .build();
-        String url="http://localhost:"+port+"/api/v1/dealReview";
+        String url="http://localhost:"+port+"/api/v1/deal/review";
         // when
         mvc.perform(put(url)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -206,7 +206,7 @@ public class DealReviewApiControllerTest {
                 .build();
         dealReviewRepository.save(dealReview);
 
-        String url="http://localhost:"+port+"/api/v1/dealReview";
+        String url="http://localhost:"+port+"/api/v1/deal/review";
         // when
         mvc.perform(delete(url)
                 .param("dealReviewId",dealReviewRepository.findAll().get(0).getId().toString()))
