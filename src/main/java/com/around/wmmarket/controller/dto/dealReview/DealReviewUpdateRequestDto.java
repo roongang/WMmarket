@@ -11,4 +11,5 @@ import lombok.Getter;
 public class DealReviewUpdateRequestDto {
     @ApiModelProperty(value = "리뷰 내용",example = "수정한 리뷰 내용입니다.",required = true)
     private String content;
+    private String tmp;
 }

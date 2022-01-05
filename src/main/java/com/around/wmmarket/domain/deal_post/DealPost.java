@@ -48,7 +48,7 @@ public class DealPost extends BaseTimeEntity {
     private DealState dealState;
 
     @OneToMany(mappedBy = "dealPost")
-    private List<DealPostImage> dealPostImages = new ArrayList<>();
+    private final List<DealPostImage> dealPostImages = new ArrayList<>();
 
     @Column(nullable = false)
     private LocalDateTime pullingDate;
@@ -60,10 +60,10 @@ public class DealPost extends BaseTimeEntity {
     private DealSuccess dealSuccess;
 
     @OneToMany(mappedBy = "dealPost")
-    private List<DealReview> dealReviews = new ArrayList<>();
+    private final List<DealReview> dealReviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "dealPost")
-    private List<UserLike> userLikes = new ArrayList<>();
+    private final List<UserLike> userLikes = new ArrayList<>();
 
     @Builder
     public DealPost(User user,Category category,String title,Integer price,String content,DealState dealState){

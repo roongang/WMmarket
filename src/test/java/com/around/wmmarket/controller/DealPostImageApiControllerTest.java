@@ -110,7 +110,7 @@ public class DealPostImageApiControllerTest {
         MockMultipartFile file1= new MockMultipartFile("files","img1.jpg","image/jpeg","img1".getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file2= new MockMultipartFile("files","img2.png","image/png","img2".getBytes(StandardCharsets.UTF_8));
 
-        String url = "http://localhost:"+port+"/api/v1/deal/post/image";
+        String url = "http://localhost:"+port+"/api/v1/deal-post-images";
         // when
         mvc.perform(multipart(url)
                 .file(file1)
@@ -142,10 +142,9 @@ public class DealPostImageApiControllerTest {
         dealPostImageService.save(dealPost,files);
         int dealPostImageId=dealPostImageRepository.findAll().get(0).getId();
 
-        String url = "http://localhost:"+port+"/api/v1/deal/post/image";
+        String url = "http://localhost:"+port+"/api/v1/deal-post-images/"+dealPostImageId;
         // when
-        mvc.perform(delete(url)
-                .param("dealPostImageId",Integer.toString(dealPostImageId)))
+        mvc.perform(delete(url))
                 .andExpect(status().isOk());
         // then
         assertThat(dealPostImageRepository.findAll().isEmpty()).isTrue();
