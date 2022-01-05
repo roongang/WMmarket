@@ -12,7 +12,6 @@ import com.around.wmmarket.common.Constants;
 import com.around.wmmarket.common.FileHandler;
 import com.around.wmmarket.service.userLike.UserLikeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -135,12 +134,12 @@ public class UserService{
         if(file==null) //throw new CustomException(ErrorCode.PARAMETER_NULL);
         // delete remain image
         if(user.getImage()==null) throw new CustomException(ErrorCode.USER_IMAGE_NOT_FOUND);
-        try { deleteImage(userId); } catch (Exception e) { throw new CustomException(ErrorCode.DELETE_FAIL); }
+        deleteImage(userId);
         // new image
         String image=fileHandler.parseUserImage(file);
         user.setImage(image);
     }
-    public void deleteImage(Integer userId) throws Exception{
+    public void deleteImage(Integer userId) {
         User user=userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         if(user.getImage()!=null) fileHandler.delete(Constants.userImagePath,user.getImage());

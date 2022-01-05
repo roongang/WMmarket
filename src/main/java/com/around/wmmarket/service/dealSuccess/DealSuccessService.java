@@ -1,5 +1,7 @@
 package com.around.wmmarket.service.dealSuccess;
 
+import com.around.wmmarket.common.error.CustomException;
+import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_success.DealSuccess;
 import com.around.wmmarket.domain.deal_success.DealSuccessRepository;
@@ -21,7 +23,7 @@ public class DealSuccessService {
     }
     public DealSuccess findById(int dealPostId){
         return dealSuccessRepository.findById(dealPostId)
-                .orElseThrow(()->new NoSuchElementException("해당 게시글 완료가 존재하지 않습니다. dealPost id:"+dealPostId));
+                .orElseThrow(()->new CustomException(ErrorCode.DEAL_SUCCESS_NOT_FOUND));
     }
     public void delete(DealSuccess dealSuccess){
         dealSuccess.deleteRelation();

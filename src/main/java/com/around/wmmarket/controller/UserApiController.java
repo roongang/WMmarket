@@ -272,7 +272,7 @@ public class UserApiController {
                                              @PathVariable("userId") Integer userId,
                                              @ApiParam(value = "거래 글 아이디",example = "1",required = true)
                                              @RequestParam Integer dealPostId) {
-        if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         User user=userService.getUser(userId);
         if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
 

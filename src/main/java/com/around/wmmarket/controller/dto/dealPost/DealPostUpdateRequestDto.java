@@ -11,8 +11,6 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class DealPostUpdateRequestDto {
-    @ApiModelProperty(value = "거래 글 아이디",example = "1",required = true)
-    private Integer dealPostId;
     @ApiModelProperty(value = "거래 글 카테고리",example = "B",required = false)
     private Category category;
     @ApiModelProperty(value = "거래 글 제목",example = "수정한 거래 글 제목",required = false)

@@ -1,5 +1,7 @@
 package com.around.wmmarket.service.dealReview;
 
+import com.around.wmmarket.common.error.CustomException;
+import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.dealReview.DealReviewGetResponseDto;
 import com.around.wmmarket.controller.dto.dealReview.DealReviewUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.DealPost;
@@ -34,7 +36,7 @@ public class DealReviewService {
 
     public DealReviewGetResponseDto getResponseDto(Integer dealReviewId){
         DealReview dealReview=dealReviewRepository.findById(dealReviewId)
-                .orElseThrow(()->new NoSuchElementException("해당 리뷰글이 없습니다. dealReviewId:"+dealReviewId));
+                .orElseThrow(()-> new CustomException(ErrorCode.DEAL_REVIEW_NOT_FOUND));
         DealReviewGetResponseDto responseDto=DealReviewGetResponseDto.builder()
                 .content(dealReview.getContent())
                 .createdDate(dealReview.getCreatedDate())
@@ -46,14 +48,14 @@ public class DealReviewService {
         return responseDto;
     }
 
-    public void update(DealReviewUpdateRequestDto requestDto){
-        DealReview dealReview=dealReviewRepository.findById(requestDto.getDealReviewId())
-                .orElseThrow(()->new NoSuchElementException("해당 리뷰글이 없습니다. reviewId:"+requestDto.getDealReviewId()));
+    public void update(Integer dealReviewId,DealReviewUpdateRequestDto requestDto){
+        DealReview dealReview=dealReviewRepository.findById(dealReviewId)
+                .orElseThrow(()-> new CustomException(ErrorCode.DEAL_REVIEW_NOT_FOUND));
         dealReview.setContent(requestDto.getContent());
     }
-    public void delete(Integer dealReviewId) throws Exception{
+    public void delete(Integer dealReviewId) {
         DealReview dealReview=dealReviewRepository.findById(dealReviewId)
-                .orElseThrow(()->new NoSuchElementException("해당 리뷰글이 없습니다. dealReviewId:"+dealReviewId));
+                .orElseThrow(()-> new CustomException(ErrorCode.DEAL_REVIEW_NOT_FOUND));
         dealReview.deleteRelation();
         dealReviewRepository.delete(dealReview);
     }

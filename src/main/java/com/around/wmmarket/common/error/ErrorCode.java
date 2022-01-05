@@ -33,17 +33,25 @@ public enum ErrorCode {
     DUPLICATE_USER_LIKE(BAD_REQUEST,"U008","이미 좋아요를 누른 글입니다."),
     USER_LIKE_NOT_FOUND(BAD_REQUEST,"U009","좋아요를 찾을 수 없습니다."),
 
-    // Post
-    UNAUTHORIZED_USER_TO_DEALPOST(FORBIDDEN,"P001","거래글에대한 권한이 없습니다."),
-    DEALPOST_NOT_FOUND(BAD_REQUEST,"P002","거래글을 찾을 수 없습니다."),
+    // Deal
+    UNAUTHORIZED_USER_TO_DEALPOST(FORBIDDEN,"D001","거래글에대한 권한이 없습니다."),
+    DEALPOST_NOT_FOUND(BAD_REQUEST,"D002","거래글을 찾을 수 없습니다."),
+    DEALPOST_IMAGE_NOT_FOUND(BAD_REQUEST,"D003","거래글 이미지를 찾을 수 없습니다."),
+    BUYER_NOT_FOUND(BAD_REQUEST,"D004","구매자를 찾을 수 없습니다."),
+    SAME_BUYER_SELLER(BAD_REQUEST,"D005","판매자와 구매자가 같습니다."),
+    DEAL_REVIEW_NOT_FOUND(BAD_REQUEST,"D006","거래 리뷰를 찾을 수 없습니다."),
+    UNAUTHORIZED_USER_TO_DEAL_REVIEW(FORBIDDEN,"D007","거래 리뷰에대한 권한이 없습니다."),
+    DEAL_SUCCESS_NOT_FOUND(BAD_REQUEST,"D008","거래 완료되지 않은 글입니다."),
+    DEALPOST_NOT_DONE(BAD_REQUEST,"D009","거래글이 완료 상태가 아닙니다."),
 
     // Common
     INVALID_TYPE_VALUE(BAD_REQUEST, "C001", "Invalid Type Value"),
+    NOTHING_HAPPEN_BECAUSE_EMPTY(BAD_REQUEST,"C002","비어있어 처리할것이 없습니다."),
 
     // Server
     UNDEFINED_ERROR(INTERNAL_SERVER_ERROR, "S001", "정의되지 않은 에러입니다."),
     FILE_NOT_FOUND(INTERNAL_SERVER_ERROR,"S002","파일을 읽을 수 없습니다."),
-    DELETE_FAIL(INTERNAL_SERVER_ERROR,"S003","파일을 삭제할 수 없습니다."),
+    FILE_DELETE_FAIL(INTERNAL_SERVER_ERROR,"S003","파일을 삭제할 수 없습니다."),
     MEDIA_TYPE_NOT_FOUND(INTERNAL_SERVER_ERROR,"S004","미디어 파일 타입이 유효하지 않습니다."),
     ;
 
