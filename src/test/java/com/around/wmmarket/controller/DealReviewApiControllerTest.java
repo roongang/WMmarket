@@ -125,7 +125,7 @@ public class DealReviewApiControllerTest {
         DealReviewSaveRequestDto requestDto=DealReviewSaveRequestDto.builder()
                 .dealPostId(dealPostRepository.findAll().get(0).getId())
                 .content("review_content").build();
-        String url="http://localhost:"+port+"/api/v1/dealReview";
+        String url="http://localhost:"+port+"/api/v1/deal-reviews";
         // when
         mvc.perform(post(url)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -149,8 +149,8 @@ public class DealReviewApiControllerTest {
                 .dealPost(dealPost)
                 .build();
         dealReviewRepository.save(dealReview);
-
-        String url="http://localhost:"+port+"/api/v1/dealReview";
+        dealReview=dealReviewRepository.findAll().get(0);
+        String url="http://localhost:"+port+"/api/v1/deal-reviews/"+dealReview.getId();
         // when
         MvcResult result=mvc.perform(get(url)
                 .param("dealReviewId",dealReviewRepository.findAll().get(0).getId().toString()))
@@ -177,10 +177,10 @@ public class DealReviewApiControllerTest {
         dealReviewRepository.save(dealReview);
 
         DealReviewUpdateRequestDto requestDto=DealReviewUpdateRequestDto.builder()
-                .dealReviewId(dealReviewRepository.findAll().get(0).getId())
                 .content("update_review")
                 .build();
-        String url="http://localhost:"+port+"/api/v1/dealReview";
+        int dealReviewId=dealReviewRepository.findAll().get(0).getId();
+        String url="http://localhost:"+port+"/api/v1/deal-reviews/"+dealReviewId;
         // when
         mvc.perform(put(url)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -205,8 +205,8 @@ public class DealReviewApiControllerTest {
                 .dealPost(dealPost)
                 .build();
         dealReviewRepository.save(dealReview);
-
-        String url="http://localhost:"+port+"/api/v1/dealReview";
+        dealReview=dealReviewRepository.findAll().get(0);
+        String url="http://localhost:"+port+"/api/v1/deal-reviews/"+dealReview.getId();
         // when
         mvc.perform(delete(url)
                 .param("dealReviewId",dealReviewRepository.findAll().get(0).getId().toString()))

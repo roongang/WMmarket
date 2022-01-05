@@ -1,5 +1,7 @@
 package com.around.wmmarket.service.userLike;
 
+import com.around.wmmarket.common.error.CustomException;
+import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
 import com.around.wmmarket.domain.user.User;
@@ -21,14 +23,14 @@ public class UserLikeService {
     private final UserRepository userRepository;
     private final DealPostRepository dealPostRepository;
 
-    public void save(String userEmail,Integer dealPostId){
-        User user=userRepository.findByEmail(userEmail)
-                .orElseThrow(()->new UsernameNotFoundException("해당 유저가 존재하지 않습니다. email:"+userEmail));
+    public void save(Integer userId,Integer dealPostId){
+        User user=userRepository.findById(userId)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         DealPost dealPost=dealPostRepository.findById(dealPostId)
-                .orElseThrow(()->new NoSuchElementException("해당 dealPost 가 존재하지 않습니다. id:"+dealPostId));
+                .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
         if(userLikeRepository.existsById(UserLikeId.builder()
                 .userId(user.getId())
-                .dealPostId(dealPost.getId()).build())) throw new IllegalArgumentException("이미 좋아요를 눌렀습니다.");
+                .dealPostId(dealPost.getId()).build())) throw new CustomException(ErrorCode.DUPLICATE_USER_LIKE);
         userLikeRepository.save(UserLike.builder()
                 .user(user)
                 .dealPost(dealPost).build());
@@ -38,7 +40,7 @@ public class UserLikeService {
                 .userId(userId)
                 .dealPostId(dealPostId).build();
         return userLikeRepository.findById(userLikeId)
-                .orElseThrow(()->new NoSuchElementException("not found userLike; userId:"+userId+", dealPostId:"+dealPostId));
+                .orElseThrow(()->new CustomException(ErrorCode.USER_LIKE_NOT_FOUND));
     }
 
     public void delete(Integer userId,Integer dealPostId){
@@ -46,7 +48,7 @@ public class UserLikeService {
                 .userId(userId)
                 .dealPostId(dealPostId).build();
         UserLike userLike=userLikeRepository.findById(userLikeId)
-                .orElseThrow(()->new NoSuchElementException("not found userLike; userId:"+userId+", dealPostId:"+dealPostId));
+                .orElseThrow(()->new CustomException(ErrorCode.USER_LIKE_NOT_FOUND));
         userLike.deleteRelation();
         userLikeRepository.delete(userLike);
     }

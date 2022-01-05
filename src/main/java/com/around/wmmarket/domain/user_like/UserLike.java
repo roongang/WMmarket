@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Entity
 public class UserLike extends BaseTimeEntity implements Serializable{
     @EmbeddedId
-    private UserLikeId userLikeId=new UserLikeId();
+    private final UserLikeId userLikeId=new UserLikeId();
 
     @MapsId("userId")
     @ManyToOne

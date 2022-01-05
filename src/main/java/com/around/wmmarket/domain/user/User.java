@@ -65,31 +65,31 @@ public class User extends BaseTimeEntity {
     // 관계 매핑
     // not yet
     @OneToMany(mappedBy = "user")
-    private List<Notification> notifications = new ArrayList<>();
+    private final List<Notification> notifications = new ArrayList<>();
 
     // not yet
     @OneToMany(mappedBy = "user")
-    private List<Keyword> keywords = new ArrayList<>();
+    private final List<Keyword> keywords = new ArrayList<>();
 
     // not yet
     @OneToMany(mappedBy = "seller")
-    private List<MannerReview> mannerReviews = new ArrayList<>();
+    private final List<MannerReview> mannerReviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "seller")
-    private List<DealReview> sellDealReviews = new ArrayList<>();
+    private final List<DealReview> sellDealReviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "buyer")
-    private List<DealReview> buyDealReviews = new ArrayList<>();
+    private final List<DealReview> buyDealReviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<DealPost> dealPosts = new ArrayList<>();
+    private final List<DealPost> dealPosts = new ArrayList<>();
 
     @OneToMany(mappedBy = "buyer")
-    private List<DealSuccess> dealSuccesses = new ArrayList<>();
+    private final List<DealSuccess> dealSuccesses = new ArrayList<>();
 
     // 부모가 사라지면 자식(userLike)도 같이 사라짐
     @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<UserLike> userLikes = new ArrayList<>();
+    private final List<UserLike> userLikes = new ArrayList<>();
 
     @Builder
     public User(String email,String password,String image,String nickname,Role role,String city_1,String town_1,String city_2,String town_2,int isAuth,String code){

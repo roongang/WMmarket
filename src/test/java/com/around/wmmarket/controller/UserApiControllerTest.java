@@ -117,7 +117,7 @@ public class UserApiControllerTest {
         String testNickname="test_nickname";
         Role testRole=Role.USER;
         MockMultipartFile image= new MockMultipartFile("image","img.jpg","image/jpeg","img".getBytes(StandardCharsets.UTF_8));
-        String url = "http://localhost:"+port+"/api/v1/user";
+        String url = "http://localhost:"+port+"/api/v1/users";
         // when
         mvc.perform(multipart(url)
                 .file(image)
@@ -152,7 +152,7 @@ public class UserApiControllerTest {
                 .email(testEmail)
                 .password(testPassword)
                 .build();
-        String url = "http://localhost:"+port+"/api/v1/user/signIn";
+        String url = "http://localhost:"+port+"/api/v1/signin";
         // when
         mvc.perform(post(url)
                 .session(session)
@@ -170,7 +170,7 @@ public class UserApiControllerTest {
     @Transactional
     public void userGetTest() throws Exception{
         // given
-        String url="http://localhost:"+port+"/api/v1/user";
+        String url="http://localhost:"+port+"/api/v1/users";
         // when
         MvcResult result=mvc.perform(get(url)
                 .param("email","user@email"))
@@ -191,7 +191,9 @@ public class UserApiControllerTest {
                 .password("update_password")
                 .nickname("update_nickname")
                 .build();
-        String url="http://localhost:"+port+"/api/v1/user";
+        User user=userRepository.findByEmail("user@email")
+                .orElseThrow(() -> new UsernameNotFoundException("user@email"));
+        String url="http://localhost:"+port+"/api/v1/users/"+user.getId();
         // when
         mvc.perform(put(url)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -209,7 +211,9 @@ public class UserApiControllerTest {
     @WithUserDetails(value = "deleteUser@email")
     public void userDeleteTest() throws Exception{
         // given
-        String url="http://localhost:"+port+"/api/v1/user";
+        User deleteUser=userRepository.findByEmail("deleteUser@email")
+                .orElseThrow(()->new UsernameNotFoundException("deleteUser"));
+        String url="http://localhost:"+port+"/api/v1/users/"+deleteUser.getId();
         // when
         mvc.perform(delete(url)
                 .session(session)
@@ -223,10 +227,11 @@ public class UserApiControllerTest {
     @Transactional
     public void userImageGetTest() throws Exception{
         // given
-        String url="http://localhost:"+port+"/api/v1/user/image";
+        User user=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user@email"));
+        String url="http://localhost:"+port+"/api/v1/users/"+user.getId()+"/image";
         // when
-        MvcResult result=mvc.perform(get(url)
-                .param("email","user@email"))
+        MvcResult result=mvc.perform(get(url))
                 .andExpect(status().isOk())
                 .andReturn();
         // then
@@ -244,7 +249,9 @@ public class UserApiControllerTest {
 
         MockMultipartFile updateFile=new MockMultipartFile("file","img.jpg","image/jpeg","updateImg".getBytes(StandardCharsets.UTF_8));
 
-        String url="http://localhost"+port+"/api/v1/user/image";
+        User user=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user@email"));
+        String url="http://localhost"+port+"/api/v1/users/"+user.getId()+"/image";
         // when
         MockMultipartHttpServletRequestBuilder builder=multipart(url);
         builder.with(new RequestPostProcessor() {
@@ -266,7 +273,9 @@ public class UserApiControllerTest {
     @WithUserDetails(value = "user@email")
     public void userImageDeleteTest() throws Exception{
         // given
-        String url="http://localhost"+port+"/api/v1/user/image";
+        User user=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user@email"));
+        String url="http://localhost"+port+"/api/v1/users/"+user.getId()+"/image";
         // when
         mvc.perform(delete(url))
                 .andExpect(status().isOk());
@@ -291,7 +300,10 @@ public class UserApiControllerTest {
                 .dealState(DealState.ONGOING).build());
         DealPost dealPost=dealPostRepository.findAll().get(0);
 
-        String url="http://localhost"+port+"/api/v1/user/like";
+        User user=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user@email"));
+
+        String url="http://localhost"+port+"/api/v1/users/"+user.getId()+"/likes";
         // when
         mvc.perform(post(url)
                 .param("dealPostId",dealPost.getId().toString()))
@@ -324,10 +336,9 @@ public class UserApiControllerTest {
                 .dealPost(dealPost)
                 .build());
 
-        String url="http://localhost"+port+"/api/v1/user/likes";
+        String url="http://localhost"+port+"/api/v1/users/"+user.getId()+"/likes";
         // when
-        MvcResult result=mvc.perform(get(url)
-                .param("userId",user.getId().toString()))
+        MvcResult result=mvc.perform(get(url))
                 .andExpect(status().isOk())
                 .andReturn();
         // then
@@ -360,7 +371,7 @@ public class UserApiControllerTest {
                 .dealPost(dealPost)
                 .build());
 
-        String url="http://localhost"+port+"/api/v1/user/like";
+        String url="http://localhost"+port+"/api/v1/users/"+user.getId()+"/likes";
         // when
         mvc.perform(delete(url)
                         .param("dealPostId",dealPost.getId().toString()))

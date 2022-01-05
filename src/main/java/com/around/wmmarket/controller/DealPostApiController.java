@@ -1,14 +1,16 @@
 package com.around.wmmarket.controller;
 
-import com.around.wmmarket.common.ResourceResponse;
+import com.around.wmmarket.common.Constants;
 import com.around.wmmarket.common.ResponseHandler;
 import com.around.wmmarket.common.SuccessResponse;
+import com.around.wmmarket.common.error.CustomException;
+import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostSaveRequestDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostUpdateRequestDto;
-import com.around.wmmarket.controller.dto.user.UserGetResponseDto;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.user.SignedUser;
+import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.user.UserService;
 import io.swagger.annotations.ApiOperation;
@@ -28,6 +30,7 @@ import java.util.List;
 
 // TODO : @AuthenticationPrincipal adapter 패턴으로 감싸야하는가 의문
 @Slf4j
+@RequestMapping(Constants.API_PATH)
 @RequiredArgsConstructor
 @RestController
 public class DealPostApiController {
@@ -39,10 +42,11 @@ public class DealPostApiController {
             @ApiResponse(code = 201, message = "CREATED"),
     })
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
-    @PostMapping("/api/v1/dealPost")
-    public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,@ModelAttribute DealPostSaveRequestDto requestDto) throws Exception{
-        if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
-        dealPostService.save(signedUser,requestDto);
+    @PostMapping("/deal-posts")
+    public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
+                                  @ModelAttribute DealPostSaveRequestDto requestDto) {
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        dealPostService.save(userService.getUser(signedUser.getUsername()).getId(),requestDto);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("거래글 삽입 성공했습니다.").build());
@@ -52,10 +56,9 @@ public class DealPostApiController {
     @ApiResponses({
             @ApiResponse(code = 200,message = "return body : dealPost info",response = DealPostGetResponseDto.class),
     }) // SWAGGER
-    @GetMapping("/api/v1/dealPost")
+    @GetMapping("/deal-posts/{dealPostId}")
     public ResponseEntity<?> get(
-            @ApiParam(value = "거래 글 아이디",example = "1",required = true)
-            @RequestParam Integer dealPostId) throws Exception{
+            @PathVariable("dealPostId") Integer dealPostId) {
         DealPostGetResponseDto responseDto=dealPostService.getDealPostGetResponseDto(dealPostId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
@@ -66,10 +69,9 @@ public class DealPostApiController {
     @ApiResponses({
             @ApiResponse(code = 200,message = "return body : List dealPostImageId",response = ArrayList.class),
     }) // SWAGGER
-    @GetMapping("/api/v1/dealPost/images")
+    @GetMapping("/deal-posts/{dealPostId}/images")
     public ResponseEntity<?> getImages(
-            @ApiParam(value = "거래 글 아이디",example = "1",required = true)
-            @RequestParam Integer dealPostId){
+            @PathVariable("dealPostId") Integer dealPostId) {
         List<Integer> imageIds=dealPostService.getImages(dealPostId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
@@ -78,17 +80,20 @@ public class DealPostApiController {
     }
 
     @ApiOperation(value = "거래 글 수정") // SWAGGER
-    @PutMapping("/api/v1/dealPost")
-    public ResponseEntity<?> update(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser, @RequestBody DealPostUpdateRequestDto requestDto){
+    @PutMapping("/deal-posts/{dealPostId}")
+    public ResponseEntity<?> update(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
+                                    @PathVariable("dealPostId") Integer dealPostId,
+                                    @RequestBody DealPostUpdateRequestDto requestDto){
         // TODO : 너무너무 더럽다 다시 정리해야할듯!
-        if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
-        DealPost dealPost=dealPostService.getDealPost(requestDto.getDealPostId());
-        if(dealPost.getUser()==null||!dealPost.getUser().getEmail().equals(signedUser.getUsername())) return ResponseEntity.badRequest().body("게시글 작성자가 아닙니다.");
-        if(requestDto.getBuyerId()!=null&&!userService.isExist(requestDto.getBuyerId())) return ResponseEntity.badRequest().body("구매자가 존재하지 않습니다.");
-        if(requestDto.getBuyerId()!=null
-                && userService.getUserEmail(requestDto.getBuyerId()).equals(signedUser.getUsername())) return ResponseEntity.badRequest().body("구매자와 판매자가 일치할 수 없습니다.");
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
 
-        dealPostService.update(requestDto);
+        DealPost dealPost=dealPostService.getDealPost(dealPostId);
+        if(dealPost.getUser()==null||!dealPost.getUser().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEALPOST);
+        if(requestDto.getBuyerId()!=null&&!userService.isExist(requestDto.getBuyerId())) throw new CustomException(ErrorCode.BUYER_NOT_FOUND);
+        if(requestDto.getBuyerId()!=null
+                && userService.getUserEmail(requestDto.getBuyerId()).equals(signedUser.getUsername())) throw new CustomException(ErrorCode.SAME_BUYER_SELLER);
+
+        dealPostService.update(dealPostId,requestDto);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("거래글 수정 성공했습니다.")
@@ -96,12 +101,12 @@ public class DealPostApiController {
     }
 
     @ApiOperation(value = "거래 글 삭제") // SWAGGER
-    @DeleteMapping("/api/v1/dealPost")
+    @DeleteMapping("/deal-posts/{dealPostId}")
     public ResponseEntity<?> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
-                                    @ApiParam(value = "거래 글 아이디",example = "1",required = true)
-                                    @RequestParam Integer dealPostId) throws Exception{
+                                    @PathVariable("dealPostId") Integer dealPostId) {
         // check
-        if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+
         DealPost dealPost=dealPostService.getDealPost(dealPostId);
         if(dealPost.getUser()==null||!dealPost.getUser().getEmail().equals(signedUser.getUsername())) return ResponseEntity.badRequest().body("게시글 작성자가 아닙니다.");
 

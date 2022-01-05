@@ -1,5 +1,7 @@
 package com.around.wmmarket.service.dealPostImage;
 
+import com.around.wmmarket.common.error.CustomException;
+import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
 import com.around.wmmarket.domain.deal_post_image.DealPostImageRepository;
@@ -20,20 +22,20 @@ public class DealPostImageService {
     private final DealPostImageRepository dealPostImageRepository;
 
     @Transactional
-    public void save(DealPost dealPost, List<MultipartFile> files) throws Exception{
-        if(files.isEmpty()) return;
+    public void save(DealPost dealPost, List<MultipartFile> files) {
+        if(files.isEmpty()) throw new CustomException(ErrorCode.NOTHING_HAPPEN_BECAUSE_EMPTY);
         List<DealPostImage> dealPostImages=fileHandler.parseFileInfo(dealPost,files);
         dealPostImageRepository.saveAll(dealPostImages);
     }
     public DealPostImage get(Integer dealPostImageId) {
         return dealPostImageRepository.findById(dealPostImageId)
-                .orElseThrow(()->new NoSuchElementException("해당 이미지가 없습니다. id:"+dealPostImageId));
+                .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_IMAGE_NOT_FOUND));
     }
 
     @Transactional
-    public void delete(Integer dealPostImageId) throws Exception{
+    public void delete(Integer dealPostImageId) {
         DealPostImage dealPostImage=dealPostImageRepository.findById(dealPostImageId)
-                .orElseThrow(()->new NoSuchElementException("해당 거래글 이미지가 없습니다. id:"+dealPostImageId));
+                .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_IMAGE_NOT_FOUND));
         // 물리적인 삭제
         fileHandler.delete(Constants.dealPostImagePath,dealPostImage.getName());
         dealPostImage.deleteRelation();

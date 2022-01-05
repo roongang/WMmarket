@@ -1,5 +1,7 @@
 package com.around.wmmarket.service.dealPost;
 
+import com.around.wmmarket.common.error.CustomException;
+import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostSaveRequestDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostUpdateRequestDto;
@@ -33,8 +35,8 @@ public class DealPostService {
     private final DealSuccessService dealSuccessService;
 
     @Transactional
-    public void save(SignedUser signedUser,DealPostSaveRequestDto requestDto) throws Exception{
-        User user = userService.getUser(signedUser.getUsername());
+    public void save(Integer userId,DealPostSaveRequestDto requestDto) {
+        User user = userService.getUser(userId);
         DealPost dealPost = DealPost.builder()
                 .user(user)
                 .category(requestDto.getCategory())
@@ -49,7 +51,7 @@ public class DealPostService {
     // TODO : service 메소드 이름을 이렇게 지어야하나
     public DealPostGetResponseDto getDealPostGetResponseDto(Integer id) {
         DealPost dealPost=dealPostRepository.findById(id)
-                .orElseThrow(()->new NoSuchElementException("해당 게시글이 없습니다. id:"+id));
+                .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
         DealPostGetResponseDto responseDto=DealPostGetResponseDto.builder()
                 .category(dealPost.getCategory())
                 .title(dealPost.getTitle())
@@ -62,19 +64,18 @@ public class DealPostService {
     }
     public DealPost getDealPost(Integer id){
         return dealPostRepository.findById(id)
-                .orElseThrow(()->new NoSuchElementException("해당 게시글이 없습니다. id:"+id));
+                .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
     }
 
     public boolean isDealPostAuthor(SignedUser signedUser,Integer dealPostId){
         DealPost dealPost=dealPostRepository.findById(dealPostId)
-                .orElseThrow(()->new NoSuchElementException("해당 게시글이 없습니다. id:"+dealPostId));
-        if(dealPost.getUser()==null) throw new IllegalArgumentException("해당 dealPost 에 user 가 존재하지 않습니다.");
+                .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
         return signedUser.getUsername().equals(dealPost.getUser().getEmail());
     }
 
     public List<Integer> getImages(Integer dealPostId){
         DealPost dealPost=dealPostRepository.findById(dealPostId)
-                .orElseThrow(()->new NoSuchElementException("해당 게시글이 없습니다. id:"+dealPostId));
+                .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
         List<DealPostImage> dealPostImages=dealPost.getDealPostImages();
         List<Integer> images=new ArrayList<>();
         for(DealPostImage dealPostImage:dealPostImages){
@@ -84,9 +85,9 @@ public class DealPostService {
     }
 
     @Transactional
-    public void update(DealPostUpdateRequestDto requestDto){
-        DealPost dealPost=dealPostRepository.findById(requestDto.getDealPostId())
-                .orElseThrow(()->new NoSuchElementException("해당 게시글이 없습니다. id:"+requestDto.getDealPostId()));
+    public void update(Integer dealPostId,DealPostUpdateRequestDto requestDto){
+        DealPost dealPost=dealPostRepository.findById(dealPostId)
+                .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
         if(requestDto.getCategory()!=null) dealPost.setCategory(requestDto.getCategory());
         if(requestDto.getTitle()!=null) dealPost.setTitle(requestDto.getTitle());
         if(requestDto.getPrice()!=null) dealPost.setPrice(requestDto.getPrice());
@@ -123,7 +124,7 @@ public class DealPostService {
     }
 
     @Transactional
-    public void delete(DealPost dealPost) throws Exception{
+    public void delete(DealPost dealPost) {
         // TODO : 연관관계가 추가된다면 로직을 추가해야함
         for(DealPostImage dealPostImage:dealPost.getDealPostImages()){
             dealPostImage.deleteRelation();
@@ -131,5 +132,10 @@ public class DealPostService {
         }
         dealPost.deleteRelation();
         dealPostRepository.delete(dealPost);
+    }
+
+    @Transactional
+    public void deleteImage(Integer dealPostImageId){
+        dealPostImageService.delete(dealPostImageId);
     }
 }

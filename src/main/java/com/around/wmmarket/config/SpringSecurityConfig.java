@@ -1,5 +1,6 @@
 package com.around.wmmarket.config;
 
+import com.around.wmmarket.common.Constants;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.service.user.CustomUserDetailsService;
 import com.around.wmmarket.service.user.UserService;
@@ -38,12 +39,12 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/").permitAll()
                 .and()
                     .formLogin()
-                    .loginPage("/signIn")
+                    .loginPage("/signin")
                     .permitAll()
                 .and()
                     .logout()
-                    .logoutRequestMatcher(new AntPathRequestMatcher("/api/v1/user/signout"))
-                    .logoutSuccessUrl("/signIn")
+                    .logoutRequestMatcher(new AntPathRequestMatcher(Constants.API_PATH+"/signout"))
+                    .logoutSuccessUrl("/signin")
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID")
                 .and() // 기본 auth 사용

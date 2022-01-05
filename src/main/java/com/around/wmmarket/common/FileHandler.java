@@ -1,5 +1,7 @@
 package com.around.wmmarket.common;
 
+import com.around.wmmarket.common.error.CustomException;
+import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +27,7 @@ public class FileHandler {
     private SimpleDateFormat simpleDateFormat;
 
     // for dealPostImage
-    public List<DealPostImage> parseFileInfo(DealPost dealPost, List<MultipartFile> files) throws Exception{
+    public List<DealPostImage> parseFileInfo(DealPost dealPost, List<MultipartFile> files) {
         List<DealPostImage> dealPostImages=new ArrayList<>();
 
         if(files==null||CollectionUtils.isEmpty(files)) return null;
@@ -103,8 +105,8 @@ public class FileHandler {
             e.printStackTrace();
         }
     }
-    public void delete(Path dir,String fileName) throws Exception{
+    public void delete(Path dir,String fileName) {
         File file=Paths.get(dir.toString(),fileName).toFile();
-        if(!file.delete()) throw new Exception("delete fail! path:"+Paths.get(dir.toString(),fileName));
+        if(!file.delete()) throw new CustomException(ErrorCode.FILE_DELETE_FAIL);
     }
 }

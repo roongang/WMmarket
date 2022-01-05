@@ -40,6 +40,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 @Slf4j
+@RequestMapping(Constants.API_PATH)
 @RequiredArgsConstructor
 @RestController
 public class UserApiController {
@@ -57,7 +58,7 @@ public class UserApiController {
     })
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @Transactional
-    @PostMapping("/api/v1/user")
+    @PostMapping("/users")
     public ResponseEntity<Object> save(@ModelAttribute UserSaveRequestDto requestDto){
         userService.save(requestDto);
         return ResponseHandler.toResponse(SuccessResponse.builder()
@@ -72,7 +73,7 @@ public class UserApiController {
     })
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @Transactional
-    @PostMapping("/api/v1/user/signIn")
+    @PostMapping("/signin")
     public ResponseEntity<Object> signIn(@RequestBody UserSignInRequestDto requestDto,@ApiIgnore HttpSession session){
         // 이미 로그인한 유저면 반환
         if(session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY)!=null){
@@ -100,7 +101,7 @@ public class UserApiController {
     @ApiResponses({
             @ApiResponse(code = 200,message = "return body : user info",response = UserGetResponseDto.class),
     }) // SWAGGER
-    @GetMapping("/api/v1/user")
+    @GetMapping("/users")
     public ResponseEntity<Object> get(
             @ApiParam(value = "유저 이메일",example = "test_email@gmail.com",required = true)
             @RequestParam String email){
@@ -111,15 +112,32 @@ public class UserApiController {
                 .data(responseDto).build());
     }
 
+    @ApiOperation(value = "유저 반환") // SWAGGER
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "return body : user info",response = UserGetResponseDto.class),
+    }) // SWAGGER
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<Object> get(
+            @PathVariable("userId") Integer userId){
+        UserGetResponseDto responseDto = userService.getUserResponseDto(userId);
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("유저 반환 성공했습니다.")
+                .data(responseDto).build());
+    }
+
     @ApiOperation(value = "유저 수정") // SWAGGER
-    @Transactional
-    @PutMapping("/api/v1/user")
-    public ResponseEntity<Object> update(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser, @RequestBody UserUpdateRequestDto requestDto) {
+    @PutMapping("/users/{userId}")
+    public ResponseEntity<Object> update(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
+                                         @PathVariable("userId") Integer userId,
+                                         @RequestBody UserUpdateRequestDto requestDto) {
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        // compare id, signed user
+        if(!userService.getUser(userId).getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
 
         // update
-        userService.update(signedUser.getUsername(),requestDto);
+        userService.update(userId,requestDto);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 수정 성공했습니다.")
@@ -131,12 +149,17 @@ public class UserApiController {
             @ApiResponse(code = 200,message = "remove session"),
     }) // SWAGGER
     @Transactional
-    @DeleteMapping("/api/v1/user")
-    public ResponseEntity<Object> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,@ApiIgnore HttpSession session){
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<Object> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
+                                         @ApiIgnore HttpSession session,
+                                         @PathVariable Integer userId){
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        // compare id, signed user
+        if(!userService.getUser(userId).getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+
         // delete
-        userService.delete(signedUser.getUsername());
+        userService.delete(userId);
         session.invalidate();
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
@@ -148,12 +171,11 @@ public class UserApiController {
     @ApiResponses({
             @ApiResponse(code = 200,message = "return Image File"),
     }) // SWAGGER
-    @GetMapping("/api/v1/user/image")
+    @GetMapping("/users/{userId}/image")
     public ResponseEntity<Object> getImage(
-            @ApiParam(value = "유저 이메일",example = "test_email@gmail.com",required = true)
-            @RequestParam String email) {
-        if(!userService.isExist(email)) throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        String fileName= userService.getImage(email);
+            @PathVariable("userId") Integer userId) {
+        if(!userService.isExist(userId)) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        String fileName= userService.getImage(userId);
         if(fileName==null) throw new CustomException(ErrorCode.USER_IMAGE_NOT_FOUND);
         Resource resource=resourceLoader.getResource("file:"+ Paths.get(Constants.userImagePath.toString(),fileName));
 
@@ -178,13 +200,16 @@ public class UserApiController {
 
     @ApiOperation(value = "유저 이미지 수정") // SWAGGER
     @Transactional
-    @PutMapping("/api/v1/user/image")
+    @PutMapping("/users/{userId}/image")
     public ResponseEntity<Object> updateImage(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
+                                              @PathVariable("userId") Integer userId,
                                               @ApiParam(value = "이미지",allowMultiple = true,required = false)
                                               @RequestPart MultipartFile file) {
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
-        userService.updateImage(signedUser.getUsername(),file);
+        if(!userService.getUser(userId).getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+
+        userService.updateImage(userId,file);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 이미지 수정 성공했습니다.")
@@ -193,11 +218,14 @@ public class UserApiController {
 
     @ApiOperation(value = "유저 이미지 삭제") // SWAGGER
     @Transactional
-    @DeleteMapping("/api/v1/user/image")
-    public ResponseEntity<Object> deleteImage(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser) throws Exception{
+    @DeleteMapping("/users/{userId}/image")
+    public ResponseEntity<Object> deleteImage(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
+                                              @PathVariable("userId") Integer userId) throws Exception{
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
-        userService.deleteImage(signedUser.getUsername());
+        if(!userService.getUser(userId).getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+
+        userService.deleteImage(userId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 이미지 삭제 성공했습니다.")
@@ -209,41 +237,46 @@ public class UserApiController {
             @ApiResponse(code = 201,message = "CREATED"),
     })
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
-    @PostMapping("/api/v1/user/like")
+    @PostMapping("/users/{userId}/likes")
     public ResponseEntity<Object> saveLike(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
+                                           @PathVariable("userId") Integer userId,
                                            @ApiParam(value = "거래 글 아이디",example = "1",required = true)
                                            @RequestParam Integer dealPostId) {
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
-        userLikeService.save(signedUser.getUsername(),dealPostId);
+        if(!userService.getUser(userId).getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+
+        userLikeService.save(userId,dealPostId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.CREATED)
                 .message("유저 좋아요 삽입 성공하였습니다.")
                 .build());
     }
 
-    @ApiOperation(value = "유저 좋아요 리스트 반환") // SWAGGER
+    @ApiOperation(value = "유저 좋아요들 ID 반환") // SWAGGER
     @ApiResponses({
             @ApiResponse(code = 200,message = "return body : List dealPostId",response = ArrayList.class),
     }) // SWAGGER
-    @GetMapping("/api/v1/user/likes")
+    @GetMapping("/users/{userId}/likes")
     public ResponseEntity<Object> getLikes(
-            @ApiParam(value = "유저 아이디",example = "1",required = true)
-            @RequestParam Integer userId){
+            @PathVariable("userId") Integer userId) {
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
-                .message("유저 좋아요 리스트 반환 성공했습니다.")
+                .message("유저 좋아요들 ID 반환 성공했습니다.")
                 .data(userService.getLikesDealPostId(userId)).build());
     }
 
     @ApiOperation(value = "유저 좋아요 삭제") // SWAGGER
-    @DeleteMapping("/api/v1/user/like")
+    @DeleteMapping("/users/{userId}/likes")
     public ResponseEntity<Object> deleteLike(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
+                                             @PathVariable("userId") Integer userId,
                                              @ApiParam(value = "거래 글 아이디",example = "1",required = true)
                                              @RequestParam Integer dealPostId) {
-        if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
-        User user=userService.getUser(signedUser.getUsername());
-        userService.deleteLike(user.getId(),dealPostId);
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        User user=userService.getUser(userId);
+        if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+
+        userService.deleteLike(userId,dealPostId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 좋아요 삭제 성공했습니다.")

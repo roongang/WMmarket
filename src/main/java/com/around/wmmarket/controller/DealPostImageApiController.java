@@ -30,9 +30,11 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.transaction.Transactional;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 
 @Slf4j
+@RequestMapping(Constants.API_PATH)
 @RequiredArgsConstructor
 @RestController
 public class DealPostImageApiController {
@@ -47,13 +49,15 @@ public class DealPostImageApiController {
     })
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @Transactional
-    @PostMapping("/api/v1/dealPostImage")
-    public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser, @ModelAttribute DealPostImageSaveRequestDto requestDto) throws Exception{
-        if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
+    @PostMapping("/deal-post-images")
+    public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
+                                  @ModelAttribute DealPostImageSaveRequestDto requestDto) {
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         // signedUser 와 dealPostId 의 email 비교
-        if(!dealPostService.isDealPostAuthor(signedUser,requestDto.getDealPostId())){
-            return ResponseEntity.badRequest().body("게시글의 작성자가 아닙니다.");
+        if(!dealPostService.isDealPostAuthor(signedUser, requestDto.getDealPostId())){
+            throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEALPOST);
         }
+
         DealPost dealPost=dealPostService.getDealPost(requestDto.getDealPostId());
         dealPostImageService.save(dealPost,requestDto.getFiles());
         return ResponseHandler.toResponse(SuccessResponse.builder()
@@ -64,16 +68,17 @@ public class DealPostImageApiController {
 
     @ApiOperation(value = "거래 글 이미지 삭제") // SWAGGER
     @Transactional
-    @DeleteMapping("/api/v1/dealPostImage")
+    @DeleteMapping("/deal-post-images/{dealPostImageId}")
     public ResponseEntity<?> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
-                                    @ApiParam(value = "거래 글 이미지 아이디",example = "1",required = true)
-                                    @RequestParam Integer dealPostImageId) throws Exception{
-        if(signedUser==null) return ResponseEntity.badRequest().body("login 을 먼저 해주세요");
+                                    @PathVariable("dealPostImageId") Integer dealPostImageId) {
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         // signedUser 와 dealPostId 의 email 비교
-        DealPostImage dealPostImage=dealPostImageService.get(dealPostImageId);
-        if(!dealPostService.isDealPostAuthor(signedUser,dealPostImage.getDealPost().getId())){
+        DealPost dealPost=dealPostImageService.get(dealPostImageId).getDealPost();
+        if(!dealPostService.isDealPostAuthor(signedUser,dealPost.getId())){
             throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEALPOST);
         }
+
+        // delete
         dealPostImageService.delete(dealPostImageId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
@@ -85,15 +90,16 @@ public class DealPostImageApiController {
     @ApiResponses({
             @ApiResponse(code = 200,message = "return Image File")
     }) // SWAGGER
-    @GetMapping("/api/v1/dealPostImage")
+    @GetMapping("/deal-post-images/{dealPostImageId}")
     public ResponseEntity<?> get(
-            @ApiParam(value = "거래 글 이미지 아이디",example = "1",required = true)
-            @RequestParam Integer dealPostImageId) throws Exception{
+            @PathVariable("dealPostImageId") Integer dealPostImageId) {
         DealPostImage dealPostImage=dealPostImageService.get(dealPostImageId);
         String fileName=dealPostImage.getName();
         Resource resource=resourceLoader.getResource("file:"+ Paths.get(Constants.dealPostImagePath.toString(),fileName));
-        File file=resource.getFile();
-        String mediaType=tika.detect(file);
+        File file= null;
+        try { file = resource.getFile(); } catch (IOException e) { new CustomException(ErrorCode.FILE_NOT_FOUND); }
+        String mediaType;
+        try { mediaType = tika.detect(file); } catch (IOException e) { throw new CustomException(ErrorCode.MEDIA_TYPE_NOT_FOUND); }
 
         HttpHeaders headers=new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\""+resource.getFilename()+"\"");
