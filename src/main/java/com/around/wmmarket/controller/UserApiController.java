@@ -74,20 +74,27 @@ public class UserApiController {
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @Transactional
     @PostMapping("/signin")
-    public ResponseEntity<Object> signIn(@RequestBody UserSignInRequestDto requestDto,@ApiIgnore HttpSession session){
+    public ResponseEntity<Object> signIn(@RequestBody UserSignInRequestDto requestDto,
+                                         @ApiIgnore HttpSession session){
         // 이미 로그인한 유저면 반환
         if(session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY)!=null){
             throw new CustomException(ErrorCode.DUPLICATE_SIGN_IN); }
         SignedUser signedUser;
         try { signedUser = customUserDetailsService.getSignedUser(requestDto);}
-        catch (Exception e) {throw new CustomException(ErrorCode.USER_NOT_FOUND);}
+        catch (Exception e) {
+            session.invalidate();
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
         // 인증 토큰 발급
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(signedUser.getUsername(),signedUser.getPassword());
         // 인증 객체
         Authentication authentication;
         try{ authentication = authenticationManager.authenticate(token);}
-        catch (Exception e){ throw new CustomException(ErrorCode.INVALID_USER_PASSWORD); }
+        catch (Exception e){
+            session.invalidate();
+            throw new CustomException(ErrorCode.INVALID_USER_PASSWORD);
+        }
         // 시큐리티 컨텍스트에 인증 저장
         SecurityContextHolder.getContext().setAuthentication(authentication);
         // 세션에 컨텍스트 저장
