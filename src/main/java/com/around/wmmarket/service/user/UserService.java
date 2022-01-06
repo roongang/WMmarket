@@ -5,6 +5,7 @@ import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.user.UserGetResponseDto;
 import com.around.wmmarket.controller.dto.user.UserSaveRequestDto;
 import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
+import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.domain.user_like.UserLike;
@@ -37,7 +38,7 @@ public class UserService{
                 .email(requestDto.getEmail())
                 .password(passwordEncoder.encode(requestDto.getPassword()))
                 .nickname(requestDto.getNickname())
-                .role(requestDto.getRole())
+                .role(Role.valueOf(requestDto.getRole()))
                 .city_1(requestDto.getCity_1())
                 .town_1(requestDto.getTown_1())
                 .city_2(requestDto.getCity_2())

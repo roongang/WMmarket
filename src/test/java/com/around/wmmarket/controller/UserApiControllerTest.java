@@ -124,7 +124,7 @@ public class UserApiControllerTest {
                 .param("email",testEmail)
                 .param("password",testPassword)
                 .param("nickname",testNickname)
-                .param("role","USER")
+                .param("role",testRole.toString())
         ).andExpect(status().isCreated());
         // then
         List<User> allUser = userRepository.findAll();

@@ -31,9 +31,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -59,7 +59,7 @@ public class UserApiController {
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @Transactional
     @PostMapping("/users")
-    public ResponseEntity<Object> save(@ModelAttribute UserSaveRequestDto requestDto){
+    public ResponseEntity<Object> save(@Valid @ModelAttribute UserSaveRequestDto requestDto){
         userService.save(requestDto);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .message("유저 회원가입 성공했습니다.")
