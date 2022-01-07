@@ -1,6 +1,9 @@
 package com.around.wmmarket.controller;
 
-import com.around.wmmarket.common.*;
+import com.around.wmmarket.common.Constants;
+import com.around.wmmarket.common.ResourceResponse;
+import com.around.wmmarket.common.ResponseHandler;
+import com.around.wmmarket.common.SuccessResponse;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.user.UserGetResponseDto;
@@ -12,9 +15,11 @@ import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.service.user.CustomUserDetailsService;
 import com.around.wmmarket.service.user.UserService;
 import com.around.wmmarket.service.userLike.UserLikeService;
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -27,19 +32,24 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-@Slf4j
+@Validated
 @RequestMapping(Constants.API_PATH)
 @RequiredArgsConstructor
 @RestController
@@ -59,7 +69,7 @@ public class UserApiController {
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @Transactional
     @PostMapping("/users")
-    public ResponseEntity<Object> save(@ModelAttribute UserSaveRequestDto requestDto){
+    public ResponseEntity<Object> save(@Valid @ModelAttribute UserSaveRequestDto requestDto){
         userService.save(requestDto);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .message("유저 회원가입 성공했습니다.")
@@ -74,7 +84,7 @@ public class UserApiController {
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @Transactional
     @PostMapping("/signin")
-    public ResponseEntity<Object> signIn(@RequestBody UserSignInRequestDto requestDto,
+    public ResponseEntity<Object> signin(@Valid @RequestBody UserSignInRequestDto requestDto,
                                          @ApiIgnore HttpSession session){
         // 이미 로그인한 유저면 반환
         if(session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY)!=null){
@@ -111,7 +121,7 @@ public class UserApiController {
     @GetMapping("/users")
     public ResponseEntity<Object> get(
             @ApiParam(value = "유저 이메일",example = "test_email@gmail.com",required = true)
-            @RequestParam String email){
+            @NotEmpty @Email @RequestParam String email){
         UserGetResponseDto responseDto = userService.getUserResponseDto(email);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
@@ -125,7 +135,7 @@ public class UserApiController {
     }) // SWAGGER
     @GetMapping("/users/{userId}")
     public ResponseEntity<Object> get(
-            @PathVariable("userId") Integer userId){
+            @Min(1) @PathVariable("userId") Integer userId){
         UserGetResponseDto responseDto = userService.getUserResponseDto(userId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
@@ -136,8 +146,8 @@ public class UserApiController {
     @ApiOperation(value = "유저 수정") // SWAGGER
     @PutMapping("/users/{userId}")
     public ResponseEntity<Object> update(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
-                                         @PathVariable("userId") Integer userId,
-                                         @RequestBody UserUpdateRequestDto requestDto) {
+                                         @Min(1) @PathVariable("userId") Integer userId,
+                                         @Valid @RequestBody UserUpdateRequestDto requestDto) {
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         // compare id, signed user
@@ -159,7 +169,7 @@ public class UserApiController {
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Object> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                          @ApiIgnore HttpSession session,
-                                         @PathVariable Integer userId){
+                                         @Min(1) @PathVariable Integer userId){
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         // compare id, signed user
@@ -180,7 +190,7 @@ public class UserApiController {
     }) // SWAGGER
     @GetMapping("/users/{userId}/image")
     public ResponseEntity<Object> getImage(
-            @PathVariable("userId") Integer userId) {
+            @Min(1) @PathVariable("userId") Integer userId) {
         if(!userService.isExist(userId)) throw new CustomException(ErrorCode.USER_NOT_FOUND);
         String fileName= userService.getImage(userId);
         if(fileName==null) throw new CustomException(ErrorCode.USER_IMAGE_NOT_FOUND);
@@ -209,9 +219,9 @@ public class UserApiController {
     @Transactional
     @PutMapping("/users/{userId}/image")
     public ResponseEntity<Object> updateImage(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
-                                              @PathVariable("userId") Integer userId,
+                                              @Min(1) @PathVariable("userId") Integer userId,
                                               @ApiParam(value = "이미지",allowMultiple = true,required = false)
-                                              @RequestPart MultipartFile file) {
+                                              @NotNull @RequestPart MultipartFile file) {
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         if(!userService.getUser(userId).getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
@@ -227,7 +237,7 @@ public class UserApiController {
     @Transactional
     @DeleteMapping("/users/{userId}/image")
     public ResponseEntity<Object> deleteImage(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
-                                              @PathVariable("userId") Integer userId) throws Exception{
+                                              @Min(1) @PathVariable("userId") Integer userId) {
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         if(!userService.getUser(userId).getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
@@ -246,9 +256,9 @@ public class UserApiController {
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @PostMapping("/users/{userId}/likes")
     public ResponseEntity<Object> saveLike(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
-                                           @PathVariable("userId") Integer userId,
+                                           @Min(1) @PathVariable("userId") Integer userId,
                                            @ApiParam(value = "거래 글 아이디",example = "1",required = true)
-                                           @RequestParam Integer dealPostId) {
+                                           @Min(1) @RequestParam Integer dealPostId) {
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         if(!userService.getUser(userId).getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
@@ -266,7 +276,7 @@ public class UserApiController {
     }) // SWAGGER
     @GetMapping("/users/{userId}/likes")
     public ResponseEntity<Object> getLikes(
-            @PathVariable("userId") Integer userId) {
+            @Min(1) @PathVariable("userId") Integer userId) {
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 좋아요들 ID 반환 성공했습니다.")
@@ -276,9 +286,9 @@ public class UserApiController {
     @ApiOperation(value = "유저 좋아요 삭제") // SWAGGER
     @DeleteMapping("/users/{userId}/likes")
     public ResponseEntity<Object> deleteLike(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
-                                             @PathVariable("userId") Integer userId,
+                                             @Min(1) @PathVariable("userId") Integer userId,
                                              @ApiParam(value = "거래 글 아이디",example = "1",required = true)
-                                             @RequestParam Integer dealPostId) {
+                                             @Min(1) @RequestParam Integer dealPostId) {
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         User user=userService.getUser(userId);
         if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);

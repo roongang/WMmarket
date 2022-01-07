@@ -103,7 +103,7 @@ public class DealPostApiControllerTest {
         MockMultipartFile file2= new MockMultipartFile("files","img2.png","image/png","img2".getBytes(StandardCharsets.UTF_8));
 
         DealPostSaveRequestDto requestDto = new DealPostSaveRequestDto();
-        requestDto.setCategory(Category.A);
+        requestDto.setCategory(Category.A.name());
         requestDto.setTitle("title");
         requestDto.setPrice(1000);
         requestDto.setContent("content");
@@ -112,7 +112,7 @@ public class DealPostApiControllerTest {
         mvc.perform(multipart(url)
                 .file(file1)
                 .file(file2)
-                .param("category",requestDto.getCategory().name())
+                .param("category",requestDto.getCategory())
                 .param("title",requestDto.getTitle())
                 .param("price",requestDto.getPrice().toString())
                 .param("content",requestDto.getContent())
@@ -159,9 +159,9 @@ public class DealPostApiControllerTest {
                 .dealState(DealState.ONGOING).build());
         int dealPostId=dealPostRepository.findAll().get(0).getId();
         DealPostUpdateRequestDto requestDto=DealPostUpdateRequestDto.builder()
-                .category(Category.B)
+                .category(Category.B.name())
                 .content("update_content")
-                .dealState(DealState.DONE).build();
+                .dealState(DealState.DONE.name()).build();
         String url = "http://localhost:"+port+"/api/v1/deal-posts/"+dealPostId;
         // when
         mvc.perform(put(url)
@@ -198,10 +198,10 @@ public class DealPostApiControllerTest {
                 .orElseThrow(()->new UsernameNotFoundException("user@email2 없음"));
 
         DealPostUpdateRequestDto requestDto=DealPostUpdateRequestDto.builder()
-                .category(Category.B)
+                .category(Category.B.name())
                 .content("update_content")
                 .buyerId(user2.getId())
-                .dealState(DealState.DONE).build();
+                .dealState(DealState.DONE.name()).build();
         String url = "http://localhost:"+port+"/api/v1/deal-posts/"+dealPostId;
         // when
         mvc.perform(put(url)
@@ -242,17 +242,17 @@ public class DealPostApiControllerTest {
                 .orElseThrow(()->new UsernameNotFoundException("user@email3 없음"));
 
         DealPostUpdateRequestDto requestDto2=DealPostUpdateRequestDto.builder()
-                .category(Category.B)
+                .category(Category.B.name())
                 .content("update_content")
                 .buyerId(user2.getId())
-                .dealState(DealState.DONE).build();
+                .dealState(DealState.DONE.name()).build();
         dealPostService.update(dealPostId,requestDto2);
 
         DealPostUpdateRequestDto requestDto=DealPostUpdateRequestDto.builder()
-                .category(Category.B)
+                .category(Category.B.name())
                 .content("update_content")
                 .buyerId(user3.getId())
-                .dealState(DealState.DONE).build();
+                .dealState(DealState.DONE.name()).build();
         String url = "http://localhost:"+port+"/api/v1/deal-posts/"+dealPostId;
         // when
         mvc.perform(put(url)
@@ -286,16 +286,16 @@ public class DealPostApiControllerTest {
                 .orElseThrow(()->new UsernameNotFoundException("user@email2 없음"));
 
         DealPostUpdateRequestDto requestDto2=DealPostUpdateRequestDto.builder()
-                .category(Category.B)
+                .category(Category.B.name())
                 .content("update_content")
                 .buyerId(user2.getId())
-                .dealState(DealState.DONE).build();
+                .dealState(DealState.DONE.name()).build();
         dealPostService.update(dealPostId,requestDto2);
 
         DealPostUpdateRequestDto requestDto=DealPostUpdateRequestDto.builder()
-                .category(Category.B)
+                .category(Category.B.name())
                 .content("update_content")
-                .dealState(DealState.ONGOING).build();
+                .dealState(DealState.ONGOING.name()).build();
         String url = "http://localhost:"+port+"/api/v1/deal-posts/"+dealPostId;
         // when
         mvc.perform(put(url)

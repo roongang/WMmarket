@@ -112,7 +112,7 @@ public class UserApiControllerTest {
     @Test
     public void userSaveTest() throws Exception{
         // given
-        String testEmail="test_email3";
+        String testEmail="test_email3@email";
         String testPassword="test_password";
         String testNickname="test_nickname";
         Role testRole=Role.USER;
@@ -124,7 +124,7 @@ public class UserApiControllerTest {
                 .param("email",testEmail)
                 .param("password",testPassword)
                 .param("nickname",testNickname)
-                .param("role","USER")
+                .param("role",testRole.toString())
         ).andExpect(status().isCreated());
         // then
         List<User> allUser = userRepository.findAll();
@@ -137,7 +137,7 @@ public class UserApiControllerTest {
     @Test
     public void userSignInTest() throws Exception{
         // given
-        String testEmail="test_email2";
+        String testEmail="test_email2@email";
         String testPassword="test_password2";
         String testNickname="test_nickname2";
         Role testRole=Role.USER;

@@ -1,5 +1,6 @@
 package com.around.wmmarket.controller;
 
+import com.around.wmmarket.common.Constants;
 import com.around.wmmarket.common.ResourceResponse;
 import com.around.wmmarket.common.ResponseHandler;
 import com.around.wmmarket.common.SuccessResponse;
@@ -9,15 +10,12 @@ import com.around.wmmarket.controller.dto.dealPostImage.DealPostImageSaveRequest
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
 import com.around.wmmarket.domain.user.SignedUser;
-import com.around.wmmarket.common.Constants;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.dealPostImage.DealPostImageService;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -25,15 +23,18 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-@Slf4j
+@Validated
 @RequestMapping(Constants.API_PATH)
 @RequiredArgsConstructor
 @RestController
@@ -51,7 +52,7 @@ public class DealPostImageApiController {
     @Transactional
     @PostMapping("/deal-post-images")
     public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
-                                  @ModelAttribute DealPostImageSaveRequestDto requestDto) {
+                                  @Valid @ModelAttribute DealPostImageSaveRequestDto requestDto) {
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         // signedUser 와 dealPostId 의 email 비교
         if(!dealPostService.isDealPostAuthor(signedUser, requestDto.getDealPostId())){
@@ -70,7 +71,7 @@ public class DealPostImageApiController {
     @Transactional
     @DeleteMapping("/deal-post-images/{dealPostImageId}")
     public ResponseEntity<?> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
-                                    @PathVariable("dealPostImageId") Integer dealPostImageId) {
+                                    @Min(1) @PathVariable("dealPostImageId") Integer dealPostImageId) {
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         // signedUser 와 dealPostId 의 email 비교
         DealPost dealPost=dealPostImageService.get(dealPostImageId).getDealPost();
@@ -92,7 +93,7 @@ public class DealPostImageApiController {
     }) // SWAGGER
     @GetMapping("/deal-post-images/{dealPostImageId}")
     public ResponseEntity<?> get(
-            @PathVariable("dealPostImageId") Integer dealPostImageId) {
+            @Min(1) @PathVariable("dealPostImageId") Integer dealPostImageId) {
         DealPostImage dealPostImage=dealPostImageService.get(dealPostImageId);
         String fileName=dealPostImage.getName();
         Resource resource=resourceLoader.getResource("file:"+ Paths.get(Constants.dealPostImagePath.toString(),fileName));
