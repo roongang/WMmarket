@@ -10,26 +10,26 @@ import com.around.wmmarket.controller.dto.dealPost.DealPostSaveRequestDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.user.SignedUser;
-import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.user.UserService;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.ArrayList;
 import java.util.List;
 
 // TODO : @AuthenticationPrincipal adapter 패턴으로 감싸야하는가 의문
-@Slf4j
+@Validated
 @RequestMapping(Constants.API_PATH)
 @RequiredArgsConstructor
 @RestController
@@ -44,7 +44,7 @@ public class DealPostApiController {
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @PostMapping("/deal-posts")
     public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
-                                  @ModelAttribute DealPostSaveRequestDto requestDto) {
+                                  @Valid @ModelAttribute DealPostSaveRequestDto requestDto) {
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         dealPostService.save(userService.getUser(signedUser.getUsername()).getId(),requestDto);
         return ResponseHandler.toResponse(SuccessResponse.builder()
@@ -58,7 +58,7 @@ public class DealPostApiController {
     }) // SWAGGER
     @GetMapping("/deal-posts/{dealPostId}")
     public ResponseEntity<?> get(
-            @PathVariable("dealPostId") Integer dealPostId) {
+            @Min(1) @PathVariable("dealPostId") Integer dealPostId) {
         DealPostGetResponseDto responseDto=dealPostService.getDealPostGetResponseDto(dealPostId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
@@ -71,7 +71,7 @@ public class DealPostApiController {
     }) // SWAGGER
     @GetMapping("/deal-posts/{dealPostId}/images")
     public ResponseEntity<?> getImages(
-            @PathVariable("dealPostId") Integer dealPostId) {
+            @Min(1) @PathVariable("dealPostId") Integer dealPostId) {
         List<Integer> imageIds=dealPostService.getImages(dealPostId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
@@ -82,8 +82,8 @@ public class DealPostApiController {
     @ApiOperation(value = "거래 글 수정") // SWAGGER
     @PutMapping("/deal-posts/{dealPostId}")
     public ResponseEntity<?> update(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
-                                    @PathVariable("dealPostId") Integer dealPostId,
-                                    @RequestBody DealPostUpdateRequestDto requestDto){
+                                    @Min(1) @PathVariable("dealPostId") Integer dealPostId,
+                                    @Valid @RequestBody DealPostUpdateRequestDto requestDto){
         // TODO : 너무너무 더럽다 다시 정리해야할듯!
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
 
@@ -103,7 +103,7 @@ public class DealPostApiController {
     @ApiOperation(value = "거래 글 삭제") // SWAGGER
     @DeleteMapping("/deal-posts/{dealPostId}")
     public ResponseEntity<?> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
-                                    @PathVariable("dealPostId") Integer dealPostId) {
+                                    @Min(1) @PathVariable("dealPostId") Integer dealPostId) {
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
 

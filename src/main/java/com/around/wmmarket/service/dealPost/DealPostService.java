@@ -5,6 +5,7 @@ import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostSaveRequestDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostUpdateRequestDto;
+import com.around.wmmarket.domain.deal_post.Category;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
 import com.around.wmmarket.domain.deal_post.DealState;
@@ -21,7 +22,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 @Service
@@ -39,7 +39,7 @@ public class DealPostService {
         User user = userService.getUser(userId);
         DealPost dealPost = DealPost.builder()
                 .user(user)
-                .category(requestDto.getCategory())
+                .category(Category.valueOf(requestDto.getCategory()))
                 .title(requestDto.getTitle())
                 .price(requestDto.getPrice())
                 .content(requestDto.getContent())
@@ -88,7 +88,7 @@ public class DealPostService {
     public void update(Integer dealPostId,DealPostUpdateRequestDto requestDto){
         DealPost dealPost=dealPostRepository.findById(dealPostId)
                 .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
-        if(requestDto.getCategory()!=null) dealPost.setCategory(requestDto.getCategory());
+        if(requestDto.getCategory()!=null) dealPost.setCategory(Category.valueOf(requestDto.getCategory()));
         if(requestDto.getTitle()!=null) dealPost.setTitle(requestDto.getTitle());
         if(requestDto.getPrice()!=null) dealPost.setPrice(requestDto.getPrice());
         if(requestDto.getContent()!=null) dealPost.setContent(requestDto.getContent());
@@ -101,13 +101,13 @@ public class DealPostService {
             }
             // dealSuccess 저장, ? -> DONE
             if(dealPost.getDealState()!=DealState.DONE
-                    && requestDto.getDealState()==DealState.DONE
+                    && Objects.equals(requestDto.getDealState(), DealState.DONE.name())
                     && buyer!=null){
                 dealPost.setDealSuccess(dealSuccessService.save(buyer,dealPost));
             }
             // dealSuccess 수정, DONE && buyerId -> ?
             else if(dealPost.getDealState()==DealState.DONE
-                    && requestDto.getDealState()==DealState.DONE
+                    && Objects.equals(requestDto.getDealState(), DealState.DONE.name())
                     && buyer!=null
                     && !Objects.equals(dealPost.getDealSuccess().getBuyer(), buyer)){
                 DealSuccess dealSuccess=dealSuccessService.findById(dealPost.getId());
@@ -115,11 +115,11 @@ public class DealPostService {
             }
             // dealSuccess 삭제, DONE -> ?
             else if(dealPost.getDealState()==DealState.DONE
-                    && requestDto.getDealState()!=DealState.DONE){
+                    && !requestDto.getDealState().equals(DealState.DONE.name())){
                 dealSuccessService.delete(dealSuccessService.findById(dealPost.getId()));
                 dealPost.setDealSuccess(null);
             }
-            dealPost.setDealState(requestDto.getDealState());
+            dealPost.setDealState(DealState.valueOf(requestDto.getDealState()));
         }
     }
 

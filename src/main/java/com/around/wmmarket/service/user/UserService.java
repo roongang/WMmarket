@@ -109,7 +109,7 @@ public class UserService{
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         if(requestDto.getPassword()!=null) user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         if(requestDto.getNickname()!=null) user.setNickname(requestDto.getNickname());
-        if(requestDto.getRole()!=null) user.setRole(requestDto.getRole());
+        if(requestDto.getRole()!=null) user.setRole(Role.valueOf(requestDto.getRole()));
         if(requestDto.getCity_1()!=null) user.setCity_1(requestDto.getCity_1());
         if(requestDto.getTown_1()!=null) user.setTown_1(requestDto.getTown_1());
         if(requestDto.getCity_2()!=null) user.setCity_2(requestDto.getCity_2());

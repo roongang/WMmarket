@@ -22,9 +22,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+
+@Validated
 @RequestMapping(Constants.API_PATH)
 @RequiredArgsConstructor
 @RestController
@@ -40,7 +45,7 @@ public class DealReviewApiController {
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
     @PostMapping("/deal-reviews")
     public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
-                                  @RequestBody DealReviewSaveRequestDto requestDto) {
+                                  @Valid @RequestBody DealReviewSaveRequestDto requestDto) {
         // check signedUser
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         DealPost dealPost=dealPostService.getDealPost(requestDto.getDealPostId());
@@ -63,7 +68,7 @@ public class DealReviewApiController {
     }) // SWAGGER
     @GetMapping("/deal-reviews/{dealReviewId}")
     public ResponseEntity<?> get(
-            @PathVariable("dealReviewId") Integer dealReviewId) {
+            @Min(1) @PathVariable("dealReviewId") Integer dealReviewId) {
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("거래글 리뷰 반환 성공했습니다.")
@@ -73,8 +78,8 @@ public class DealReviewApiController {
     @ApiOperation(value = "거래 글 리뷰 수정") // SWAGGER
     @PutMapping("/deal-reviews/{dealReviewId}")
     public ResponseEntity<?> update(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
-                                    @PathVariable("dealReviewId") Integer dealReviewId,
-                                    @RequestBody DealReviewUpdateRequestDto requestDto){
+                                    @Min(1) @PathVariable("dealReviewId") Integer dealReviewId,
+                                    @Valid @RequestBody DealReviewUpdateRequestDto requestDto){
         // check signedUser
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         DealReview dealReview=dealReviewRepository.findById(dealReviewId)
@@ -91,7 +96,7 @@ public class DealReviewApiController {
     @ApiOperation(value = "거래 글 리뷰 삭제") // SWAGGER
     @DeleteMapping("/deal-reviews/{dealReviewId}")
     public ResponseEntity<?> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
-                                    @PathVariable("dealReviewId") Integer dealReviewId) {
+                                    @Min(1) @PathVariable("dealReviewId") Integer dealReviewId) {
         // check signedUser
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         DealReview dealReview=dealReviewRepository.findById(dealReviewId)

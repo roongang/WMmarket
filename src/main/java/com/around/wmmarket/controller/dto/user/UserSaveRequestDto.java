@@ -3,21 +3,21 @@ package com.around.wmmarket.controller.dto.user;
 import com.around.wmmarket.common.validation.Enum;
 import com.around.wmmarket.domain.user.Role;
 import io.swagger.annotations.ApiParam;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 
 @Getter
 @Setter
 public class UserSaveRequestDto {
     @ApiParam(value = "유저 이메일",example = "test_email@gmail.com",required = true)
-    @Email
+    @NotBlank @Email
     private String email;
     @ApiParam(value = "유저 비밀번호",example = "test_password",required = true)
-    @NotEmpty
+    @NotBlank
     private String password;
     @ApiParam(value = "유저 이미지",allowMultiple = true,required = false)
     private MultipartFile image;

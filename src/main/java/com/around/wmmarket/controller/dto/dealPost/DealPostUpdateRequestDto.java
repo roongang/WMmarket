@@ -8,30 +8,26 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Min;
 
 @Getter
 @Builder
 @AllArgsConstructor
 public class DealPostUpdateRequestDto {
     @ApiModelProperty(value = "거래 글 카테고리",example = "B",required = false)
-    @Enum(enumClass = Category.class)
-    private Category category;
+    @Enum(enumClass = Category.class,isNullable = true)
+    private final String category;
     @ApiModelProperty(value = "거래 글 제목",example = "수정한 거래 글 제목",required = false)
-    @NotBlank
-    private String title;
+    private final String title;
     @ApiModelProperty(value = "거래 가격",example = "2000",required = false)
-    @DecimalMin(value = "0")
-    private Integer price;
+    @Min(0)
+    private final Integer price;
     @ApiModelProperty(value = "거래 글 내용",example = "수정한 거래 글 내용",required = false)
-    @NotNull
-    private String content;
+    private final String content;
     @ApiModelProperty(value = "구매자 아이디",example = "2",required = false)
-    @DecimalMin(value = "0")
-    private Integer buyerId;
+    @Min(0)
+    private final Integer buyerId;
     @ApiModelProperty(value = "거래 글 상태",example = "DONE",required = false)
-    @Enum(enumClass = DealState.class)
-    private DealState dealState;
+    @Enum(enumClass = DealState.class,isNullable = true)
+    private final String dealState;
 }
