@@ -48,7 +48,7 @@ public class DealPostApiController {
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         dealPostService.save(userService.getUser(signedUser.getUsername()).getId(),requestDto);
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.CREATED)
                 .message("거래글 삽입 성공했습니다.").build());
     }
 
