@@ -116,7 +116,7 @@ public class DealPostApiControllerTest {
                 .param("title",requestDto.getTitle())
                 .param("price",requestDto.getPrice().toString())
                 .param("content",requestDto.getContent())
-        ).andExpect(status().isOk());
+        ).andExpect(status().isCreated());
         // then
         assertThat(dealPostRepository.findAll()).isNotNull();
     }
