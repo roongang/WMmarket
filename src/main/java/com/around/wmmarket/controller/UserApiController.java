@@ -31,6 +31,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -91,7 +92,7 @@ public class UserApiController {
             throw new CustomException(ErrorCode.DUPLICATE_SIGN_IN); }
         SignedUser signedUser;
         try { signedUser = customUserDetailsService.getSignedUser(requestDto);}
-        catch (Exception e) {
+        catch (UsernameNotFoundException e) {
             session.invalidate();
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
@@ -122,11 +123,10 @@ public class UserApiController {
     public ResponseEntity<Object> get(
             @ApiParam(value = "유저 이메일",example = "test_email@gmail.com",required = true)
             @NotEmpty @Email @RequestParam String email){
-        UserGetResponseDto responseDto = userService.getUserResponseDto(email);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 반환 성공했습니다.")
-                .data(responseDto).build());
+                .data(userService.getUserDto(email)).build());
     }
 
     @ApiOperation(value = "유저 반환") // SWAGGER
@@ -136,11 +136,10 @@ public class UserApiController {
     @GetMapping("/users/{userId}")
     public ResponseEntity<Object> get(
             @Min(1) @PathVariable("userId") Integer userId){
-        UserGetResponseDto responseDto = userService.getUserResponseDto(userId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 반환 성공했습니다.")
-                .data(responseDto).build());
+                .data(userService.getUserDto(userId)).build());
     }
 
     @ApiOperation(value = "유저 수정") // SWAGGER
@@ -148,19 +147,15 @@ public class UserApiController {
     public ResponseEntity<Object> update(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                          @Min(1) @PathVariable("userId") Integer userId,
                                          @Valid @RequestBody UserUpdateRequestDto requestDto) {
-        // check
-        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
-        // compare id, signed user
-        if(!userService.getUser(userId).getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
-
         // update
-        userService.update(userId,requestDto);
+        userService.update(signedUser,userId,requestDto);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 수정 성공했습니다.")
                 .build());
     }
 
+    // TODO : 유저 삭제가 이뤄지면 안됨, Email 이 후보키이므로
     @ApiOperation(value = "유저 삭제") // SWAGGER
     @ApiResponses({
             @ApiResponse(code = 200,message = "remove session"),
@@ -170,14 +165,8 @@ public class UserApiController {
     public ResponseEntity<Object> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                          @ApiIgnore HttpSession session,
                                          @Min(1) @PathVariable Integer userId){
-        // check
-        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
-        // compare id, signed user
-        if(!userService.getUser(userId).getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
-
         // delete
-        userService.delete(userId);
-        session.invalidate();
+        userService.delete(signedUser,userId,session);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 삭제 성공했습니다.")
@@ -191,7 +180,6 @@ public class UserApiController {
     @GetMapping("/users/{userId}/image")
     public ResponseEntity<Object> getImage(
             @Min(1) @PathVariable("userId") Integer userId) {
-        if(!userService.isExist(userId)) throw new CustomException(ErrorCode.USER_NOT_FOUND);
         String fileName= userService.getImage(userId);
         if(fileName==null) throw new CustomException(ErrorCode.USER_IMAGE_NOT_FOUND);
         Resource resource=resourceLoader.getResource("file:"+ Paths.get(Constants.userImagePath.toString(),fileName));

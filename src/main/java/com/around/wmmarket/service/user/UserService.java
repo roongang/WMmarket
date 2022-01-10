@@ -6,6 +6,7 @@ import com.around.wmmarket.controller.dto.user.UserGetResponseDto;
 import com.around.wmmarket.controller.dto.user.UserSaveRequestDto;
 import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
 import com.around.wmmarket.domain.user.Role;
+import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.domain.user_like.UserLike;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +34,7 @@ public class UserService{
     @Transactional
     public void save(UserSaveRequestDto requestDto){
         // check duplicate user
-        if(!userRepository.findByEmail(requestDto.getEmail()).isPresent()) throw new CustomException(ErrorCode.DUPLICATE_USER_EMAIL);
+        if(userRepository.findByEmail(requestDto.getEmail()).isPresent()) throw new CustomException(ErrorCode.DUPLICATE_USER_EMAIL);
 
         User user = User.builder()
                 .email(requestDto.getEmail())
@@ -53,7 +55,7 @@ public class UserService{
     }
     public boolean isExist(Integer id) { return userRepository.existsById(id); }
 
-    public UserGetResponseDto getUserResponseDto(String email){
+    public UserGetResponseDto getUserDto(String email){
         User user = userRepository.findByEmail(email)
                 .orElse(null);
         if(user==null) return null;
@@ -70,7 +72,7 @@ public class UserService{
                 .code(user.getCode())
                 .build();
     }
-    public UserGetResponseDto getUserResponseDto(Integer id){
+    public UserGetResponseDto getUserDto(Integer id){
         User user = userRepository.findById(id)
                 .orElse(null);
         if(user==null) return null;
@@ -104,9 +106,15 @@ public class UserService{
     }
 
     @Transactional
-    public void update(Integer id, UserUpdateRequestDto requestDto) {
+    public void update(SignedUser signedUser,Integer id, UserUpdateRequestDto requestDto) {
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        // compare id, signed user
         User user=userRepository.findById(id)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+
+        // update logic
         if(requestDto.getPassword()!=null) user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         if(requestDto.getNickname()!=null) user.setNickname(requestDto.getNickname());
         if(requestDto.getRole()!=null) user.setRole(Role.valueOf(requestDto.getRole()));
@@ -117,10 +125,18 @@ public class UserService{
     }
 
     @Transactional
-    public void delete(Integer id){
+    public void delete(SignedUser signedUser, Integer id, HttpSession session){
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        if(session==null) throw new CustomException(ErrorCode.SESSION_NULL);
+        // compare id, signed user
         User user=userRepository.findById(id)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+
+        // delete logic
         userRepository.delete(user);
+        session.invalidate();
     }
 
     public String getImage(Integer id){
