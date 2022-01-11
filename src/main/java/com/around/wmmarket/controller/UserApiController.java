@@ -11,7 +11,6 @@ import com.around.wmmarket.controller.dto.user.UserSaveRequestDto;
 import com.around.wmmarket.controller.dto.user.UserSignInRequestDto;
 import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
 import com.around.wmmarket.domain.user.SignedUser;
-import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.service.user.CustomUserDetailsService;
 import com.around.wmmarket.service.user.UserService;
 import com.around.wmmarket.service.userLike.UserLikeService;
@@ -204,17 +203,12 @@ public class UserApiController {
     }
 
     @ApiOperation(value = "유저 이미지 수정") // SWAGGER
-    @Transactional
     @PutMapping("/users/{userId}/image")
     public ResponseEntity<Object> updateImage(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                               @Min(1) @PathVariable("userId") Integer userId,
-                                              @ApiParam(value = "이미지",allowMultiple = true,required = false)
+                                              @ApiParam(value = "이미지",allowMultiple = true,required = true)
                                               @NotNull @RequestPart MultipartFile file) {
-        // check
-        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
-        if(!userService.getUser(userId).getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
-
-        userService.updateImage(userId,file);
+        userService.updateImage(signedUser,userId,file);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 이미지 수정 성공했습니다.")
@@ -227,10 +221,7 @@ public class UserApiController {
     public ResponseEntity<Object> deleteImage(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                               @Min(1) @PathVariable("userId") Integer userId) {
         // check
-        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
-        if(!userService.getUser(userId).getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
-
-        userService.deleteImage(userId);
+        userService.deleteImage(signedUser,userId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 이미지 삭제 성공했습니다.")
@@ -247,18 +238,14 @@ public class UserApiController {
                                            @Min(1) @PathVariable("userId") Integer userId,
                                            @ApiParam(value = "거래 글 아이디",example = "1",required = true)
                                            @Min(1) @RequestParam Integer dealPostId) {
-        // check
-        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
-        if(!userService.getUser(userId).getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
-
-        userLikeService.save(userId,dealPostId);
+        userService.saveLike(signedUser,userId,dealPostId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.CREATED)
                 .message("유저 좋아요 삽입 성공하였습니다.")
                 .build());
     }
 
-    @ApiOperation(value = "유저 좋아요들 ID 반환") // SWAGGER
+    @ApiOperation(value = "유저 좋아요 ID 리스트 반환") // SWAGGER
     @ApiResponses({
             @ApiResponse(code = 200,message = "return body : List dealPostId",response = ArrayList.class),
     }) // SWAGGER
@@ -267,8 +254,8 @@ public class UserApiController {
             @Min(1) @PathVariable("userId") Integer userId) {
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
-                .message("유저 좋아요들 ID 반환 성공했습니다.")
-                .data(userService.getLikesDealPostId(userId)).build());
+                .message("유저 좋아요들 ID 리스트 성공했습니다.")
+                .data(userService.getLikes(userId)).build());
     }
 
     @ApiOperation(value = "유저 좋아요 삭제") // SWAGGER
@@ -277,11 +264,7 @@ public class UserApiController {
                                              @Min(1) @PathVariable("userId") Integer userId,
                                              @ApiParam(value = "거래 글 아이디",example = "1",required = true)
                                              @Min(1) @RequestParam Integer dealPostId) {
-        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
-        User user=userService.getUser(userId);
-        if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
-
-        userService.deleteLike(userId,dealPostId);
+        userService.deleteLike(signedUser,userId,dealPostId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 좋아요 삭제 성공했습니다.")

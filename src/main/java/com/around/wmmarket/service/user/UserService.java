@@ -1,17 +1,19 @@
 package com.around.wmmarket.service.user;
 
+import com.around.wmmarket.common.Constants;
+import com.around.wmmarket.common.FileHandler;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.user.UserGetResponseDto;
 import com.around.wmmarket.controller.dto.user.UserSaveRequestDto;
 import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
+import com.around.wmmarket.domain.deal_post.DealPost;
+import com.around.wmmarket.domain.deal_post.DealPostRepository;
 import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.domain.user_like.UserLike;
-import com.around.wmmarket.common.Constants;
-import com.around.wmmarket.common.FileHandler;
 import com.around.wmmarket.service.userLike.UserLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,14 +22,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService{
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final DealPostRepository dealPostRepository;
     private final UserLikeService userLikeService;
     private final FileHandler fileHandler;
 
@@ -144,35 +147,59 @@ public class UserService{
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         return user.getImage();
     }
-    public void updateImage(Integer userId,MultipartFile file) {
+    public void updateImage(SignedUser signedUser,Integer userId,MultipartFile file) {
         // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         User user=userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
-        if(file==null) //throw new CustomException(ErrorCode.PARAMETER_NULL);
+        if(!this.getUser(userId).getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+        if(file==null) throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
+
+        // update
         // delete remain image
         if(user.getImage()==null) throw new CustomException(ErrorCode.USER_IMAGE_NOT_FOUND);
-        deleteImage(userId);
+        deleteImage(signedUser,userId);
         // new image
         String image=fileHandler.parseUserImage(file);
         user.setImage(image);
     }
-    public void deleteImage(Integer userId) {
+    public void deleteImage(SignedUser signedUser,Integer userId) {
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         User user=userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
-        if(user.getImage()!=null) fileHandler.delete(Constants.userImagePath,user.getImage());
+        if(!this.getUser(userId).getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+        if(user.getImage()==null) throw new CustomException(ErrorCode.USER_IMAGE_NOT_FOUND);
+        // delete
+        fileHandler.delete(Constants.userImagePath,user.getImage());
         user.setImage(null);
     }
-
-    public List<Integer> getLikesDealPostId(Integer userId){
-        User user=getUser(userId);
-        List<Integer> dealPostIds=new ArrayList<>();
-        for(UserLike userLike:user.getUserLikes()){
-            dealPostIds.add(userLike.getDealPost().getId());
-        }
-        return dealPostIds;
+    public void saveLike(SignedUser signedUser,Integer userId,Integer dealPostId){
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        if(!this.getUser(userId).getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+        if(!dealPostRepository.existsById(dealPostId)) throw new CustomException(ErrorCode.DEALPOST_NOT_FOUND);
+        // save
+        userLikeService.save(userId,dealPostId);
     }
 
-    public void deleteLike(Integer userId,Integer dealPostId){
+    public List<Integer> getLikes(Integer userId){
+        // check
+        User user=userRepository.findById(userId)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        // get
+        return user.getUserLikes().stream()
+                .map(UserLike::getDealPost)
+                .map(DealPost::getId)
+                .collect(Collectors.toList());
+    }
+
+    public void deleteLike(SignedUser signedUser,Integer userId,Integer dealPostId){
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        if(!this.getUser(userId).getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+        if(!dealPostRepository.existsById(dealPostId)) throw new CustomException(ErrorCode.DEALPOST_NOT_FOUND);
+        // delete
         userLikeService.delete(userId,dealPostId);
     }
 }
