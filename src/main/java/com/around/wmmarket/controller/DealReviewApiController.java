@@ -46,16 +46,7 @@ public class DealReviewApiController {
     @PostMapping("/deal-reviews")
     public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                   @Valid @RequestBody DealReviewSaveRequestDto requestDto) {
-        // check signedUser
-        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
-        DealPost dealPost=dealPostService.getDealPost(requestDto.getDealPostId());
-        if(dealPost.getUser()==null||signedUser.getUsername().equals(dealPost.getUser().getEmail())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEAL_REVIEW);
-        // check dealState && dealSuccess
-        if(dealPost.getDealState()!=DealState.DONE) throw new CustomException(ErrorCode.DEALPOST_NOT_DONE);
-        if(dealPost.getDealSuccess().getBuyer()==null||!dealPost.getDealSuccess().getBuyer().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEAL_REVIEW);
-
-        dealReviewService.save(signedUser.getUsername(),requestDto.getContent(),dealPost);
-
+        dealReviewService.save(signedUser,requestDto.getContent(),requestDto.getDealPostId());
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("거래글 리뷰 삽입 성공했습니다.")
@@ -72,7 +63,8 @@ public class DealReviewApiController {
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("거래글 리뷰 반환 성공했습니다.")
-                .data(dealReviewService.getResponseDto(dealReviewId)).build());
+                .data(dealReviewService.getDealReviewDto(dealReviewId))
+                .build());
     }
 
     @ApiOperation(value = "거래 글 리뷰 수정") // SWAGGER
@@ -81,12 +73,11 @@ public class DealReviewApiController {
                                     @Min(1) @PathVariable("dealReviewId") Integer dealReviewId,
                                     @Valid @RequestBody DealReviewUpdateRequestDto requestDto){
         // check signedUser
-        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         DealReview dealReview=dealReviewRepository.findById(dealReviewId)
                 .orElseThrow(()->new CustomException(ErrorCode.DEAL_REVIEW_NOT_FOUND));
         if(dealReview.getBuyer()==null||!dealReview.getBuyer().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEAL_REVIEW);
         // update
-        dealReviewService.update(dealReviewId,requestDto);
+        dealReviewService.update(signedUser,dealReviewId,requestDto);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("거래글 리뷰 수정 성공했습니다.")
