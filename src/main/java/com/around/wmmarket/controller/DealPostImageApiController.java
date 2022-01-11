@@ -49,7 +49,6 @@ public class DealPostImageApiController {
             @ApiResponse(code = 201, message = "CREATED"),
     })
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
-    @Transactional
     @PostMapping("/deal-post-images")
     public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                   @Valid @ModelAttribute DealPostImageSaveRequestDto requestDto) {
@@ -61,19 +60,11 @@ public class DealPostImageApiController {
     }
 
     @ApiOperation(value = "거래 글 이미지 삭제") // SWAGGER
-    @Transactional
     @DeleteMapping("/deal-post-images/{dealPostImageId}")
     public ResponseEntity<?> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                     @Min(1) @PathVariable("dealPostImageId") Integer dealPostImageId) {
-        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
-        // signedUser 와 dealPostId 의 email 비교
-        DealPost dealPost=dealPostImageService.get(dealPostImageId).getDealPost();
-        if(!dealPostService.isDealPostAuthor(signedUser,dealPost.getId())){
-            throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEALPOST);
-        }
-
         // delete
-        dealPostImageService.delete(dealPostImageId);
+        dealPostImageService.delete(signedUser,dealPostImageId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("거래글 이미지 삭제 성공했습니다.")
@@ -87,8 +78,7 @@ public class DealPostImageApiController {
     @GetMapping("/deal-post-images/{dealPostImageId}")
     public ResponseEntity<?> get(
             @Min(1) @PathVariable("dealPostImageId") Integer dealPostImageId) {
-        DealPostImage dealPostImage=dealPostImageService.get(dealPostImageId);
-        String fileName=dealPostImage.getName();
+        String fileName=dealPostImageService.get(dealPostImageId).getName();
         Resource resource=resourceLoader.getResource("file:"+ Paths.get(Constants.dealPostImagePath.toString(),fileName));
         File file= null;
         try { file = resource.getFile(); } catch (IOException e) { new CustomException(ErrorCode.FILE_NOT_FOUND); }

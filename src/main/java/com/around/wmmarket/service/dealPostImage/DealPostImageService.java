@@ -23,27 +23,45 @@ public class DealPostImageService {
     private final DealPostImageRepository dealPostImageRepository;
     private final DealPostRepository dealPostRepository;
 
-    @Transactional
     public void save(SignedUser signedUser,Integer dealPostId, List<MultipartFile> files) {
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        if(!dealPostRepository.existsById(dealPostId)) throw new CustomException(ErrorCode.DEALPOST_NOT_FOUND);
         DealPost dealPost=dealPostRepository.findById(dealPostId)
                 .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
         if(!dealPost.getUser().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEALPOST);
         // save
+        this.save(dealPost,files);
+    }
+
+    @Transactional
+    public void save(DealPost dealPost,List<MultipartFile> files){
         List<DealPostImage> dealPostImages=fileHandler.parseFileInfo(dealPost,files);
         dealPostImageRepository.saveAll(dealPostImages);
     }
+
     public DealPostImage get(Integer dealPostImageId) {
         return dealPostImageRepository.findById(dealPostImageId)
                 .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_IMAGE_NOT_FOUND));
     }
 
-    @Transactional
-    public void delete(Integer dealPostImageId) {
+    public void delete(SignedUser signedUser,Integer dealPostImageId) {
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         DealPostImage dealPostImage=dealPostImageRepository.findById(dealPostImageId)
                 .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_IMAGE_NOT_FOUND));
+        if(dealPostImage.getDealPost()==null) throw new CustomException(ErrorCode.DEALPOST_NOT_FOUND);
+        if(dealPostImage.getDealPost().getUser()==null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        if(!dealPostImage.getDealPost().getUser().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEALPOST);
         // 물리적인 삭제
+        this.delete(dealPostImageId);
+    }
+
+    @Transactional
+    public void delete(Integer dealPostImageId){
+        // 물리적인 삭제
+        DealPostImage dealPostImage=dealPostImageRepository.findById(dealPostImageId)
+                .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_IMAGE_NOT_FOUND));
         fileHandler.delete(Constants.dealPostImagePath,dealPostImage.getName());
         dealPostImageRepository.delete(dealPostImage);
     }

@@ -24,10 +24,4 @@ public class EnumValidator implements ConstraintValidator<Enum,String> {
         }
         return false;
     }
-
-    /*private void addConstraintViolation(ConstraintValidatorContext context,String msg){
-        context.disableDefaultConstraintViolation();
-        context.buildConstraintViolationWithTemplate(msg)
-                .addConstraintViolation();
-    }*/
 }

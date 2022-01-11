@@ -52,6 +52,7 @@ public class DealPostService {
         dealPostRepository.save(dealPost);
     }
 
+
     public DealPostGetResponseDto getDealPostDto(Integer id) {
         DealPost dealPost=dealPostRepository.findById(id)
                 .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
