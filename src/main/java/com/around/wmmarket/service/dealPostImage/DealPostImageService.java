@@ -5,8 +5,10 @@ import com.around.wmmarket.common.FileHandler;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.domain.deal_post.DealPost;
+import com.around.wmmarket.domain.deal_post.DealPostRepository;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
 import com.around.wmmarket.domain.deal_post_image.DealPostImageRepository;
+import com.around.wmmarket.domain.user.SignedUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,10 +21,16 @@ import java.util.List;
 public class DealPostImageService {
     private final FileHandler fileHandler;
     private final DealPostImageRepository dealPostImageRepository;
+    private final DealPostRepository dealPostRepository;
 
     @Transactional
-    public void save(DealPost dealPost, List<MultipartFile> files) {
-        if(files.isEmpty()) throw new CustomException(ErrorCode.NOTHING_HAPPEN_BECAUSE_EMPTY);
+    public void save(SignedUser signedUser,Integer dealPostId, List<MultipartFile> files) {
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        DealPost dealPost=dealPostRepository.findById(dealPostId)
+                .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
+        if(!dealPost.getUser().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEALPOST);
+        // save
         List<DealPostImage> dealPostImages=fileHandler.parseFileInfo(dealPost,files);
         dealPostImageRepository.saveAll(dealPostImages);
     }

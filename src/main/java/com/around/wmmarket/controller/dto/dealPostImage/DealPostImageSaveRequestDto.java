@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @Getter
@@ -15,5 +16,6 @@ public class DealPostImageSaveRequestDto {
     @Min(1)
     private Integer dealPostId;
     @ApiParam(value = "거래 글 사진들",allowMultiple = true,required = true)
+    @NotEmpty
     private List<MultipartFile> files;
 }

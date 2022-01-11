@@ -53,14 +53,7 @@ public class DealPostImageApiController {
     @PostMapping("/deal-post-images")
     public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                   @Valid @ModelAttribute DealPostImageSaveRequestDto requestDto) {
-        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
-        // signedUser 와 dealPostId 의 email 비교
-        if(!dealPostService.isDealPostAuthor(signedUser, requestDto.getDealPostId())){
-            throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEALPOST);
-        }
-
-        DealPost dealPost=dealPostService.getDealPost(requestDto.getDealPostId());
-        dealPostImageService.save(dealPost,requestDto.getFiles());
+        dealPostImageService.save(signedUser,requestDto.getDealPostId(),requestDto.getFiles());
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("거래글 이미지 삽입 성공했습니다.")
