@@ -37,7 +37,6 @@ public class DealPostImageService {
                 .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_IMAGE_NOT_FOUND));
         // 물리적인 삭제
         fileHandler.delete(Constants.dealPostImagePath,dealPostImage.getName());
-        dealPostImage.deleteRelation();
         dealPostImageRepository.delete(dealPostImage);
     }
 }

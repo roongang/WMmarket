@@ -17,7 +17,7 @@ import javax.persistence.*;
 public class DealSuccess extends BaseTimeEntity {
 
     @Id
-    private Integer dealPostId;
+    private Integer dealSuccessId;
 
     @ManyToOne
     @JoinColumn(name = "BUYER_ID")
@@ -47,6 +47,7 @@ public class DealSuccess extends BaseTimeEntity {
         if(dealPost!=null) dealPost.setDealSuccess(this);
     }
     // delete
+    @PreRemove
     public void deleteRelation(){
         if(this.buyer!=null) this.buyer.getDealSuccesses().remove(this);
         if(this.dealPost!=null) this.dealPost.setDealSuccess(null);

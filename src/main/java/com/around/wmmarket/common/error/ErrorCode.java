@@ -43,6 +43,8 @@ public enum ErrorCode {
     UNAUTHORIZED_USER_TO_DEAL_REVIEW(FORBIDDEN,"D007","거래 리뷰에대한 권한이 없습니다."),
     DEAL_SUCCESS_NOT_FOUND(BAD_REQUEST,"D008","거래 완료되지 않은 글입니다."),
     DEALPOST_NOT_DONE(BAD_REQUEST,"D009","거래글이 완료 상태가 아닙니다."),
+    DEALPOST_USER_NOT_FOUND(BAD_REQUEST,"D010","거래글 작성자가 존재하지 않습니다."),
+    DEALPOST_STATE_SAME(BAD_REQUEST,"D011","거래글 상태가 이전과 동일합니다."),
 
     // Common
     INVALID_TYPE_VALUE(BAD_REQUEST, "C001", "Invalid Type Value"),

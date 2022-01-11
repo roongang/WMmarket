@@ -19,12 +19,13 @@ public class DealSuccessService {
                 .buyer(buyer)
                 .dealPost(dealPost).build());
     }
-    public DealSuccess findById(int dealPostId){
+    public DealSuccess findById(Integer dealPostId){
         return dealSuccessRepository.findById(dealPostId)
                 .orElseThrow(()->new CustomException(ErrorCode.DEAL_SUCCESS_NOT_FOUND));
     }
-    public void delete(DealSuccess dealSuccess){
-        dealSuccess.deleteRelation();
+    public void delete(Integer dealSuccessId){
+        DealSuccess dealSuccess=dealSuccessRepository.findById(dealSuccessId)
+                .orElseThrow(()->new CustomException(ErrorCode.DEAL_SUCCESS_NOT_FOUND));
         dealSuccessRepository.delete(dealSuccess);
     }
 }

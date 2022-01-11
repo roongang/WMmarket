@@ -1,5 +1,7 @@
 package com.around.wmmarket.controller;
 
+import com.around.wmmarket.common.error.CustomException;
+import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.dealPost.DealPostSaveRequestDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.Category;
@@ -8,6 +10,7 @@ import com.around.wmmarket.domain.deal_post.DealPostRepository;
 import com.around.wmmarket.domain.deal_post.DealState;
 import com.around.wmmarket.domain.deal_success.DealSuccessRepository;
 import com.around.wmmarket.domain.user.Role;
+import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.service.dealPost.DealPostService;
@@ -158,9 +161,18 @@ public class DealPostApiControllerTest {
                 .content("content")
                 .dealState(DealState.ONGOING).build());
         int dealPostId=dealPostRepository.findAll().get(0).getId();
+        User buyer=User.builder()
+                .email("buyer@email")
+                .password(passwordEncoder.encode("password"))
+                .nickname("nickname")
+                .role(Role.USER).build();
+        userRepository.save(buyer);
+        int buyerId=userRepository.findByEmail("buyer@email").orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND))
+                .getId();
         DealPostUpdateRequestDto requestDto=DealPostUpdateRequestDto.builder()
                 .category(Category.B.name())
                 .content("update_content")
+                .buyerId(buyerId)
                 .dealState(DealState.DONE.name()).build();
         String url = "http://localhost:"+port+"/api/v1/deal-posts/"+dealPostId;
         // when
@@ -227,26 +239,12 @@ public class DealPostApiControllerTest {
         int dealPostId=dealPostRepository.findAll().get(0).getId();
 
         userRepository.save(User.builder()
-                .email("user@email2")
-                .password(passwordEncoder.encode("password"))
-                .nickname("nickname")
-                .role(Role.USER).build());
-        User user2=userRepository.findByEmail("user@email2")
-                .orElseThrow(()->new UsernameNotFoundException("user@email2 없음"));
-        userRepository.save(User.builder()
                 .email("user@email3")
                 .password(passwordEncoder.encode("password"))
                 .nickname("nickname")
                 .role(Role.USER).build());
         User user3=userRepository.findByEmail("user@email3")
                 .orElseThrow(()->new UsernameNotFoundException("user@email3 없음"));
-
-        DealPostUpdateRequestDto requestDto2=DealPostUpdateRequestDto.builder()
-                .category(Category.B.name())
-                .content("update_content")
-                .buyerId(user2.getId())
-                .dealState(DealState.DONE.name()).build();
-        dealPostService.update(dealPostId,requestDto2);
 
         DealPostUpdateRequestDto requestDto=DealPostUpdateRequestDto.builder()
                 .category(Category.B.name())
@@ -290,7 +288,10 @@ public class DealPostApiControllerTest {
                 .content("update_content")
                 .buyerId(user2.getId())
                 .dealState(DealState.DONE.name()).build();
-        dealPostService.update(dealPostId,requestDto2);
+        SignedUser signedUser=SignedUser.builder()
+                .name("user@email")
+                .build();
+        dealPostService.update(signedUser,dealPostId,requestDto2);
 
         DealPostUpdateRequestDto requestDto=DealPostUpdateRequestDto.builder()
                 .category(Category.B.name())

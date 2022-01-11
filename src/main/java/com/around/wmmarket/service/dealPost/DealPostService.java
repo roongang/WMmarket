@@ -10,9 +10,9 @@ import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
 import com.around.wmmarket.domain.deal_post.DealState;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
-import com.around.wmmarket.domain.deal_success.DealSuccess;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
+import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.service.dealPostImage.DealPostImageService;
 import com.around.wmmarket.service.dealSuccess.DealSuccessService;
 import com.around.wmmarket.service.user.UserService;
@@ -20,23 +20,27 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class DealPostService {
     // repo
     private final DealPostRepository dealPostRepository;
+    private final UserRepository userRepository;
     // service
     private final UserService userService;
     private final DealPostImageService dealPostImageService;
     private final DealSuccessService dealSuccessService;
 
     @Transactional
-    public void save(Integer userId,DealPostSaveRequestDto requestDto) {
-        User user = userService.getUser(userId);
+    public void save(SignedUser signedUser,DealPostSaveRequestDto requestDto) {
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        User user = userRepository.findByEmail(signedUser.getUsername())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        // save
         DealPost dealPost = DealPost.builder()
                 .user(user)
                 .category(Category.valueOf(requestDto.getCategory()))
@@ -48,8 +52,7 @@ public class DealPostService {
         dealPostRepository.save(dealPost);
     }
 
-    // TODO : service 메소드 이름을 이렇게 지어야하나
-    public DealPostGetResponseDto getDealPostGetResponseDto(Integer id) {
+    public DealPostGetResponseDto getDealPostDto(Integer id) {
         DealPost dealPost=dealPostRepository.findById(id)
                 .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
         DealPostGetResponseDto responseDto=DealPostGetResponseDto.builder()
@@ -59,7 +62,7 @@ public class DealPostService {
                 .content(dealPost.getContent())
                 .dealState(dealPost.getDealState())
                 .build();
-        if(dealPost.getUser()!=null) responseDto.setUserEmail(dealPost.getUser().getEmail());
+        if(dealPost.getUser()!=null) responseDto.setUserEmail(dealPost.getUser().getEmail()); // user 가 삭제되는 경우 null
         return responseDto;
     }
     public DealPost getDealPost(Integer id){
@@ -76,61 +79,62 @@ public class DealPostService {
     public List<Integer> getImages(Integer dealPostId){
         DealPost dealPost=dealPostRepository.findById(dealPostId)
                 .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
-        List<DealPostImage> dealPostImages=dealPost.getDealPostImages();
-        List<Integer> images=new ArrayList<>();
-        for(DealPostImage dealPostImage:dealPostImages){
-            images.add(dealPostImage.getId());
-        }
-        return images;
+        return dealPost.getDealPostImages().stream()
+                .map(DealPostImage::getId)
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public void update(Integer dealPostId,DealPostUpdateRequestDto requestDto){
+    public void update(SignedUser signedUser,Integer dealPostId,DealPostUpdateRequestDto requestDto){
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         DealPost dealPost=dealPostRepository.findById(dealPostId)
                 .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
+        if(dealPost.getUser()==null) throw new CustomException(ErrorCode.DEALPOST_USER_NOT_FOUND);
+        if(!dealPost.getUser().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEALPOST);
+        // update
         if(requestDto.getCategory()!=null) dealPost.setCategory(Category.valueOf(requestDto.getCategory()));
         if(requestDto.getTitle()!=null) dealPost.setTitle(requestDto.getTitle());
         if(requestDto.getPrice()!=null) dealPost.setPrice(requestDto.getPrice());
         if(requestDto.getContent()!=null) dealPost.setContent(requestDto.getContent());
         // dealState 변경
         if(requestDto.getDealState()!=null){
-            // TODO : dealSuccess service 따로 구현!!
+            // check
+            if(dealPost.getDealState().name().equals(requestDto.getDealState())) throw new CustomException(ErrorCode.DEALPOST_STATE_SAME);
             User buyer = null;
-            if(requestDto.getBuyerId()!=null){
-                buyer=userService.getUser(requestDto.getBuyerId());
-            }
-            // dealSuccess 저장, ? -> DONE
-            if(dealPost.getDealState()!=DealState.DONE
-                    && Objects.equals(requestDto.getDealState(), DealState.DONE.name())
-                    && buyer!=null){
-                dealPost.setDealSuccess(dealSuccessService.save(buyer,dealPost));
-            }
-            // dealSuccess 수정, DONE && buyerId -> ?
-            else if(dealPost.getDealState()==DealState.DONE
-                    && Objects.equals(requestDto.getDealState(), DealState.DONE.name())
-                    && buyer!=null
-                    && !Objects.equals(dealPost.getDealSuccess().getBuyer(), buyer)){
-                DealSuccess dealSuccess=dealSuccessService.findById(dealPost.getId());
-                dealSuccess.setBuyer(buyer);
-            }
-            // dealSuccess 삭제, DONE -> ?
-            else if(dealPost.getDealState()==DealState.DONE
-                    && !requestDto.getDealState().equals(DealState.DONE.name())){
-                dealSuccessService.delete(dealSuccessService.findById(dealPost.getId()));
-                dealPost.setDealSuccess(null);
-            }
-            dealPost.setDealState(DealState.valueOf(requestDto.getDealState()));
+            if(requestDto.getBuyerId()!=null) buyer=userRepository.findById(requestDto.getBuyerId()).orElseThrow(()->new CustomException(ErrorCode.BUYER_NOT_FOUND));
+            if(requestDto.getBuyerId()!=null && userService.getUserEmail(requestDto.getBuyerId()).equals(signedUser.getUsername())) throw new CustomException(ErrorCode.SAME_BUYER_SELLER);
+
+            // update dealState
+            this.updateDealState(dealPost,DealState.valueOf(requestDto.getDealState()),buyer);
         }
     }
 
-    @Transactional
-    public void delete(DealPost dealPost) {
-        // TODO : 연관관계가 추가된다면 로직을 추가해야함
-        for(DealPostImage dealPostImage:dealPost.getDealPostImages()){
-            dealPostImage.deleteRelation();
-            dealPostImageService.delete(dealPostImage.getId());
+    private void updateDealState(DealPost dealPost,DealState dealState,User buyer){
+        // dealSuccess save, ?->DONE
+        if(dealState.equals(DealState.DONE)){
+            if(buyer==null) throw new CustomException(ErrorCode.BUYER_NOT_FOUND);
+            dealSuccessService.save(buyer,dealPost);
         }
-        dealPost.deleteRelation();
+        // dealSuccess delete, DONE->?
+        else if(dealPost.getDealState().equals(DealState.DONE)){
+            dealSuccessService.delete(dealPost.getId());
+        }
+        dealPost.setDealState(dealState);
+    }
+
+    @Transactional
+    public void delete(SignedUser signedUser,Integer dealPostId) {
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        DealPost dealPost=dealPostRepository.findById(dealPostId)
+                .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
+        if(dealPost.getUser()==null) throw new CustomException(ErrorCode.DEALPOST_USER_NOT_FOUND);
+        if(!dealPost.getUser().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEALPOST);
+        // delete
+        dealPost.getDealPostImages().stream()
+                .map(DealPostImage::getId)
+                .forEach(dealPostImageService::delete);
         dealPostRepository.delete(dealPost);
     }
 

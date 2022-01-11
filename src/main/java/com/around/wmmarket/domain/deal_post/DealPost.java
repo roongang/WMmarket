@@ -10,12 +10,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -96,6 +94,7 @@ public class DealPost extends BaseTimeEntity {
     public void setDealState(DealState dealState){this.dealState=dealState;}
     public void setDealSuccess(DealSuccess dealSuccess){this.dealSuccess=dealSuccess;}
     // delete
+    @PreRemove
     public void deleteRelation(){
         if(this.user!=null) this.user.getDealPosts().remove(this);
     }
