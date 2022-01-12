@@ -38,7 +38,7 @@ public class DealReviewApiController {
     public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                   @Valid @RequestBody DealReviewSaveRequestDto requestDto) {
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.CREATED)
                 .message("거래글 리뷰 삽입 성공했습니다.")
                 .data(dealReviewService.save(signedUser,requestDto.getContent(),requestDto.getDealPostId()))
                 .build());

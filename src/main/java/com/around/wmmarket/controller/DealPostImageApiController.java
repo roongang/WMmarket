@@ -48,7 +48,7 @@ public class DealPostImageApiController {
     public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                   @Valid @ModelAttribute DealPostImageSaveRequestDto requestDto) {
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.CREATED)
                 .message("거래글 이미지 삽입 성공했습니다.")
                 .data(dealPostImageService.save(signedUser,requestDto.getDealPostId(),requestDto.getFiles()))
                 .build());
