@@ -7,10 +7,7 @@ import com.around.wmmarket.common.SuccessResponse;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.dealPostImage.DealPostImageSaveRequestDto;
-import com.around.wmmarket.domain.deal_post.DealPost;
-import com.around.wmmarket.domain.deal_post_image.DealPostImage;
 import com.around.wmmarket.domain.user.SignedUser;
-import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.dealPostImage.DealPostImageService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -27,7 +24,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.io.File;
@@ -40,7 +36,6 @@ import java.nio.file.Paths;
 @RestController
 public class DealPostImageApiController {
     private final DealPostImageService dealPostImageService;
-    private final DealPostService dealPostService;
     private final ResourceLoader resourceLoader;
     private final Tika tika=new Tika();
 
@@ -52,10 +47,10 @@ public class DealPostImageApiController {
     @PostMapping("/deal-post-images")
     public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                   @Valid @ModelAttribute DealPostImageSaveRequestDto requestDto) {
-        dealPostImageService.save(signedUser,requestDto.getDealPostId(),requestDto.getFiles());
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.CREATED)
                 .message("거래글 이미지 삽입 성공했습니다.")
+                .data(dealPostImageService.save(signedUser,requestDto.getDealPostId(),requestDto.getFiles()))
                 .build());
     }
 

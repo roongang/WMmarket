@@ -39,10 +39,11 @@ public class DealPostApiController {
     @PostMapping("/deal-posts")
     public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                   @Valid @ModelAttribute DealPostSaveRequestDto requestDto) {
-        dealPostService.save(signedUser,requestDto);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.CREATED)
-                .message("거래글 삽입 성공했습니다.").build());
+                .message("거래글 삽입 성공했습니다.")
+                .data(dealPostService.save(signedUser,requestDto))
+                .build());
     }
 
     @ApiOperation(value = "거래 글 반환") // SWAGGER

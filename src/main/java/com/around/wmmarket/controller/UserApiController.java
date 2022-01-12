@@ -13,7 +13,6 @@ import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.user.CustomUserDetailsService;
 import com.around.wmmarket.service.user.UserService;
-import com.around.wmmarket.service.userLike.UserLikeService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -56,7 +55,6 @@ import java.util.ArrayList;
 public class UserApiController {
     private final UserService userService;
     private final CustomUserDetailsService customUserDetailsService;
-    private final UserLikeService userLikeService;
 
     private final AuthenticationManager authenticationManager;
     private final ResourceLoader resourceLoader;
@@ -70,10 +68,11 @@ public class UserApiController {
     @Transactional
     @PostMapping("/users")
     public ResponseEntity<Object> save(@Valid @ModelAttribute UserSaveRequestDto requestDto){
-        userService.save(requestDto);
         return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.CREATED)
                 .message("유저 회원가입 성공했습니다.")
-                .status(HttpStatus.CREATED).build());
+                .data(userService.save(requestDto))
+                .build());
     }
 
     // TODO : 분산환경을 위해 쿠키방식 생각

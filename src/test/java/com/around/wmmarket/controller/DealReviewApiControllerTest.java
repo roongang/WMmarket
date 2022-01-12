@@ -130,7 +130,7 @@ public class DealReviewApiControllerTest {
         mvc.perform(post(url)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(new ObjectMapper().writeValueAsString(requestDto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         // then
         assertThat(dealReviewRepository.findAll().isEmpty()).isFalse();
     }
