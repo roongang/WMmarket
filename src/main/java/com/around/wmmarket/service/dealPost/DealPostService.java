@@ -17,6 +17,7 @@ import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.service.dealPostImage.DealPostImageService;
 import com.around.wmmarket.service.dealSuccess.DealSuccessService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -145,5 +146,12 @@ public class DealPostService {
     @Transactional
     public void deleteImage(Integer dealPostImageId){
         dealPostImageService.delete(dealPostImageId);
+    }
+
+    public List<DealPostGetResponseDto> findByDealState(Pageable pageable){
+        return dealPostRepository.findAllBy(pageable).stream()
+                .map(DealPost::getId)
+                .map(this::getDealPostDto)
+                .collect(Collectors.toList());
     }
 }

@@ -3,15 +3,18 @@ package com.around.wmmarket.controller;
 import com.around.wmmarket.common.Constants;
 import com.around.wmmarket.common.ResponseHandler;
 import com.around.wmmarket.common.SuccessResponse;
+import com.around.wmmarket.common.validation.Enum;
 import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostSaveRequestDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostUpdateRequestDto;
+import com.around.wmmarket.domain.deal_post.DealState;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -91,6 +94,15 @@ public class DealPostApiController {
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("거래글 삭제 성공했습니다.")
+                .build());
+    }
+
+    @GetMapping("/deal-posts")
+    public ResponseEntity<Object> getFindByState(Pageable pageable){
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("거래글 검색 성공했습니다.")
+                .data(dealPostService.findByDealState(pageable))
                 .build());
     }
 }
