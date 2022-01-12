@@ -116,7 +116,7 @@ public class DealPostImageApiControllerTest {
                 .file(file1)
                 .file(file2)
                 .param("dealPostId",dealPost.getId().toString())
-        ).andExpect(status().isOk());
+        ).andExpect(status().isCreated());
         // then
         dealPost=dealPostRepository.findAll().get(0);
         log.info("image list size:"+dealPost.getDealPostImages().size()); // TODO : 어떻게 리스트에 4개가 저장되는거지???? 도저히 모르겠네
