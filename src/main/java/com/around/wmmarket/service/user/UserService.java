@@ -53,11 +53,6 @@ public class UserService{
         userRepository.save(user);
     }
 
-    public boolean isExist(String email){
-        return userRepository.existsByEmail(email);
-    }
-    public boolean isExist(Integer id) { return userRepository.existsById(id); }
-
     public UserGetResponseDto getUserDto(String email){
         User user = userRepository.findByEmail(email)
                 .orElse(null);
@@ -147,6 +142,7 @@ public class UserService{
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         return user.getImage();
     }
+    @Transactional
     public void updateImage(SignedUser signedUser,Integer userId,MultipartFile file) {
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
@@ -163,6 +159,7 @@ public class UserService{
         String image=fileHandler.parseUserImage(file);
         user.setImage(image);
     }
+    @Transactional
     public void deleteImage(SignedUser signedUser,Integer userId) {
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
@@ -193,7 +190,6 @@ public class UserService{
                 .map(DealPost::getId)
                 .collect(Collectors.toList());
     }
-
     public void deleteLike(SignedUser signedUser,Integer userId,Integer dealPostId){
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);

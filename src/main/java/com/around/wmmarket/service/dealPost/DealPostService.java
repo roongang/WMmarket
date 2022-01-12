@@ -52,7 +52,6 @@ public class DealPostService {
         dealPostRepository.save(dealPost);
     }
 
-
     public DealPostGetResponseDto getDealPostDto(Integer id) {
         DealPost dealPost=dealPostRepository.findById(id)
                 .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
@@ -66,6 +65,7 @@ public class DealPostService {
         if(dealPost.getUser()!=null) responseDto.setUserEmail(dealPost.getUser().getEmail()); // user 가 삭제되는 경우 null
         return responseDto;
     }
+
     public DealPost getDealPost(Integer id){
         return dealPostRepository.findById(id)
                 .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
@@ -111,7 +111,8 @@ public class DealPostService {
         }
     }
 
-    private void updateDealState(DealPost dealPost,DealState dealState,User buyer){
+    @Transactional
+    public void updateDealState(DealPost dealPost, DealState dealState, User buyer){
         // dealSuccess save, ?->DONE
         if(dealState.equals(DealState.DONE)){
             if(buyer==null) throw new CustomException(ErrorCode.BUYER_NOT_FOUND);

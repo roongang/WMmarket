@@ -3,14 +3,9 @@ package com.around.wmmarket.controller;
 import com.around.wmmarket.common.Constants;
 import com.around.wmmarket.common.ResponseHandler;
 import com.around.wmmarket.common.SuccessResponse;
-import com.around.wmmarket.common.error.CustomException;
-import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.dealReview.DealReviewGetResponseDto;
 import com.around.wmmarket.controller.dto.dealReview.DealReviewSaveRequestDto;
 import com.around.wmmarket.controller.dto.dealReview.DealReviewUpdateRequestDto;
-import com.around.wmmarket.domain.deal_post.DealPost;
-import com.around.wmmarket.domain.deal_post.DealState;
-import com.around.wmmarket.domain.deal_review.DealReview;
 import com.around.wmmarket.domain.deal_review.DealReviewRepository;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.dealPost.DealPostService;
@@ -72,10 +67,6 @@ public class DealReviewApiController {
     public ResponseEntity<?> update(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                     @Min(1) @PathVariable("dealReviewId") Integer dealReviewId,
                                     @Valid @RequestBody DealReviewUpdateRequestDto requestDto){
-        // check signedUser
-        DealReview dealReview=dealReviewRepository.findById(dealReviewId)
-                .orElseThrow(()->new CustomException(ErrorCode.DEAL_REVIEW_NOT_FOUND));
-        if(dealReview.getBuyer()==null||!dealReview.getBuyer().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEAL_REVIEW);
         // update
         dealReviewService.update(signedUser,dealReviewId,requestDto);
         return ResponseHandler.toResponse(SuccessResponse.builder()
@@ -88,14 +79,8 @@ public class DealReviewApiController {
     @DeleteMapping("/deal-reviews/{dealReviewId}")
     public ResponseEntity<?> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                     @Min(1) @PathVariable("dealReviewId") Integer dealReviewId) {
-        // check signedUser
-        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
-        DealReview dealReview=dealReviewRepository.findById(dealReviewId)
-                .orElseThrow(()-> new CustomException(ErrorCode.DEAL_REVIEW_NOT_FOUND));
-        if(dealReview.getBuyer()==null||!dealReview.getBuyer().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEAL_REVIEW);
-
         // delete
-        dealReviewService.delete(dealReviewId);
+        dealReviewService.delete(signedUser,dealReviewId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("거래글 리뷰 삭제 성공했습니다.")

@@ -65,19 +65,26 @@ public class DealReviewService {
         return responseDto;
     }
 
+    @Transactional
     public void update(SignedUser signedUser,Integer dealReviewId,DealReviewUpdateRequestDto requestDto){
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         DealReview dealReview=dealReviewRepository.findById(dealReviewId)
                 .orElseThrow(()-> new CustomException(ErrorCode.DEAL_REVIEW_NOT_FOUND));
-        if(!dealReview.getBuyer().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEAL_REVIEW);
+        if(dealReview.getBuyer()==null
+                ||!dealReview.getBuyer().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEAL_REVIEW);
         // update
         dealReview.setContent(requestDto.getContent());
     }
-    public void delete(Integer dealReviewId) {
+    @Transactional
+    public void delete(SignedUser signedUser,Integer dealReviewId) {
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         DealReview dealReview=dealReviewRepository.findById(dealReviewId)
                 .orElseThrow(()-> new CustomException(ErrorCode.DEAL_REVIEW_NOT_FOUND));
-        dealReview.deleteRelation();
+        if(dealReview.getBuyer()==null
+                ||!dealReview.getBuyer().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEAL_REVIEW);
+        // delete
         dealReviewRepository.delete(dealReview);
     }
 }

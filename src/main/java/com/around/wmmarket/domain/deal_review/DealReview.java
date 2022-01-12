@@ -62,6 +62,7 @@ public class DealReview extends BaseTimeEntity {
     }
     public void setContent(String content){this.content=content;}
 
+    @PreRemove
     public void deleteRelation(){
         if(this.buyer!=null) this.buyer.getBuyDealReviews().remove(this);
         if(this.seller!=null) this.seller.getSellDealReviews().remove(this);
