@@ -6,6 +6,7 @@ import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.user.UserGetResponseDto;
 import com.around.wmmarket.controller.dto.user.UserSaveRequestDto;
+import com.around.wmmarket.controller.dto.user.UserSaveResponseDto;
 import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
@@ -35,7 +36,7 @@ public class UserService{
     private final FileHandler fileHandler;
 
     @Transactional
-    public void save(UserSaveRequestDto requestDto){
+    public UserSaveResponseDto save(UserSaveRequestDto requestDto){
         // check duplicate user
         if(userRepository.findByEmail(requestDto.getEmail()).isPresent()) throw new CustomException(ErrorCode.DUPLICATE_USER_EMAIL);
 
@@ -50,7 +51,7 @@ public class UserService{
                 .town_2(requestDto.getTown_2())
                 .build();
         if(requestDto.getImage()!=null) user.setImage(fileHandler.parseUserImage(requestDto.getImage()));
-        userRepository.save(user);
+        return new UserSaveResponseDto(userRepository.save(user).getId());
     }
 
     public UserGetResponseDto getUserDto(String email){

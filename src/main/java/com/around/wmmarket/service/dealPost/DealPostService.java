@@ -4,6 +4,7 @@ import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostSaveRequestDto;
+import com.around.wmmarket.controller.dto.dealPost.DealPostSaveResponseDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.Category;
 import com.around.wmmarket.domain.deal_post.DealPost;
@@ -35,7 +36,7 @@ public class DealPostService {
     private final DealSuccessService dealSuccessService;
 
     @Transactional
-    public void save(SignedUser signedUser,DealPostSaveRequestDto requestDto) {
+    public DealPostSaveResponseDto save(SignedUser signedUser, DealPostSaveRequestDto requestDto) {
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         User user = userRepository.findByEmail(signedUser.getUsername())
@@ -49,7 +50,7 @@ public class DealPostService {
                 .content(requestDto.getContent())
                 .dealState(DealState.ONGOING).build();
         if(requestDto.getFiles()!=null) dealPostImageService.save(dealPost,requestDto.getFiles());
-        dealPostRepository.save(dealPost);
+        return new DealPostSaveResponseDto(dealPostRepository.save(dealPost).getId());
     }
 
     public DealPostGetResponseDto getDealPostDto(Integer id) {

@@ -6,9 +6,7 @@ import com.around.wmmarket.common.SuccessResponse;
 import com.around.wmmarket.controller.dto.dealReview.DealReviewGetResponseDto;
 import com.around.wmmarket.controller.dto.dealReview.DealReviewSaveRequestDto;
 import com.around.wmmarket.controller.dto.dealReview.DealReviewUpdateRequestDto;
-import com.around.wmmarket.domain.deal_review.DealReviewRepository;
 import com.around.wmmarket.domain.user.SignedUser;
-import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.dealReview.DealReviewService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -29,9 +27,7 @@ import javax.validation.constraints.Min;
 @RequiredArgsConstructor
 @RestController
 public class DealReviewApiController {
-    private final DealPostService dealPostService;
     private final DealReviewService dealReviewService;
-    private final DealReviewRepository dealReviewRepository;
 
     @ApiOperation(value = "거래 리뷰 삽입") // SWAGGER
     @ApiResponses({
@@ -41,10 +37,10 @@ public class DealReviewApiController {
     @PostMapping("/deal-reviews")
     public ResponseEntity<?> save(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                   @Valid @RequestBody DealReviewSaveRequestDto requestDto) {
-        dealReviewService.save(signedUser,requestDto.getContent(),requestDto.getDealPostId());
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("거래글 리뷰 삽입 성공했습니다.")
+                .data(dealReviewService.save(signedUser,requestDto.getContent(),requestDto.getDealPostId()))
                 .build());
     }
 

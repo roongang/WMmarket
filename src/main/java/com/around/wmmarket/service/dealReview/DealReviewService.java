@@ -3,6 +3,7 @@ package com.around.wmmarket.service.dealReview;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.dealReview.DealReviewGetResponseDto;
+import com.around.wmmarket.controller.dto.dealReview.DealReviewSaveResponseDto;
 import com.around.wmmarket.controller.dto.dealReview.DealReviewUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
@@ -27,7 +28,7 @@ public class DealReviewService {
     private final UserService userService;
 
     @Transactional
-    public void save(SignedUser signedUser, String content, Integer dealPostId) {
+    public DealReviewSaveResponseDto save(SignedUser signedUser, String content, Integer dealPostId) {
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         DealPost dealPost=dealPostRepository.findById(dealPostId)
@@ -43,11 +44,12 @@ public class DealReviewService {
         // save
         User buyer=userService.getUser(signedUser.getUsername());
         User seller=dealPost.getUser();
-        dealReviewRepository.save(DealReview.builder()
+        return new DealReviewSaveResponseDto(dealReviewRepository.save(DealReview.builder()
                 .buyer(buyer)
                 .seller(seller)
                 .content(content)
-                .dealPost(dealPost).build());
+                .dealPost(dealPost)
+                .build()).getId());
     }
 
     public DealReviewGetResponseDto getDealReviewDto(Integer dealReviewId){
