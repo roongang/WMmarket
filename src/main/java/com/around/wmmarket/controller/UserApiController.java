@@ -253,7 +253,7 @@ public class UserApiController {
             @Min(1) @PathVariable("userId") Integer userId) {
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
-                .message("유저 좋아요들 ID 리스트 성공했습니다.")
+                .message("유저 좋아요 ID 리스트 반환 성공했습니다.")
                 .data(userService.getLikes(userId)).build());
     }
 
@@ -267,6 +267,17 @@ public class UserApiController {
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 좋아요 삭제 성공했습니다.")
+                .build());
+    }
+
+    @ApiOperation(value = "유저 거래 글 리스트 반환")
+    @GetMapping("/users/{userId}/deal-posts")
+    public ResponseEntity<Object> getDealPosts(
+            @Min(1) @PathVariable("userId") Integer userId){
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("유저 거래글 ID 리스트 반환 성공했습니다.")
+                .data(userService.getDealPosts(userId))
                 .build());
     }
 }

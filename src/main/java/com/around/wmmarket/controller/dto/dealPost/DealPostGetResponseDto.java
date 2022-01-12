@@ -12,6 +12,8 @@ import lombok.*;
 public class DealPostGetResponseDto {
     @ApiModelProperty(value = "유저 이메일",example = "test_email@gmail.com",required = true)
     private String userEmail;
+    @ApiModelProperty(value = "거래 글 아이디",example = "1",required = true)
+    private Integer id;
     @ApiModelProperty(value = "거래 글 카테고리",example = "A",required = true)
     private Category category;
     @ApiModelProperty(value = "거래 글 제목",example = "거래 글 제목입니다.",required = true)

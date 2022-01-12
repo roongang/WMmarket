@@ -382,4 +382,31 @@ public class UserApiControllerTest {
         log.info("userLike size:"+user.getUserLikes().size());
         assertThat(user.getUserLikes().isEmpty()).isTrue();
     }
+
+    @Test
+    @Transactional
+    @WithUserDetails(value = "user@email")
+    public void userDealPostsGetTest() throws Exception{
+        // given
+        // 글 여러개 쓰기
+        for(int i=1;i<=5;i++){
+            dealPostRepository.save(DealPost.builder()
+                    .user(user)
+                    .category(Category.valueOf(Category.A.name()))
+                    .title("title")
+                    .price(i*1000)
+                    .content("content")
+                    .dealState(DealState.ONGOING).build());
+        }
+        String url="http://localhost"+port+"/api/v1/users/"+user.getId()+"/deal-posts";
+        // when
+        MvcResult result=mvc.perform(get(url))
+                .andExpect(status().isOk())
+                .andReturn();
+        // then
+        for(int i=1;i<=5;i++){
+            String price=Integer.toString(i*1000);
+            assertThat(result.getResponse().getContentAsString()).contains(price);
+        }
+    }
 }

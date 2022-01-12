@@ -4,6 +4,7 @@ import com.around.wmmarket.common.Constants;
 import com.around.wmmarket.common.FileHandler;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
+import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
 import com.around.wmmarket.controller.dto.user.UserGetResponseDto;
 import com.around.wmmarket.controller.dto.user.UserSaveRequestDto;
 import com.around.wmmarket.controller.dto.user.UserSaveResponseDto;
@@ -15,6 +16,7 @@ import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.domain.user_like.UserLike;
+import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.userLike.UserLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,10 +31,13 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserService{
-    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final DealPostRepository dealPostRepository;
+
     private final UserLikeService userLikeService;
+    private final DealPostService dealPostService;
+
+    private final PasswordEncoder passwordEncoder;
     private final FileHandler fileHandler;
 
     @Transactional
@@ -198,5 +203,14 @@ public class UserService{
         if(!dealPostRepository.existsById(dealPostId)) throw new CustomException(ErrorCode.DEALPOST_NOT_FOUND);
         // delete
         userLikeService.delete(userId,dealPostId);
+    }
+
+    public List<DealPostGetResponseDto> getDealPosts(Integer userId){
+        User user=userRepository.findById(userId)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        return user.getDealPosts().stream()
+                .map(DealPost::getId)
+                .map(dealPostService::getDealPostDto)
+                .collect(Collectors.toList());
     }
 }

@@ -16,7 +16,6 @@ import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.service.dealPostImage.DealPostImageService;
 import com.around.wmmarket.service.dealSuccess.DealSuccessService;
-import com.around.wmmarket.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +30,6 @@ public class DealPostService {
     private final DealPostRepository dealPostRepository;
     private final UserRepository userRepository;
     // service
-    private final UserService userService;
     private final DealPostImageService dealPostImageService;
     private final DealSuccessService dealSuccessService;
 
@@ -57,6 +55,7 @@ public class DealPostService {
         DealPost dealPost=dealPostRepository.findById(id)
                 .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
         DealPostGetResponseDto responseDto=DealPostGetResponseDto.builder()
+                .id(dealPost.getId())
                 .category(dealPost.getCategory())
                 .title(dealPost.getTitle())
                 .price(dealPost.getPrice())
@@ -104,8 +103,10 @@ public class DealPostService {
             // check
             if(dealPost.getDealState().name().equals(requestDto.getDealState())) throw new CustomException(ErrorCode.DEALPOST_STATE_SAME);
             User buyer = null;
-            if(requestDto.getBuyerId()!=null) buyer=userRepository.findById(requestDto.getBuyerId()).orElseThrow(()->new CustomException(ErrorCode.BUYER_NOT_FOUND));
-            if(requestDto.getBuyerId()!=null && userService.getUserEmail(requestDto.getBuyerId()).equals(signedUser.getUsername())) throw new CustomException(ErrorCode.SAME_BUYER_SELLER);
+            if(requestDto.getBuyerId()!=null){
+                buyer=userRepository.findById(requestDto.getBuyerId()).orElseThrow(()->new CustomException(ErrorCode.BUYER_NOT_FOUND));
+                if(buyer.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.SAME_BUYER_SELLER);
+            }
 
             // update dealState
             this.updateDealState(dealPost,DealState.valueOf(requestDto.getDealState()),buyer);
