@@ -32,3 +32,6 @@
 ## [ERD CLOUD](https://www.erdcloud.com/d/PonvnYhMhuKBgyDHk)
 - read는 누구나 가능
 - edit은 팀만
+
+# code review
+[![CodeFactor](https://www.codefactor.io/repository/github/roongang/wmmarket/badge)](https://www.codefactor.io/repository/github/roongang/wmmarket)
