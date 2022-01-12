@@ -18,6 +18,7 @@ import com.around.wmmarket.service.dealPostImage.DealPostImageService;
 import com.around.wmmarket.service.dealSuccess.DealSuccessService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -148,10 +149,8 @@ public class DealPostService {
         dealPostImageService.delete(dealPostImageId);
     }
 
-    public List<DealPostGetResponseDto> findByDealState(Pageable pageable){
-        return dealPostRepository.findAllBy(pageable).stream()
-                .map(DealPost::getId)
-                .map(this::getDealPostDto)
-                .collect(Collectors.toList());
+    // TODO : Slice를 custom해서 사용해주세요
+    public Slice<DealPostGetResponseDto> findByDealState(String dealState, Pageable pageable){
+        //return dealPostRepository.findByDealState(DealState.valueOf(dealState),pageable);
     }
 }

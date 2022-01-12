@@ -98,11 +98,13 @@ public class DealPostApiController {
     }
 
     @GetMapping("/deal-posts")
-    public ResponseEntity<Object> getFindByState(Pageable pageable){
+    public ResponseEntity<Object> getFindByState(
+            @Enum(enumClass=DealState.class) @RequestParam String dealState,Pageable pageable){
+        // TODO : Slice<DealPostGetResponseDto> 로 반환해주세요
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("거래글 검색 성공했습니다.")
-                .data(dealPostService.findByDealState(pageable))
+                .data(dealPostService.findByDealState(dealState,pageable))
                 .build());
     }
 }
