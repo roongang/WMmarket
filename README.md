@@ -1,3 +1,11 @@
+# WMmarket
+## 목차
+1. [DEV SERVER](#dev-server)
+2. [POST MAN](#post-man)
+3. [SWAGGER](#swagger)
+4. [DOCUMENT](#document)
+5. [CODE REVIEW](#code-review)
+
 # DEV SERVER
 ## 서버링크 (https://wm-market.herokuapp.com/)
 - paas 형태인 heroku 사용
@@ -33,5 +41,5 @@
 - read는 누구나 가능
 - edit은 팀만
 
-# code review
+# CODE REVIEW
 [![CodeFactor](https://www.codefactor.io/repository/github/roongang/wmmarket/badge)](https://www.codefactor.io/repository/github/roongang/wmmarket)
