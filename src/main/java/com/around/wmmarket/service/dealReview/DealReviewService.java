@@ -57,6 +57,7 @@ public class DealReviewService {
                 .orElse(null);
         if(dealReview==null) return null;
         DealReviewGetResponseDto responseDto=DealReviewGetResponseDto.builder()
+                .id(dealReview.getId())
                 .content(dealReview.getContent())
                 .createdDate(dealReview.getCreatedDate())
                 .modifiedDate(dealReview.getModifiedDate())
