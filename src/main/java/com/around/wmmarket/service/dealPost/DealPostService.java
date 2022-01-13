@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -171,6 +172,23 @@ public class DealPostService {
     public Slice<DealPostGetResponseDto> findByDealStateWithPaging(String dealState, Pageable pageable){
         //return dealPostQueryRepository.findByDealState(DealState.valueOf(dealState),pageable);
         return dealPostRepository.findByDealState(DealState.valueOf(dealState),pageable)
+                .map(dealPost -> DealPostGetResponseDto.builder()
+                        .id(dealPost.getId())
+                        .userId(dealPost.getUser().getId())
+                        .category(dealPost.getCategory())
+                        .title(dealPost.getTitle())
+                        .price(dealPost.getPrice())
+                        .content(dealPost.getContent())
+                        .dealState(dealPost.getDealState())
+                        .createdDate(dealPost.getCreatedDate())
+                        .modifiedDate(dealPost.getModifiedDate())
+                        .imageIds(dealPost.getDealPostImages().stream()
+                                .map(DealPostImage::getId).collect(Collectors.toList()))
+                        .build());
+    }
+
+    public Slice<DealPostGetResponseDto> searchDealPost(Map<String,Object> filter,Pageable pageable){
+        return dealPostRepository.findAll(DealPostSpecification.searchDealPost(filter),pageable)
                 .map(dealPost -> DealPostGetResponseDto.builder()
                         .id(dealPost.getId())
                         .userId(dealPost.getUser().getId())
