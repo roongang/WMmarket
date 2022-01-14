@@ -3,11 +3,9 @@ package com.around.wmmarket.controller;
 import com.around.wmmarket.common.Constants;
 import com.around.wmmarket.common.ResponseHandler;
 import com.around.wmmarket.common.SuccessResponse;
-import com.around.wmmarket.common.validation.Enum;
 import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostSaveRequestDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostUpdateRequestDto;
-import com.around.wmmarket.domain.deal_post.DealState;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import io.swagger.annotations.ApiOperation;
@@ -25,6 +23,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.ArrayList;
+import java.util.Map;
 
 // TODO : @AuthenticationPrincipal adapter 패턴으로 감싸야하는가 의문
 @Validated
@@ -97,17 +96,19 @@ public class DealPostApiController {
                 .build());
     }
 
-    @GetMapping("/deal-posts/query")
-    public ResponseEntity<Object> getFindAllWithPaging(Pageable pageable){
-        // TODO : Slice<DealPostGetResponseDto> 로 반환해주세요
+    @GetMapping("/deal-posts")
+    public ResponseEntity<Object> searchDealPost(@RequestParam(required = false) Map<String,Object> filter, Pageable pageable){
+        // TODO : filter validation 은?
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("거래글 검색 성공했습니다.")
-                .data(dealPostService.findAllWithPaging(pageable))
+                .data(filter.isEmpty()
+                        ? dealPostService.findAllWithPaging(pageable)
+                        : dealPostService.findAllWithFilteringAndPaging(filter,pageable))
                 .build());
     }
 
-    @GetMapping("/deal-posts")
+    /*@GetMapping("/deal-posts")
     public ResponseEntity<Object> getFindByDealStateWithPaging(
             @Enum(enumClass=DealState.class) @RequestParam String dealState,Pageable pageable){
         // TODO : Slice<DealPostGetResponseDto> 로 반환해주세요
@@ -116,5 +117,5 @@ public class DealPostApiController {
                 .message("거래글 검색 성공했습니다.")
                 .data(dealPostService.findByDealStateWithPaging(dealState,pageable))
                 .build());
-    }
+    }*/
 }

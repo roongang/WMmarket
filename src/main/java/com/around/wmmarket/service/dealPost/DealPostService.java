@@ -187,7 +187,7 @@ public class DealPostService {
                         .build());
     }
 
-    public Slice<DealPostGetResponseDto> searchDealPost(Map<String,Object> filter,Pageable pageable){
+    public Slice<DealPostGetResponseDto> findAllWithFilteringAndPaging(Map<String,Object> filter,Pageable pageable){
         return dealPostRepository.findAll(DealPostSpecification.searchDealPost(filter),pageable)
                 .map(dealPost -> DealPostGetResponseDto.builder()
                         .id(dealPost.getId())
