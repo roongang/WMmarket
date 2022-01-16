@@ -23,6 +23,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 // TODO : @AuthenticationPrincipal adapter 패턴으로 감싸야하는가 의문
@@ -57,7 +58,9 @@ public class DealPostApiController {
             @Min(1) @PathVariable("dealPostId") Integer dealPostId) {
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
-                .data(dealPostService.getDealPostDto(dealPostId)).build());
+                .data(dealPostService.getDealPostDto(dealPostId)!=null
+                        ? dealPostService.getDealPostDto(dealPostId)
+                        : Arrays.asList()).build());
     }
 
     @ApiOperation(value = "거래 글 이미지 리스트 반환") // SWAGGER

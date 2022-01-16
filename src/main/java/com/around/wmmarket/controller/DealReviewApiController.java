@@ -21,6 +21,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.util.Arrays;
 
 @Validated
 @RequestMapping(Constants.API_PATH)
@@ -54,7 +55,9 @@ public class DealReviewApiController {
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("거래글 리뷰 반환 성공했습니다.")
-                .data(dealReviewService.getDealReviewDto(dealReviewId))
+                .data(dealReviewService.getDealReviewDto(dealReviewId)!=null
+                        ? dealReviewService.getDealReviewDto(dealReviewId)
+                        : Arrays.asList())
                 .build());
     }
 

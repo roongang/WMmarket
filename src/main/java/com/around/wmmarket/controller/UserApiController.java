@@ -47,6 +47,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @Validated
 @RequestMapping(Constants.API_PATH)
@@ -124,7 +125,9 @@ public class UserApiController {
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 반환 성공했습니다.")
-                .data(userService.getUserDto(email)).build());
+                .data(userService.getUserDto(email)!=null
+                        ? userService.getUserDto(email)
+                        : Arrays.asList()).build());
     }
 
     @ApiOperation(value = "유저 반환") // SWAGGER
@@ -137,7 +140,9 @@ public class UserApiController {
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 반환 성공했습니다.")
-                .data(userService.getUserDto(userId)).build());
+                .data(userService.getUserDto(userId)!=null
+                        ? userService.getUserDto(userId)
+                        : Arrays.asList()).build());
     }
 
     @ApiOperation(value = "유저 수정") // SWAGGER

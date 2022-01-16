@@ -54,7 +54,8 @@ public class DealPostService {
 
     public DealPostGetResponseDto getDealPostDto(Integer id) {
         DealPost dealPost=dealPostRepository.findById(id)
-                .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
+                .orElse(null);
+        if(dealPost==null) return null;
         DealPostGetResponseDto responseDto=DealPostGetResponseDto.builder()
                 .id(dealPost.getId())
                 .category(dealPost.getCategory())
