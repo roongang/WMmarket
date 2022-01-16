@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 @Getter
 @Builder
@@ -30,4 +32,8 @@ public class UserGetResponseDto {
     private final Integer isAuth;
     @ApiModelProperty(value = "유저 인증 코드",example = "1234", required = true)
     private final String code;
+    @ApiModelProperty(value = "유저 글 생성시간",example = "2022-01-04 09:38:32.470811",required = true)
+    private LocalDateTime createdDate;
+    @ApiModelProperty(value = "유저 글 수정시간",example = "2022-01-04 09:38:32.470811",required = true)
+    private LocalDateTime modifiedDate;
 }

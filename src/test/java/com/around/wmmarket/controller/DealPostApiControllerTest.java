@@ -145,7 +145,7 @@ public class DealPostApiControllerTest {
                 .andReturn();
         // then
         String content=result.getResponse().getContentAsString();
-        assertThat(content).contains("user@email");
+        assertThat(content).contains("userId");
     }
 
     @Test

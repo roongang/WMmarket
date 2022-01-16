@@ -6,10 +6,7 @@ import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostSaveRequestDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostSaveResponseDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostUpdateRequestDto;
-import com.around.wmmarket.domain.deal_post.Category;
-import com.around.wmmarket.domain.deal_post.DealPost;
-import com.around.wmmarket.domain.deal_post.DealPostRepository;
-import com.around.wmmarket.domain.deal_post.DealState;
+import com.around.wmmarket.domain.deal_post.*;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
@@ -17,10 +14,13 @@ import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.service.dealPostImage.DealPostImageService;
 import com.around.wmmarket.service.dealSuccess.DealSuccessService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 public class DealPostService {
     // repo
     private final DealPostRepository dealPostRepository;
+    private final DealPostQueryRepository dealPostQueryRepository;
     private final UserRepository userRepository;
     // service
     private final DealPostImageService dealPostImageService;
@@ -61,8 +62,12 @@ public class DealPostService {
                 .price(dealPost.getPrice())
                 .content(dealPost.getContent())
                 .dealState(dealPost.getDealState())
+                .createdDate(dealPost.getCreatedDate())
+                .modifiedDate(dealPost.getModifiedDate())
+                .imageIds(dealPost.getDealPostImages().stream()
+                        .map(DealPostImage::getId).collect(Collectors.toList()))
                 .build();
-        if(dealPost.getUser()!=null) responseDto.setUserEmail(dealPost.getUser().getEmail()); // user 가 삭제되는 경우 null
+        if(dealPost.getUser()!=null) responseDto.setUserId(dealPost.getUser().getId()); // user 가 삭제되는 경우 null
         return responseDto;
     }
 
@@ -145,5 +150,60 @@ public class DealPostService {
     @Transactional
     public void deleteImage(Integer dealPostImageId){
         dealPostImageService.delete(dealPostImageId);
+    }
+
+    public Slice<DealPostGetResponseDto> findAllWithPaging(Pageable pageable){
+        return dealPostRepository.findAll(pageable)
+                .map(dealPost -> DealPostGetResponseDto.builder()
+                        .id(dealPost.getId())
+                        .userId(dealPost.getUser().getId())
+                        .category(dealPost.getCategory())
+                        .title(dealPost.getTitle())
+                        .price(dealPost.getPrice())
+                        .content(dealPost.getContent())
+                        .dealState(dealPost.getDealState())
+                        .createdDate(dealPost.getCreatedDate())
+                        .modifiedDate(dealPost.getModifiedDate())
+                        .imageIds(dealPost.getDealPostImages().stream()
+                                .map(DealPostImage::getId).collect(Collectors.toList()))
+                        .build());
+    }
+    // TODO : Slice를 custom해서 사용해주세요
+    public Slice<DealPostGetResponseDto> findByDealStateWithPaging(String dealState, Pageable pageable){
+        //return dealPostQueryRepository.findByDealState(DealState.valueOf(dealState),pageable);
+        return dealPostRepository.findByDealState(DealState.valueOf(dealState),pageable)
+                .map(dealPost -> DealPostGetResponseDto.builder()
+                        .id(dealPost.getId())
+                        .userId(dealPost.getUser().getId())
+                        .category(dealPost.getCategory())
+                        .title(dealPost.getTitle())
+                        .price(dealPost.getPrice())
+                        .content(dealPost.getContent())
+                        .dealState(dealPost.getDealState())
+                        .createdDate(dealPost.getCreatedDate())
+                        .modifiedDate(dealPost.getModifiedDate())
+                        .imageIds(dealPost.getDealPostImages().stream()
+                                .map(DealPostImage::getId).collect(Collectors.toList()))
+                        .build());
+    }
+
+    public Slice<DealPostGetResponseDto> findAllWithFilteringAndPaging(Map<String,Object> filter,Pageable pageable){
+        return dealPostRepository.findAll(DealPostSpecification.searchDealPost(filter),pageable)
+                .map(dealPost -> DealPostGetResponseDto.builder()
+                        .id(dealPost.getId())
+                        .userId(dealPost.getUser().getId())
+                        .category(dealPost.getCategory())
+                        .title(dealPost.getTitle())
+                        .price(dealPost.getPrice())
+                        .content(dealPost.getContent())
+                        .dealState(dealPost.getDealState())
+                        .createdDate(dealPost.getCreatedDate())
+                        .modifiedDate(dealPost.getModifiedDate())
+                        .imageIds(dealPost.getDealPostImages().stream()
+                                .map(DealPostImage::getId).collect(Collectors.toList()))
+                        .build());
+    }
+    public Slice<DealPostGetResponseDto> findByFilter(Map<String,Object> filter){
+        return dealPostQueryRepository.findByFilter(filter);
     }
 }

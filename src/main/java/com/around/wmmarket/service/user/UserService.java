@@ -74,6 +74,8 @@ public class UserService{
                 .town_2(user.getTown_2())
                 .isAuth(user.getIsAuth())
                 .code(user.getCode())
+                .createdDate(user.getCreatedDate())
+                .modifiedDate(user.getModifiedDate())
                 .build();
     }
     public UserGetResponseDto getUserDto(Integer id){

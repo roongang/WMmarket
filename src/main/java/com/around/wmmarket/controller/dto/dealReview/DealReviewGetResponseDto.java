@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 public class DealReviewGetResponseDto {
+    @ApiModelProperty(value = "거래 리뷰 아이디",example = "1",required = true)
+    private Integer id;
     @ApiModelProperty(value = "판매자 아이디",example = "1",required = true)
     private Integer sellerId;
     @ApiModelProperty(value = "구매자 아이디",example = "2",required = true)
