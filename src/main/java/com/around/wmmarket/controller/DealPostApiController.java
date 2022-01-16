@@ -97,14 +97,16 @@ public class DealPostApiController {
     }
 
     @GetMapping("/deal-posts")
-    public ResponseEntity<Object> searchDealPost(@RequestParam(required = false) Map<String,Object> filter, Pageable pageable){
+    public ResponseEntity<Object> searchDealPost(@RequestParam(required = false) Map<String,Object> filter){
         // TODO : filter validation 은?
+        if(filter.get("page")!=null) filter.put("page",Integer.parseInt(filter.get("page").toString()));
+        if(filter.get("size")!=null) filter.put("size",Integer.parseInt(filter.get("size").toString()));
+        if(filter.get("userId")!=null) filter.put("userId",Integer.parseInt(filter.get("userId").toString()));
+        if(filter.get("price")!=null) filter.put("price",Integer.parseInt(filter.get("price").toString()));
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("거래글 검색 성공했습니다.")
-                .data(filter.isEmpty()
-                        ? dealPostService.findAllWithPaging(pageable)
-                        : dealPostService.findAllWithFilteringAndPaging(filter,pageable))
+                .data(dealPostService.findByFilter(filter))
                 .build());
     }
 

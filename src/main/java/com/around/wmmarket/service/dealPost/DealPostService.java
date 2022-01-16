@@ -203,4 +203,7 @@ public class DealPostService {
                                 .map(DealPostImage::getId).collect(Collectors.toList()))
                         .build());
     }
+    public Slice<DealPostGetResponseDto> findByFilter(Map<String,Object> filter){
+        return dealPostQueryRepository.findByFilter(filter);
+    }
 }
