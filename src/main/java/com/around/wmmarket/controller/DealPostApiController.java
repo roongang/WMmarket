@@ -58,6 +58,7 @@ public class DealPostApiController {
             @Min(1) @PathVariable("dealPostId") Integer dealPostId) {
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
+                .message("거래글 반환 성공하였습니다.")
                 .data(dealPostService.getDealPostDto(dealPostId)!=null
                         ? dealPostService.getDealPostDto(dealPostId)
                         : Arrays.asList()).build());

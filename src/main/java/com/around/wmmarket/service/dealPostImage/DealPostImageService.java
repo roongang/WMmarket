@@ -47,7 +47,7 @@ public class DealPostImageService {
 
     public DealPostImage get(Integer dealPostImageId) {
         return dealPostImageRepository.findById(dealPostImageId)
-                .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_IMAGE_NOT_FOUND));
+                .orElse(null);
     }
 
     public void delete(SignedUser signedUser,Integer dealPostImageId) {

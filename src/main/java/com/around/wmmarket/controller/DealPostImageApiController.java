@@ -29,6 +29,7 @@ import javax.validation.constraints.Min;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 @Validated
 @RequestMapping(Constants.API_PATH)
@@ -74,6 +75,12 @@ public class DealPostImageApiController {
     public ResponseEntity<?> get(
             @Min(1) @PathVariable("dealPostImageId") Integer dealPostImageId) {
         String fileName=dealPostImageService.get(dealPostImageId).getName();
+        if(fileName==null){
+            return ResponseHandler.toResponse(SuccessResponse.builder()
+                    .status(HttpStatus.OK)
+                    .message("거래글 이미지 반환 성공했습니다.(존재하지 않음)")
+                    .data(Arrays.asList()).build());
+        }
         Resource resource=resourceLoader.getResource("file:"+ Paths.get(Constants.dealPostImagePath.toString(),fileName));
         File file= null;
         try { file = resource.getFile(); } catch (IOException e) { new CustomException(ErrorCode.FILE_NOT_FOUND); }
