@@ -12,7 +12,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -103,25 +102,10 @@ public class DealPostApiController {
     @GetMapping("/deal-posts")
     public ResponseEntity<Object> searchDealPost(@RequestParam(required = false) Map<String,Object> filter){
         // TODO : filter validation 은?
-        if(filter.get("page")!=null) filter.put("page",Integer.parseInt(filter.get("page").toString()));
-        if(filter.get("size")!=null) filter.put("size",Integer.parseInt(filter.get("size").toString()));
-        if(filter.get("userId")!=null) filter.put("userId",Integer.parseInt(filter.get("userId").toString()));
-        if(filter.get("price")!=null) filter.put("price",Integer.parseInt(filter.get("price").toString()));
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("거래글 검색 성공했습니다.")
                 .data(dealPostService.findByFilter(filter))
                 .build());
     }
-
-    /*@GetMapping("/deal-posts")
-    public ResponseEntity<Object> getFindByDealStateWithPaging(
-            @Enum(enumClass=DealState.class) @RequestParam String dealState,Pageable pageable){
-        // TODO : Slice<DealPostGetResponseDto> 로 반환해주세요
-        return ResponseHandler.toResponse(SuccessResponse.builder()
-                .status(HttpStatus.OK)
-                .message("거래글 검색 성공했습니다.")
-                .data(dealPostService.findByDealStateWithPaging(dealState,pageable))
-                .build());
-    }*/
 }

@@ -14,7 +14,6 @@ import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.service.dealPostImage.DealPostImageService;
 import com.around.wmmarket.service.dealSuccess.DealSuccessService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
@@ -153,58 +152,13 @@ public class DealPostService {
         dealPostImageService.delete(dealPostImageId);
     }
 
-    public Slice<DealPostGetResponseDto> findAllWithPaging(Pageable pageable){
-        return dealPostRepository.findAll(pageable)
-                .map(dealPost -> DealPostGetResponseDto.builder()
-                        .id(dealPost.getId())
-                        .userId(dealPost.getUser().getId())
-                        .category(dealPost.getCategory())
-                        .title(dealPost.getTitle())
-                        .price(dealPost.getPrice())
-                        .content(dealPost.getContent())
-                        .dealState(dealPost.getDealState())
-                        .createdDate(dealPost.getCreatedDate())
-                        .modifiedDate(dealPost.getModifiedDate())
-                        .imageIds(dealPost.getDealPostImages().stream()
-                                .map(DealPostImage::getId).collect(Collectors.toList()))
-                        .build());
-    }
-    // TODO : Slice를 custom해서 사용해주세요
-    public Slice<DealPostGetResponseDto> findByDealStateWithPaging(String dealState, Pageable pageable){
-        //return dealPostQueryRepository.findByDealState(DealState.valueOf(dealState),pageable);
-        return dealPostRepository.findByDealState(DealState.valueOf(dealState),pageable)
-                .map(dealPost -> DealPostGetResponseDto.builder()
-                        .id(dealPost.getId())
-                        .userId(dealPost.getUser().getId())
-                        .category(dealPost.getCategory())
-                        .title(dealPost.getTitle())
-                        .price(dealPost.getPrice())
-                        .content(dealPost.getContent())
-                        .dealState(dealPost.getDealState())
-                        .createdDate(dealPost.getCreatedDate())
-                        .modifiedDate(dealPost.getModifiedDate())
-                        .imageIds(dealPost.getDealPostImages().stream()
-                                .map(DealPostImage::getId).collect(Collectors.toList()))
-                        .build());
-    }
-
-    public Slice<DealPostGetResponseDto> findAllWithFilteringAndPaging(Map<String,Object> filter,Pageable pageable){
-        return dealPostRepository.findAll(DealPostSpecification.searchDealPost(filter),pageable)
-                .map(dealPost -> DealPostGetResponseDto.builder()
-                        .id(dealPost.getId())
-                        .userId(dealPost.getUser().getId())
-                        .category(dealPost.getCategory())
-                        .title(dealPost.getTitle())
-                        .price(dealPost.getPrice())
-                        .content(dealPost.getContent())
-                        .dealState(dealPost.getDealState())
-                        .createdDate(dealPost.getCreatedDate())
-                        .modifiedDate(dealPost.getModifiedDate())
-                        .imageIds(dealPost.getDealPostImages().stream()
-                                .map(DealPostImage::getId).collect(Collectors.toList()))
-                        .build());
-    }
     public Slice<DealPostGetResponseDto> findByFilter(Map<String,Object> filter){
+        // object parsing
+        if(filter.get("page")!=null) filter.put("page",Integer.parseInt(filter.get("page").toString()));
+        if(filter.get("size")!=null) filter.put("size",Integer.parseInt(filter.get("size").toString()));
+        if(filter.get("userId")!=null) filter.put("userId",Integer.parseInt(filter.get("userId").toString()));
+        if(filter.get("price")!=null) filter.put("price",Integer.parseInt(filter.get("price").toString()));
+        // filtering
         return dealPostQueryRepository.findByFilter(filter);
     }
 }
