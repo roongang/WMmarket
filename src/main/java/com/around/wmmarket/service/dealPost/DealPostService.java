@@ -152,7 +152,7 @@ public class DealPostService {
         dealPostImageService.delete(dealPostImageId);
     }
 
-    public Slice<DealPostGetResponseDto> findByFilter(Map<String,Object> filter){
+    public Slice<DealPostGetResponseDto> findByFilter(Map<String,String> filter){
         // object parsing
         /*if(filter.get("page")!=null) filter.put("page",Integer.parseInt(filter.get("page").toString()));
         if(filter.get("size")!=null) filter.put("size",Integer.parseInt(filter.get("size").toString()));

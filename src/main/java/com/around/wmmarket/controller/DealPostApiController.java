@@ -100,7 +100,7 @@ public class DealPostApiController {
     }
 
     @GetMapping("/deal-posts")
-    public ResponseEntity<Object> searchDealPost(@RequestParam(required = false) Map<String,Object> filter){
+    public ResponseEntity<Object> searchDealPost(@RequestParam(required = false) Map<String,String> filter){
         // TODO : filter validation 은?
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
