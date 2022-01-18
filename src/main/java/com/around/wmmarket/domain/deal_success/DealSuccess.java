@@ -19,13 +19,13 @@ public class DealSuccess extends BaseTimeEntity {
     @Id
     private Integer dealSuccessId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BUYER_ID")
     private User buyer;
 
     // dealPost 와 1:1 식별관계임
     @MapsId
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DEAL_POST_ID")
     private DealPost dealPost;
 

@@ -13,8 +13,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.around.wmmarket.domain.deal_post.QDealPost.dealPost;
+import static com.around.wmmarket.domain.deal_post_image.QDealPostImage.dealPostImage;
 import static com.around.wmmarket.domain.user.QUser.user;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -26,17 +28,8 @@ public class DealPostQueryRepository {
     public Slice<DealPostGetResponseDto> findByFilter(Map<String,Object> filter){
         // pageable 은 PageRequest 를 통해 생성
         Pageable pageable=toPageable((Integer)filter.get("page"),(Integer)filter.get("size"));
-        List<DealPostGetResponseDto> content=queryFactory
-                .select(Projections.constructor(DealPostGetResponseDto.class,
-                        dealPost.id,
-                        dealPost.user.id,
-                        dealPost.category,
-                        dealPost.title,
-                        dealPost.price,
-                        dealPost.content,
-                        dealPost.dealState,
-                        dealPost.createdDate,
-                        dealPost.modifiedDate))
+        List<DealPost> dealPostList=queryFactory
+                .select(dealPost)
                 .from(dealPost)
                 .leftJoin(dealPost.user,user)
                 .offset(pageable.getOffset())
@@ -50,6 +43,25 @@ public class DealPostQueryRepository {
                 )
                 .fetch();
         // TODO : dealPostImage 만 따로 쿼리를 날려서 DTO 에 SET 해야할듯 (아니면 Entity로 받아오고 DTO를 생성하던지)
+        List<DealPostGetResponseDto> content=dealPostList.stream()
+                .map(dealPostEntity-> DealPostGetResponseDto.builder()
+                        .id(dealPostEntity.getId())
+                        .userId(dealPostEntity.getUser()!=null?dealPostEntity.getUser().getId():null)
+                        .category(dealPostEntity.getCategory())
+                        .title(dealPostEntity.getTitle())
+                        .price(dealPostEntity.getPrice())
+                        .content(dealPostEntity.getContent())
+                        .dealState(dealPostEntity.getDealState())
+                        .createdDate(dealPostEntity.getCreatedDate())
+                        .modifiedDate(dealPostEntity.getModifiedDate())
+                        .imageIds(queryFactory
+                                .select(dealPostImage.id)
+                                .from(dealPostImage)
+                                .innerJoin(dealPostImage.dealPost,dealPost)
+                                .where(dealPostImage.dealPost.id.eq(dealPostEntity.getId()))
+                                .fetch())
+                        .build())
+                .collect(Collectors.toList());
         boolean hasNext=false;
         if(content.size()>pageable.getPageSize()){
             content.remove(pageable.getPageSize());

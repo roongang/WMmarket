@@ -74,13 +74,13 @@ public class DealPostImageApiController {
     @GetMapping("/deal-post-images/{dealPostImageId}")
     public ResponseEntity<?> get(
             @Min(1) @PathVariable("dealPostImageId") Integer dealPostImageId) {
-        String fileName=dealPostImageService.get(dealPostImageId).getName();
-        if(fileName==null){
+        if(dealPostImageService.get(dealPostImageId)==null){
             return ResponseHandler.toResponse(SuccessResponse.builder()
                     .status(HttpStatus.OK)
                     .message("거래글 이미지 반환 성공했습니다.(존재하지 않음)")
                     .data(Arrays.asList()).build());
         }
+        String fileName=dealPostImageService.get(dealPostImageId).getName();
         Resource resource=resourceLoader.getResource("file:"+ Paths.get(Constants.dealPostImagePath.toString(),fileName));
         File file= null;
         try { file = resource.getFile(); } catch (IOException e) { new CustomException(ErrorCode.FILE_NOT_FOUND); }
