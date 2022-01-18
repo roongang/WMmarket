@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 import static com.around.wmmarket.domain.deal_post.QDealPost.dealPost;
@@ -27,7 +28,8 @@ public class DealPostQueryRepository {
 
     public Slice<DealPostGetResponseDto> findByFilter(Map<String,Object> filter){
         // pageable 은 PageRequest 를 통해 생성
-        Pageable pageable=toPageable((Integer)filter.get("page"),(Integer)filter.get("size"));
+        Pageable pageable=toPageable((String)filter.get("page"),(String)filter.get("size"));
+        // query dealPost
         List<DealPost> dealPostList=queryFactory
                 .select(dealPost)
                 .from(dealPost)
@@ -35,14 +37,18 @@ public class DealPostQueryRepository {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize()+1)
                 .where(
-                        userIdEq((Integer)filter.get("userId")),
+                        userIdEq((String)filter.get("userId")),
                         categoryEq((String)filter.get("category")),
                         titleEq((String)filter.get("title")),
-                        priceEq((Integer)filter.get("price")),
+                        priceEq((String)filter.get("price")),
+                        priceLt((String)filter.get("price")),
+                        priceLoe((String)filter.get("price")),
+                        priceGt((String)filter.get("price")),
+                        priceGoe((String)filter.get("price")),
                         dealStateEq((String)filter.get("dealState"))
                 )
                 .fetch();
-        // TODO : dealPostImage 만 따로 쿼리를 날려서 DTO 에 SET 해야할듯 (아니면 Entity로 받아오고 DTO를 생성하던지)
+        // content
         List<DealPostGetResponseDto> content=dealPostList.stream()
                 .map(dealPostEntity-> DealPostGetResponseDto.builder()
                         .id(dealPostEntity.getId())
@@ -70,16 +76,18 @@ public class DealPostQueryRepository {
 
         return new SliceImpl<>(content,pageable,hasNext);
     }
-    private Pageable toPageable(Integer page,Integer size){
+    private Pageable toPageable(String page,String size){
         // TODO : sort 구현
         // page, size 없으면 0,5으로
-        page=page==null?0:page;
-        size=size==null?10:size;
-        return PageRequest.of(page,size);
+        Integer default_page=0;
+        Integer default_size=5;
+        return PageRequest.of(
+                hasText(page)?Integer.parseInt(page):default_page,
+                hasText(size)?Integer.parseInt(size):default_size);
     }
 
-    private BooleanExpression userIdEq(Integer userId){
-        return userId!=null?dealPost.user.id.eq(userId):null;
+    private BooleanExpression userIdEq(String userId){
+        return hasText(userId)?dealPost.user.id.eq(Integer.parseInt(userId)):null;
     }
     private BooleanExpression categoryEq(String category) {
         return hasText(category)?dealPost.category.eq(Category.valueOf(category)):null;
@@ -87,20 +95,62 @@ public class DealPostQueryRepository {
     private BooleanExpression titleEq(String title){
         return hasText(title)?dealPost.title.eq(title):null;
     }
-    private BooleanExpression priceEq(Integer price){
-        return price!=null?dealPost.price.eq(price):null;
+    private BooleanExpression priceEq(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            if(oper_tk.countTokens()==1) return dealPost.price.eq(Integer.parseInt(oper_tk.nextToken()));
+        }
+        return null;
     }
-    private BooleanExpression priceLt(Integer price){
-        return price!=null?dealPost.price.lt(price):null;
+    private BooleanExpression priceLt(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            if(oper_tk.countTokens()<2) continue;
+            String op=oper_tk.nextToken();
+            Integer val=Integer.parseInt(oper_tk.nextToken());
+            if(op.equals("lt")) return dealPost.price.lt(val);
+        }
+        return null;
     }
-    private BooleanExpression priceLoe(Integer price){
-        return price!=null?dealPost.price.loe(price):null;
+    private BooleanExpression priceLoe(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            if(oper_tk.countTokens()<2) continue;
+            String op=oper_tk.nextToken();
+            Integer val=Integer.parseInt(oper_tk.nextToken());
+            if(op.equals("loe")) return dealPost.price.loe(val);
+        }
+        return null;
     }
-    private BooleanExpression priceGt(Integer price){
-        return price!=null?dealPost.price.gt(price):null;
+    private BooleanExpression priceGt(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            if(oper_tk.countTokens()<2) continue;
+            String op=oper_tk.nextToken();
+            Integer val=Integer.parseInt(oper_tk.nextToken());
+            if(op.equals("gt")) return dealPost.price.gt(val);
+        }
+        return null;
     }
-    private BooleanExpression priceGoe(Integer price){
-        return price!=null?dealPost.price.goe(price):null;
+    private BooleanExpression priceGoe(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            if(oper_tk.countTokens()<2) continue;
+            String op=oper_tk.nextToken();
+            Integer val=Integer.parseInt(oper_tk.nextToken());
+            if(op.equals("goe")) return dealPost.price.goe(val);
+        }
+        return null;
     }
     private BooleanExpression dealStateEq(String dealState){
         return hasText(dealState)?dealPost.dealState.eq(DealState.valueOf(dealState)):null;

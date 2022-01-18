@@ -154,10 +154,10 @@ public class DealPostService {
 
     public Slice<DealPostGetResponseDto> findByFilter(Map<String,Object> filter){
         // object parsing
-        if(filter.get("page")!=null) filter.put("page",Integer.parseInt(filter.get("page").toString()));
+        /*if(filter.get("page")!=null) filter.put("page",Integer.parseInt(filter.get("page").toString()));
         if(filter.get("size")!=null) filter.put("size",Integer.parseInt(filter.get("size").toString()));
         if(filter.get("userId")!=null) filter.put("userId",Integer.parseInt(filter.get("userId").toString()));
-        if(filter.get("price")!=null) filter.put("price",Integer.parseInt(filter.get("price").toString()));
+        if(filter.get("price")!=null) filter.put("price",Integer.parseInt(filter.get("price").toString()));*/
         // filtering
         return dealPostQueryRepository.findByFilter(filter);
     }
