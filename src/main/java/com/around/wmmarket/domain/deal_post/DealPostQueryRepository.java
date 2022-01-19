@@ -68,8 +68,8 @@ public class DealPostQueryRepository {
                         modifiedDateGt(filter.get("modifiedDate")),
                         modifiedDateGoe(filter.get("modifiedDate"))
                 )
-                .orderBy(getOrderSpecifiers(filter.get("sort")).stream()
-                        .toArray(OrderSpecifier[]::new))
+                .orderBy(getOrderSpecifiers(filter.get("sort"))
+                        .toArray(new OrderSpecifier[0]))
                 .fetch();
         // content
         List<DealPostGetResponseDto> content=dealPostList.stream()
@@ -100,8 +100,10 @@ public class DealPostQueryRepository {
         return new SliceImpl<>(content,pageable,hasNext);
     }
     private Pageable toPageable(String page,String size,String opers){
-        Sort sort=sortedBy(opers);
-        if(sort==null || sort.isEmpty()) sort=Sort.unsorted();
+        List<Sort.Order> orderList=getOrderList(opers);
+        Sort sort = (orderList!=null && !orderList.isEmpty())
+                ? Sort.by(orderList)
+                : Sort.unsorted();
         return PageRequest.of(
                 hasText(page)?Integer.parseInt(page):default_page,
                 hasText(size)?Integer.parseInt(size):default_size,
@@ -345,38 +347,42 @@ public class DealPostQueryRepository {
         }
         return null;
     }
-    private List<Sort.Order> sortedBy(String opers){
+    private List<Sort.Order> getOrderList(String opers){
         if(!hasText(opers)) return null;
         // sort=price:desc,createdDate:asc
-        List<Sort.Order> sorts=new ArrayList<>();
+        List<Sort.Order> orderList=new ArrayList<>();
         StringTokenizer opers_tk=new StringTokenizer(opers,",");
         while(opers_tk.hasMoreTokens()){
             StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
             String op=oper_tk.nextToken();
-            if(!oper_tk.hasMoreTokens()) sorts.add(new Sort.Order(Sort.DEFAULT_DIRECTION,op));
+            if(!oper_tk.hasMoreTokens()) orderList.add(new Sort.Order(Sort.DEFAULT_DIRECTION,op));
             else{
                 String val=oper_tk.nextToken();
-                Sort.Direction direction=val.equals("asc")?Sort.Direction.ASC:Sort.Direction.DESC;
-                sorts.add(new Sort.Order(direction,op));
+                Sort.Direction direction=val.equalsIgnoreCase("desc")
+                        ? Sort.Direction.DESC
+                        : Sort.Direction.ASC;
+                orderList.add(new Sort.Order(direction,op));
             }
         }
-        return sorts;
+        return orderList;
     }
     private List<OrderSpecifier> getOrderSpecifiers(String opers){
         // sort=price:desc,createdDate:asc
-        List<OrderSpecifier> orders=new ArrayList<>();
-        if(!hasText(opers)) return orders;
+        List<OrderSpecifier> orderSpecifierList=new ArrayList<>();
+        if(!hasText(opers)) return orderSpecifierList;
         StringTokenizer opers_tk=new StringTokenizer(opers,",");
         while(opers_tk.hasMoreTokens()){
             StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
             String fieldName=oper_tk.nextToken();
-            if(!oper_tk.hasMoreTokens()) orders.add(QueryDslUtil.getSortedColumn(Order.ASC,dealPost,fieldName));
+            if(!oper_tk.hasMoreTokens()) orderSpecifierList.add(QueryDslUtil.getSortedColumn(Order.ASC,dealPost,fieldName));
             else{
                 String val=oper_tk.nextToken();
-                Order order=val.equals("asc")?Order.ASC:Order.DESC;
-                orders.add(QueryDslUtil.getSortedColumn(order,dealPost,fieldName));
+                Order order=val.equalsIgnoreCase("desc")
+                        ? Order.DESC
+                        : Order.ASC;
+                orderSpecifierList.add(QueryDslUtil.getSortedColumn(order,dealPost,fieldName));
             }
         }
-        return orders;
+        return orderSpecifierList;
     }
 }

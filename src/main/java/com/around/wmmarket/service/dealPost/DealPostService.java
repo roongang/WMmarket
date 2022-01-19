@@ -55,8 +55,9 @@ public class DealPostService {
         DealPost dealPost=dealPostRepository.findById(id)
                 .orElse(null);
         if(dealPost==null) return null;
-        DealPostGetResponseDto responseDto=DealPostGetResponseDto.builder()
+        return DealPostGetResponseDto.builder()
                 .id(dealPost.getId())
+                .userId(dealPost.getUser()!=null?dealPost.getUser().getId():null)
                 .category(dealPost.getCategory())
                 .title(dealPost.getTitle())
                 .price(dealPost.getPrice())
@@ -67,8 +68,6 @@ public class DealPostService {
                 .imageIds(dealPost.getDealPostImages().stream()
                         .map(DealPostImage::getId).collect(Collectors.toList()))
                 .build();
-        if(dealPost.getUser()!=null) responseDto.setUserId(dealPost.getUser().getId()); // user 가 삭제되는 경우 null
-        return responseDto;
     }
 
     public DealPost getDealPost(Integer id){
