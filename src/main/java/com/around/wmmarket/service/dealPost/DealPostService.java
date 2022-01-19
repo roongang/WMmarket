@@ -2,10 +2,7 @@ package com.around.wmmarket.service.dealPost;
 
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
-import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
-import com.around.wmmarket.controller.dto.dealPost.DealPostSaveRequestDto;
-import com.around.wmmarket.controller.dto.dealPost.DealPostSaveResponseDto;
-import com.around.wmmarket.controller.dto.dealPost.DealPostUpdateRequestDto;
+import com.around.wmmarket.controller.dto.dealPost.*;
 import com.around.wmmarket.domain.deal_post.*;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
 import com.around.wmmarket.domain.user.SignedUser;
@@ -18,6 +15,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -151,13 +149,21 @@ public class DealPostService {
         dealPostImageService.delete(dealPostImageId);
     }
 
-    public Slice<DealPostGetResponseDto> findByFilter(Map<String,String> filter){
-        // object parsing
-        /*if(filter.get("page")!=null) filter.put("page",Integer.parseInt(filter.get("page").toString()));
-        if(filter.get("size")!=null) filter.put("size",Integer.parseInt(filter.get("size").toString()));
-        if(filter.get("userId")!=null) filter.put("userId",Integer.parseInt(filter.get("userId").toString()));
-        if(filter.get("price")!=null) filter.put("price",Integer.parseInt(filter.get("price").toString()));*/
+    public Slice<DealPostGetResponseDto> findByFilter(DealPostSearchRequestDto requestDto){
         // filtering
+        Map<String,String> filter=new HashMap<>();
+        filter.put("page",requestDto.getPage());
+        filter.put("size",requestDto.getSize());
+        filter.put("sort",requestDto.getSort());
+        filter.put("id",requestDto.getId());
+        filter.put("userId",requestDto.getUserId());
+        filter.put("category",requestDto.getCategory());
+        filter.put("title",requestDto.getTitle());
+        filter.put("price",requestDto.getPrice());
+        filter.put("content",requestDto.getContent());
+        filter.put("dealState",requestDto.getDealState());
+        filter.put("createdDate",requestDto.getCreatedDate());
+        filter.put("modifiedDate",requestDto.getModifiedDate());
         return dealPostQueryRepository.findByFilter(filter);
     }
 }

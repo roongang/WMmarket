@@ -11,6 +11,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -231,10 +232,25 @@ public class DealPostQueryRepository {
         if(!hasText(opers)) return null;
         StringTokenizer opers_tk=new StringTokenizer(opers,",");
         while(opers_tk.hasMoreTokens()){
-            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(), ":");
             String op=oper_tk.nextToken();
-            if(!oper_tk.hasMoreTokens()) return dealPost.createdDate.eq(LocalDateTime.parse(op));
-            LocalDateTime val= LocalDateTime.parse(oper_tk.nextToken());
+            if(!hasText(op)) return null;
+            StringBuilder time=new StringBuilder();
+            if(!(op.equals("eq")||op.equals("gt")||op.equals("goe")||op.equals("lt")||op.equals("loe"))){
+                time.append(op);
+                while(oper_tk.hasMoreTokens()){
+                    time.append(oper_tk.nextToken());
+                    if(oper_tk.hasMoreTokens()) time.append(":");
+                }
+                DateTimeFormatter formatter=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+                LocalDateTime localDateTime=LocalDateTime.parse(time.toString(), formatter);
+                return dealPost.createdDate.eq(localDateTime);
+            }
+            while(oper_tk.hasMoreTokens()){
+                time.append(oper_tk.nextToken());
+                if(oper_tk.hasMoreTokens()) time.append(":");
+            }
+            LocalDateTime val= LocalDateTime.parse(time.toString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             if(op.equals("eq")) return dealPost.createdDate.eq(val);
         }
         return null;
@@ -246,7 +262,9 @@ public class DealPostQueryRepository {
             StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
             if(oper_tk.countTokens()<2) continue;
             String op=oper_tk.nextToken();
-            LocalDateTime val= LocalDateTime.parse(oper_tk.nextToken());
+            StringBuilder time=new StringBuilder();
+            while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+            LocalDateTime val= LocalDateTime.parse(time.toString());
             if(op.equals("lt")) return dealPost.createdDate.lt(val);
         }
         return null;
@@ -355,7 +373,7 @@ public class DealPostQueryRepository {
         while(opers_tk.hasMoreTokens()){
             StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
             String op=oper_tk.nextToken();
-            if(!oper_tk.hasMoreTokens()) orderList.add(new Sort.Order(Sort.DEFAULT_DIRECTION,op));
+            if(!oper_tk.hasMoreTokens()) orderList.add(new Sort.Order(Sort.Direction.ASC,op));
             else{
                 String val=oper_tk.nextToken();
                 Sort.Direction direction=val.equalsIgnoreCase("desc")
