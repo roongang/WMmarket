@@ -2,16 +2,16 @@ package com.around.wmmarket.domain.deal_post;
 
 import com.around.wmmarket.common.QueryDslUtil;
 import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
-import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -26,12 +26,10 @@ import static org.springframework.util.StringUtils.hasText;
 @Repository
 public class DealPostQueryRepository {
     private final JPAQueryFactory queryFactory;
-    private final static int default_page=0;
-    private final static int default_size=5;
 
     public Slice<DealPostGetResponseDto> findByFilter(Map<String,String> filter){
         // pageable 은 PageRequest 를 통해 생성
-        Pageable pageable=toPageable(filter.get("page"), filter.get("size"), filter.get("sort"));
+        Pageable pageable=QueryDslUtil.toPageable(filter.get("page"), filter.get("size"), filter.get("sort"));
         // query dealPost
         List<DealPost> dealPostList=queryFactory
                 .select(dealPost)
@@ -68,7 +66,7 @@ public class DealPostQueryRepository {
                         modifiedDateGt(filter.get("modifiedDate")),
                         modifiedDateGoe(filter.get("modifiedDate"))
                 )
-                .orderBy(getOrderSpecifiers(filter.get("sort"))
+                .orderBy(QueryDslUtil.getOrderSpecifiers(filter.get("sort"),dealPost)
                         .toArray(new OrderSpecifier[0]))
                 .fetch();
         // content
@@ -98,16 +96,6 @@ public class DealPostQueryRepository {
         }
 
         return new SliceImpl<>(content,pageable,hasNext);
-    }
-    private Pageable toPageable(String page,String size,String opers){
-        List<Sort.Order> orderList=getOrderList(opers);
-        Sort sort = (orderList!=null && !orderList.isEmpty())
-                ? Sort.by(orderList)
-                : Sort.unsorted();
-        return PageRequest.of(
-                hasText(page)?Integer.parseInt(page):default_page,
-                hasText(size)?Integer.parseInt(size):default_size,
-                sort);
     }
     // BooleanExpression
     private BooleanExpression userIdEq(String userId){
@@ -388,44 +376,5 @@ public class DealPostQueryRepository {
             return dealPost.modifiedDate.goe(val);
         }
         return null;
-    }
-    // order
-    private List<Sort.Order> getOrderList(String opers){
-        if(!hasText(opers)) return null;
-        // sort=price:desc,createdDate:asc
-        List<Sort.Order> orderList=new ArrayList<>();
-        StringTokenizer opers_tk=new StringTokenizer(opers,",");
-        while(opers_tk.hasMoreTokens()){
-            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
-            String op=oper_tk.nextToken();
-            if(!oper_tk.hasMoreTokens()) orderList.add(new Sort.Order(Sort.Direction.ASC,op));
-            else{
-                String val=oper_tk.nextToken();
-                Sort.Direction direction=val.equalsIgnoreCase("desc")
-                        ? Sort.Direction.DESC
-                        : Sort.Direction.ASC;
-                orderList.add(new Sort.Order(direction,op));
-            }
-        }
-        return orderList;
-    }
-    private List<OrderSpecifier> getOrderSpecifiers(String opers){
-        // sort=price:desc,createdDate:asc
-        List<OrderSpecifier> orderSpecifierList=new ArrayList<>();
-        if(!hasText(opers)) return orderSpecifierList;
-        StringTokenizer opers_tk=new StringTokenizer(opers,",");
-        while(opers_tk.hasMoreTokens()){
-            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
-            String fieldName=oper_tk.nextToken();
-            if(!oper_tk.hasMoreTokens()) orderSpecifierList.add(QueryDslUtil.getSortedColumn(Order.ASC,dealPost,fieldName));
-            else{
-                String val=oper_tk.nextToken();
-                Order order=val.equalsIgnoreCase("desc")
-                        ? Order.DESC
-                        : Order.ASC;
-                orderSpecifierList.add(QueryDslUtil.getSortedColumn(order,dealPost,fieldName));
-            }
-        }
-        return orderSpecifierList;
     }
 }

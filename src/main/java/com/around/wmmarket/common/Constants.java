@@ -14,4 +14,8 @@ public final class Constants {
 
     // API
     public static final String API_PATH="/api/v1";
+
+    // Pagination
+    public static final int DEFAULT_PAGE_INDEX=0;
+    public static final int DEFAULT_PAGE_SIZE=5;
 }

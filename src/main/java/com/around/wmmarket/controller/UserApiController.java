@@ -6,10 +6,7 @@ import com.around.wmmarket.common.ResponseHandler;
 import com.around.wmmarket.common.SuccessResponse;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
-import com.around.wmmarket.controller.dto.user.UserGetResponseDto;
-import com.around.wmmarket.controller.dto.user.UserSaveRequestDto;
-import com.around.wmmarket.controller.dto.user.UserSignInRequestDto;
-import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
+import com.around.wmmarket.controller.dto.user.*;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.user.CustomUserDetailsService;
 import com.around.wmmarket.service.user.UserService;
@@ -283,6 +280,16 @@ public class UserApiController {
                 .status(HttpStatus.OK)
                 .message("유저 거래글 ID 리스트 반환 성공했습니다.")
                 .data(userService.getDealPosts(userId))
+                .build());
+    }
+
+    @ApiOperation(value = "유저 검색")
+    @GetMapping("/users")
+    public ResponseEntity<Object> searchUser(UserSearchRequestDto requestDto){
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("유저 검색 성공했습니다.")
+                .data(userService.findByFilter(requestDto))
                 .build());
     }
 }

@@ -99,6 +99,7 @@ public class DealPostApiController {
                 .build());
     }
 
+    @ApiOperation(value = "거래 글 검색") // SWAGGER
     @GetMapping("/deal-posts")
     public ResponseEntity<Object> searchDealPost(DealPostSearchRequestDto requestDto){
         // TODO : filter validation 은?
