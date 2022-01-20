@@ -121,7 +121,7 @@ public class DealPostQueryRepository {
     }
     private BooleanExpression titleEq(String opers) {
         if(!hasText(opers)) return null;
-        StringTokenizer opers_tk=new StringTokenizer(opers,":");
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
         while(opers_tk.hasMoreTokens()){
             StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
             String op=oper_tk.nextToken();
@@ -133,7 +133,7 @@ public class DealPostQueryRepository {
     }
     private BooleanExpression titleCt(String opers) {
         if(!hasText(opers)) return null;
-        StringTokenizer opers_tk=new StringTokenizer(opers,":");
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
         while(opers_tk.hasMoreTokens()){
             StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
             if(oper_tk.countTokens()<2) continue;
@@ -145,7 +145,7 @@ public class DealPostQueryRepository {
     }
     private BooleanExpression contentEq(String opers) {
         if(!hasText(opers)) return null;
-        StringTokenizer opers_tk=new StringTokenizer(opers,":");
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
         while(opers_tk.hasMoreTokens()){
             StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
             String op=oper_tk.nextToken();
@@ -157,7 +157,7 @@ public class DealPostQueryRepository {
     }
     private BooleanExpression contentCt(String opers) {
         if(!hasText(opers)) return null;
-        StringTokenizer opers_tk=new StringTokenizer(opers,":");
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
         while(opers_tk.hasMoreTokens()){
             StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
             if(oper_tk.countTokens()<2) continue;

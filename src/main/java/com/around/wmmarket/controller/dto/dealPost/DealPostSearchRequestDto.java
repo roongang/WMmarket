@@ -8,8 +8,6 @@ import lombok.Setter;
 @Setter
 @Getter
 public class DealPostSearchRequestDto extends PagingRequestDto {
-    @ApiParam(value = "거래 글 아이디",example = "1",required = false)
-    private String id;
     @ApiParam(value = "유저 아이디",example = "1",required = false)
     private String userId;
     @ApiParam(value = "거래 글 카테고리",example = "A",required = false)

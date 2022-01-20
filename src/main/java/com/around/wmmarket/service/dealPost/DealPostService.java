@@ -155,7 +155,6 @@ public class DealPostService {
         filter.put("page",requestDto.getPage());
         filter.put("size",requestDto.getSize());
         filter.put("sort",requestDto.getSort());
-        filter.put("id",requestDto.getId());
         filter.put("userId",requestDto.getUserId());
         filter.put("category",requestDto.getCategory());
         filter.put("title",requestDto.getTitle());
