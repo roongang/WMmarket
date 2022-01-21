@@ -40,7 +40,6 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
@@ -88,7 +87,7 @@ public class UserApiController {
                                          @ApiIgnore HttpSession session){
         // 이미 로그인한 유저면 반환
         if(session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY)!=null){
-            throw new CustomException(ErrorCode.DUPLICATE_SIGN_IN); }
+            throw new CustomException(ErrorCode.DUPLICATED_SIGN_IN); }
         SignedUser signedUser;
         try { signedUser = customUserDetailsService.getSignedUser(requestDto);}
         catch (UsernameNotFoundException e) {
@@ -283,11 +282,12 @@ public class UserApiController {
                 .build());
     }
     // auth
-    @PostMapping("/auth")
-    public ResponseEntity<Object> authUser(){
-        authService.sendMail();
+    @ApiOperation(value = "유저 인증 코드 발송")
+    @PostMapping("/users/auth")
+    public ResponseEntity<Object> authUser(@Email @RequestParam String email){
+        authService.sendAuthCode(email);
         return ResponseHandler.toResponse(SuccessResponse.builder()
-                .status(HttpStatus.OK)
+                .status(HttpStatus.CREATED)
                 .message("인증 메일 발송 성공했습니다.")
                 .build());
     }

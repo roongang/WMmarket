@@ -41,7 +41,7 @@ public class UserService{
     @Transactional
     public UserSaveResponseDto save(UserSaveRequestDto requestDto){
         // check duplicate user
-        if(userRepository.findByEmail(requestDto.getEmail()).isPresent()) throw new CustomException(ErrorCode.DUPLICATE_USER_EMAIL);
+        if(userRepository.findByEmail(requestDto.getEmail()).isPresent()) throw new CustomException(ErrorCode.DUPLICATED_USER_EMAIL);
 
         User user = User.builder()
                 .email(requestDto.getEmail())

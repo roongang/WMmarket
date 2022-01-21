@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @Getter
@@ -115,6 +114,7 @@ public class User extends BaseTimeEntity {
     public void setTown_1(String town_1){this.town_1=town_1;}
     public void setCity_2(String city_2){this.city_2=city_2;}
     public void setTown_2(String town_2){this.town_2=town_2;}
+    public void setCode(String code){this.code=code;}
     // delete
     @PreRemove
     public void makeChildNull(){

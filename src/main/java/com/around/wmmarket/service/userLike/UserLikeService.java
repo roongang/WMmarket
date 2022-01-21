@@ -9,12 +9,8 @@ import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.domain.user_like.UserLike;
 import com.around.wmmarket.domain.user_like.UserLikeId;
 import com.around.wmmarket.domain.user_like.UserLikeRepository;
-import javassist.bytecode.DuplicateMemberException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
 @Service
@@ -30,7 +26,7 @@ public class UserLikeService {
                 .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
         if(userLikeRepository.existsById(UserLikeId.builder()
                 .userId(user.getId())
-                .dealPostId(dealPost.getId()).build())) throw new CustomException(ErrorCode.DUPLICATE_USER_LIKE);
+                .dealPostId(dealPost.getId()).build())) throw new CustomException(ErrorCode.DUPLICATED_USER_LIKE);
         userLikeRepository.save(UserLike.builder()
                 .user(user)
                 .dealPost(dealPost).build());

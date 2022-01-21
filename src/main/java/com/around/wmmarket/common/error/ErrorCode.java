@@ -23,15 +23,16 @@ public enum ErrorCode {
     /* 501 Not Implemented : 실패, 없는 리소스 요청 */
 
     // User
-    DUPLICATE_USER_EMAIL(BAD_REQUEST,"U001","중복된 회원 이메일이 있습니다."),
-    DUPLICATE_SIGN_IN(BAD_REQUEST,"U002","이미 로그인 한 상태입니다."),
+    DUPLICATED_USER_EMAIL(BAD_REQUEST,"U001","중복된 회원 이메일이 있습니다."),
+    DUPLICATED_SIGN_IN(BAD_REQUEST,"U002","이미 로그인 한 상태입니다."),
     USER_NOT_FOUND(BAD_REQUEST, "U003","유저 정보를 찾을 수 없습니다."),
     USER_IMAGE_NOT_FOUND(BAD_REQUEST,"U004","유저 이미지를 찾을 수 없습니다."),
     INVALID_USER_PASSWORD(BAD_REQUEST,"U005","비밀번호가 일치하지 않습니다."),
     SIGNED_USER_NOT_FOUND(BAD_REQUEST,"U006","로그인한 유저를 찾을 수 없습니다."),
     UNAUTHORIZED_USER_TO_USER(FORBIDDEN,"U007","유저에 대한 권한이 없습니다."),
-    DUPLICATE_USER_LIKE(BAD_REQUEST,"U008","이미 좋아요를 누른 글입니다."),
+    DUPLICATED_USER_LIKE(BAD_REQUEST,"U008","이미 좋아요를 누른 글입니다."),
     USER_LIKE_NOT_FOUND(BAD_REQUEST,"U009","좋아요를 찾을 수 없습니다."),
+    DUPLICATED_USER_AUTH(BAD_REQUEST,"U010","이미 인증된 회원입니다."),
 
     // Deal
     UNAUTHORIZED_USER_TO_DEALPOST(FORBIDDEN,"D001","거래글에대한 권한이 없습니다."),
