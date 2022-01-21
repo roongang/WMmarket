@@ -91,7 +91,7 @@ public class DealPostQueryRepository {
                                 .select(dealPostImage.id)
                                 .from(dealPostImage)
                                 .innerJoin(dealPostImage.dealPost,dealPost)
-                                .where(dealPostImage.dealPost.id.eq(dealPostEntity.getId()))
+                                .on(dealPostImage.dealPost.id.eq(dealPostEntity.getId()))
                                 .fetch())
                         .viewCnt(dealPostEntity.getViewCnt())
                         .build())
