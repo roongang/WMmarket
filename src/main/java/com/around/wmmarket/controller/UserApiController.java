@@ -6,10 +6,7 @@ import com.around.wmmarket.common.ResponseHandler;
 import com.around.wmmarket.common.SuccessResponse;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
-import com.around.wmmarket.controller.dto.user.UserGetResponseDto;
-import com.around.wmmarket.controller.dto.user.UserSaveRequestDto;
-import com.around.wmmarket.controller.dto.user.UserSignInRequestDto;
-import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
+import com.around.wmmarket.controller.dto.user.*;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.user.CustomUserDetailsService;
 import com.around.wmmarket.service.user.UserService;
@@ -21,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.tika.Tika;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -116,23 +114,7 @@ public class UserApiController {
 
     @ApiOperation(value = "유저 반환") // SWAGGER
     @ApiResponses({
-            @ApiResponse(code = 200,message = "return body : user info",response = UserGetResponseDto.class),
-    }) // SWAGGER
-    @GetMapping("/users")
-    public ResponseEntity<Object> get(
-            @ApiParam(value = "유저 이메일",example = "test_email@gmail.com",required = true)
-            @NotEmpty @Email @RequestParam String email){
-        return ResponseHandler.toResponse(SuccessResponse.builder()
-                .status(HttpStatus.OK)
-                .message("유저 반환 성공했습니다.")
-                .data(userService.getUserDto(email)!=null
-                        ? userService.getUserDto(email)
-                        : Arrays.asList()).build());
-    }
-
-    @ApiOperation(value = "유저 반환") // SWAGGER
-    @ApiResponses({
-            @ApiResponse(code = 200,message = "return body : user info",response = UserGetResponseDto.class),
+            @ApiResponse(code = 200,message = "return data : user info",response = UserGetResponseDto.class),
     }) // SWAGGER
     @GetMapping("/users/{userId}")
     public ResponseEntity<Object> get(
@@ -251,7 +233,7 @@ public class UserApiController {
 
     @ApiOperation(value = "유저 좋아요 ID 리스트 반환") // SWAGGER
     @ApiResponses({
-            @ApiResponse(code = 200,message = "return body : List dealPostId",response = ArrayList.class),
+            @ApiResponse(code = 200,message = "return data : List dealPostId",response = ArrayList.class),
     }) // SWAGGER
     @GetMapping("/users/{userId}/likes")
     public ResponseEntity<Object> getLikes(
@@ -283,6 +265,19 @@ public class UserApiController {
                 .status(HttpStatus.OK)
                 .message("유저 거래글 ID 리스트 반환 성공했습니다.")
                 .data(userService.getDealPosts(userId))
+                .build());
+    }
+
+    @ApiOperation(value = "유저 검색")
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "return data : slice",response = Slice.class),
+    })
+    @GetMapping("/users")
+    public ResponseEntity<Object> searchUser(UserSearchRequestDto requestDto){
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("유저 검색 성공했습니다.")
+                .data(userService.findByFilter(requestDto))
                 .build());
     }
 }

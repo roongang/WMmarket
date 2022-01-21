@@ -5,33 +5,31 @@ import com.around.wmmarket.common.FileHandler;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
-import com.around.wmmarket.controller.dto.user.UserGetResponseDto;
-import com.around.wmmarket.controller.dto.user.UserSaveRequestDto;
-import com.around.wmmarket.controller.dto.user.UserSaveResponseDto;
-import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
+import com.around.wmmarket.controller.dto.user.*;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
-import com.around.wmmarket.domain.user.Role;
-import com.around.wmmarket.domain.user.SignedUser;
-import com.around.wmmarket.domain.user.User;
-import com.around.wmmarket.domain.user.UserRepository;
+import com.around.wmmarket.domain.user.*;
 import com.around.wmmarket.domain.user_like.UserLike;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.userLike.UserLikeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService{
     private final UserRepository userRepository;
+    private final UserQueryRepository userQueryRepository;
     private final DealPostRepository dealPostRepository;
 
     private final UserLikeService userLikeService;
@@ -214,5 +212,23 @@ public class UserService{
                 .map(DealPost::getId)
                 .map(dealPostService::getDealPostDto)
                 .collect(Collectors.toList());
+    }
+
+    public Slice<UserGetResponseDto> findByFilter(UserSearchRequestDto requestDto){
+        Map<String,String> filter=new HashMap<>();
+        filter.put("page",requestDto.getPage());
+        filter.put("size",requestDto.getSize());
+        filter.put("sort",requestDto.getSort());
+        filter.put("email",requestDto.getEmail());
+        filter.put("nickname",requestDto.getNickname());
+        filter.put("role",requestDto.getRole());
+        filter.put("city_1",requestDto.getCity_1());
+        filter.put("town_1",requestDto.getTown_1());
+        filter.put("city_2",requestDto.getCity_2());
+        filter.put("town_2",requestDto.getTown_2());
+        filter.put("isAuth",requestDto.getIsAuth());
+        filter.put("createdDate",requestDto.getCreatedDate());
+        filter.put("modifiedDate",requestDto.getModifiedDate());
+        return userQueryRepository.findByFilter(filter);
     }
 }

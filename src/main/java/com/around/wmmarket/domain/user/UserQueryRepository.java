@@ -1,8 +1,9 @@
-package com.around.wmmarket.domain.deal_post;
+package com.around.wmmarket.domain.user;
 
 import com.around.wmmarket.common.QueryDslUtil;
-import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
+import com.around.wmmarket.controller.dto.user.UserGetResponseDto;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -15,44 +16,47 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.stream.Collectors;
 
-import static com.around.wmmarket.domain.deal_post.QDealPost.dealPost;
-import static com.around.wmmarket.domain.deal_post_image.QDealPostImage.dealPostImage;
 import static com.around.wmmarket.domain.user.QUser.user;
 import static org.springframework.util.StringUtils.hasText;
 
 @RequiredArgsConstructor
 @Repository
-public class DealPostQueryRepository {
+public class UserQueryRepository {
     private final JPAQueryFactory queryFactory;
 
-    public Slice<DealPostGetResponseDto> findByFilter(Map<String,String> filter){
-        // pageable 은 PageRequest 를 통해 생성
-        Pageable pageable=QueryDslUtil.toPageable(filter.get("page"), filter.get("size"), filter.get("sort"));
-        // query dealPost
-        List<DealPost> dealPostList=queryFactory
-                .select(dealPost)
-                .from(dealPost)
-                .leftJoin(dealPost.user,user)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize()+1)
+    public Slice<UserGetResponseDto> findByFilter(Map<String,String> filter){
+        Pageable pageable= QueryDslUtil.toPageable(filter.get("page"), filter.get("size"), filter.get("sort"));
+        List<UserGetResponseDto> content=queryFactory
+                .select(Projections.constructor(UserGetResponseDto.class,
+                        user.id,
+                        user.email,
+                        user.nickname,
+                        user.role,
+                        user.city_1,
+                        user.town_1,
+                        user.city_2,
+                        user.town_2,
+                        user.isAuth,
+                        user.code,
+                        user.createdDate,
+                        user.modifiedDate))
+                .from(user)
                 .where(
-                        userIdEq(filter.get("userId")),
-                        categoryEq(filter.get("category")),
-                        dealStateEq(filter.get("dealState")),
-                        // title
-                        titleEq(filter.get("title")),
-                        titleCt(filter.get("title")),
-                        // content
-                        contentEq(filter.get("content")),
-                        contentCt(filter.get("content")),
-                        // price
-                        priceEq(filter.get("price")),
-                        priceLt(filter.get("price")),
-                        priceLoe(filter.get("price")),
-                        priceGt(filter.get("price")),
-                        priceGoe(filter.get("price")),
+                        emailEq(filter.get("email")),
+                        emailCt(filter.get("email")),
+                        nicknameEq(filter.get("nickname")),
+                        nicknameCt(filter.get("nickname")),
+                        roleEq(filter.get("role")),
+                        city_1Eq(filter.get("city_1")),
+                        city_1Ct(filter.get("city_1")),
+                        town_1Eq(filter.get("town_1")),
+                        town_1Ct(filter.get("town_1")),
+                        city_2Eq(filter.get("city_2")),
+                        city_2Ct(filter.get("city_2")),
+                        town_2Eq(filter.get("town_2")),
+                        town_2Ct(filter.get("town_2")),
+                        isAuthEq(filter.get("isAuth")),
                         // createdDate
                         createdDateEq(filter.get("createdDate")),
                         createdDateLt(filter.get("createdDate")),
@@ -66,29 +70,11 @@ public class DealPostQueryRepository {
                         modifiedDateGt(filter.get("modifiedDate")),
                         modifiedDateGoe(filter.get("modifiedDate"))
                 )
-                .orderBy(QueryDslUtil.getOrderSpecifiers(filter.get("sort"),dealPost)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize()+1)
+                .orderBy(QueryDslUtil.getOrderSpecifiers(filter.get("sort"),user)
                         .toArray(new OrderSpecifier[0]))
                 .fetch();
-        // content
-        List<DealPostGetResponseDto> content=dealPostList.stream()
-                .map(dealPostEntity-> DealPostGetResponseDto.builder()
-                        .id(dealPostEntity.getId())
-                        .userId(dealPostEntity.getUser()!=null?dealPostEntity.getUser().getId():null)
-                        .category(dealPostEntity.getCategory())
-                        .title(dealPostEntity.getTitle())
-                        .price(dealPostEntity.getPrice())
-                        .content(dealPostEntity.getContent())
-                        .dealState(dealPostEntity.getDealState())
-                        .createdDate(dealPostEntity.getCreatedDate())
-                        .modifiedDate(dealPostEntity.getModifiedDate())
-                        .imageIds(queryFactory
-                                .select(dealPostImage.id)
-                                .from(dealPostImage)
-                                .innerJoin(dealPostImage.dealPost,dealPost)
-                                .where(dealPostImage.dealPost.id.eq(dealPostEntity.getId()))
-                                .fetch())
-                        .build())
-                .collect(Collectors.toList());
         boolean hasNext=false;
         if(content.size()>pageable.getPageSize()){
             content.remove(pageable.getPageSize());
@@ -98,122 +84,161 @@ public class DealPostQueryRepository {
         return new SliceImpl<>(content,pageable,hasNext);
     }
     // BooleanExpression
-    private BooleanExpression userIdEq(String userId){
-        return hasText(userId)?dealPost.user.id.eq(Integer.parseInt(userId)):null;
-    }
-    private BooleanExpression categoryEq(String category) {
-        return hasText(category)?dealPost.category.eq(Category.valueOf(category)):null;
-    }
-    private BooleanExpression dealStateEq(String dealState){
-        return hasText(dealState)?dealPost.dealState.eq(DealState.valueOf(dealState)):null;
-    }
-    private BooleanExpression titleEq(String opers) {
+    private BooleanExpression emailEq(String opers){
         if(!hasText(opers)) return null;
         StringTokenizer opers_tk=new StringTokenizer(opers,",");
         while(opers_tk.hasMoreTokens()){
             StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
             String op=oper_tk.nextToken();
-            if(!oper_tk.hasMoreTokens()) return dealPost.title.eq(op);
+            if(!oper_tk.hasMoreTokens()) return user.email.eq(op);
+            if(!op.equals("eq")) continue;
             String val=oper_tk.nextToken();
-            if(op.equals("eq")) return dealPost.title.eq(val);
+            return user.email.eq(val);
         }
         return null;
     }
-    private BooleanExpression titleCt(String opers) {
+    private BooleanExpression emailCt(String opers){
         if(!hasText(opers)) return null;
         StringTokenizer opers_tk=new StringTokenizer(opers,",");
         while(opers_tk.hasMoreTokens()){
             StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
-            if(oper_tk.countTokens()<2) continue;
             String op=oper_tk.nextToken();
+            if(!op.equals("ct")) continue;
             String val=oper_tk.nextToken();
-            if(op.equals("ct")) return dealPost.title.contains(val);
+            return user.email.contains(val);
         }
         return null;
     }
-    private BooleanExpression contentEq(String opers) {
+    private BooleanExpression nicknameEq(String opers){
         if(!hasText(opers)) return null;
         StringTokenizer opers_tk=new StringTokenizer(opers,",");
         while(opers_tk.hasMoreTokens()){
             StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
             String op=oper_tk.nextToken();
-            if(!oper_tk.hasMoreTokens()) return dealPost.content.eq(op);
+            if(!oper_tk.hasMoreTokens()) return user.nickname.eq(op);
+            if(!op.equals("eq")) continue;
             String val=oper_tk.nextToken();
-            if(op.equals("eq")) return dealPost.content.eq(val);
+            return user.nickname.eq(val);
         }
         return null;
     }
-    private BooleanExpression contentCt(String opers) {
+    private BooleanExpression nicknameCt(String opers){
         if(!hasText(opers)) return null;
         StringTokenizer opers_tk=new StringTokenizer(opers,",");
         while(opers_tk.hasMoreTokens()){
             StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
-            if(oper_tk.countTokens()<2) continue;
             String op=oper_tk.nextToken();
+            if(!op.equals("ct")) continue;
             String val=oper_tk.nextToken();
-            if(op.equals("ct")) return dealPost.content.contains(val);
+            return user.nickname.contains(val);
         }
         return null;
     }
-    private BooleanExpression priceEq(String opers){
+    private BooleanExpression roleEq(String role){
+        return hasText(role)?user.role.eq(Role.valueOf(role)):null;
+    }
+    private BooleanExpression city_1Eq(String opers){
         if(!hasText(opers)) return null;
         StringTokenizer opers_tk=new StringTokenizer(opers,",");
         while(opers_tk.hasMoreTokens()){
             StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
             String op=oper_tk.nextToken();
-            if(!oper_tk.hasMoreTokens()) return dealPost.price.eq(Integer.parseInt(op));
-            Integer val=Integer.parseInt(oper_tk.nextToken());
-            if(op.equals("eq")) return dealPost.price.eq(val);
+            if(!oper_tk.hasMoreTokens()) return user.city_1.eq(op);
+            if(!op.equals("eq")) continue;
+            String val=oper_tk.nextToken();
+            return user.city_1.eq(val);
         }
         return null;
     }
-    private BooleanExpression priceLt(String opers){
+    private BooleanExpression city_1Ct(String opers){
         if(!hasText(opers)) return null;
         StringTokenizer opers_tk=new StringTokenizer(opers,",");
         while(opers_tk.hasMoreTokens()){
             StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
-            if(oper_tk.countTokens()<2) continue;
             String op=oper_tk.nextToken();
-            Integer val=Integer.parseInt(oper_tk.nextToken());
-            if(op.equals("lt")) return dealPost.price.lt(val);
+            if(!op.equals("ct")) continue;
+            String val=oper_tk.nextToken();
+            return user.city_1.contains(val);
         }
         return null;
     }
-    private BooleanExpression priceLoe(String opers){
+    private BooleanExpression town_1Eq(String opers){
         if(!hasText(opers)) return null;
         StringTokenizer opers_tk=new StringTokenizer(opers,",");
         while(opers_tk.hasMoreTokens()){
             StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
-            if(oper_tk.countTokens()<2) continue;
             String op=oper_tk.nextToken();
-            Integer val=Integer.parseInt(oper_tk.nextToken());
-            if(op.equals("loe")) return dealPost.price.loe(val);
+            if(!oper_tk.hasMoreTokens()) return user.town_1.eq(op);
+            if(!op.equals("eq")) continue;
+            String val=oper_tk.nextToken();
+            return user.town_1.eq(val);
         }
         return null;
     }
-    private BooleanExpression priceGt(String opers){
+    private BooleanExpression town_1Ct(String opers){
         if(!hasText(opers)) return null;
         StringTokenizer opers_tk=new StringTokenizer(opers,",");
         while(opers_tk.hasMoreTokens()){
             StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
-            if(oper_tk.countTokens()<2) continue;
             String op=oper_tk.nextToken();
-            Integer val=Integer.parseInt(oper_tk.nextToken());
-            if(op.equals("gt")) return dealPost.price.gt(val);
+            if(!op.equals("ct")) continue;
+            String val=oper_tk.nextToken();
+            return user.town_1.contains(val);
         }
         return null;
     }
-    private BooleanExpression priceGoe(String opers){
+    private BooleanExpression city_2Eq(String opers){
         if(!hasText(opers)) return null;
         StringTokenizer opers_tk=new StringTokenizer(opers,",");
         while(opers_tk.hasMoreTokens()){
             StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
-            if(oper_tk.countTokens()<2) continue;
             String op=oper_tk.nextToken();
-            Integer val=Integer.parseInt(oper_tk.nextToken());
-            if(op.equals("goe")) return dealPost.price.goe(val);
+            if(!oper_tk.hasMoreTokens()) return user.city_2.eq(op);
+            if(!op.equals("eq")) continue;
+            String val=oper_tk.nextToken();
+            return user.city_2.eq(val);
         }
         return null;
+    }
+    private BooleanExpression city_2Ct(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            String op=oper_tk.nextToken();
+            if(!op.equals("ct")) continue;
+            String val=oper_tk.nextToken();
+            return user.city_2.contains(val);
+        }
+        return null;
+    }
+    private BooleanExpression town_2Eq(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            String op=oper_tk.nextToken();
+            if(!oper_tk.hasMoreTokens()) return user.town_2.eq(op);
+            if(!op.equals("eq")) continue;
+            String val=oper_tk.nextToken();
+            return user.town_2.eq(val);
+        }
+        return null;
+    }
+    private BooleanExpression town_2Ct(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            String op=oper_tk.nextToken();
+            if(!op.equals("ct")) continue;
+            String val=oper_tk.nextToken();
+            return user.town_2.contains(val);
+        }
+        return null;
+    }
+    private BooleanExpression isAuthEq(String isAuth){
+        return hasText(isAuth)?user.isAuth.eq(Integer.parseInt(isAuth)):null;
     }
     private BooleanExpression createdDateEq(String opers){
         if(!hasText(opers)) return null;
@@ -227,12 +252,12 @@ public class DealPostQueryRepository {
                 time.append(op);
                 while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
                 LocalDateTime localDateTime=LocalDateTime.parse(time.toString());
-                return dealPost.createdDate.eq(localDateTime);
+                return user.createdDate.eq(localDateTime);
             }
             oper_tk.nextToken(); // pass ':'
             while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
             LocalDateTime val= LocalDateTime.parse(time.toString());
-            if(op.equals("eq")) return dealPost.createdDate.eq(val);
+            if(op.equals("eq")) return user.createdDate.eq(val);
         }
         return null;
     }
@@ -247,7 +272,7 @@ public class DealPostQueryRepository {
             oper_tk.nextToken(); // pass ':'
             while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
             LocalDateTime val= LocalDateTime.parse(time.toString());
-            return dealPost.createdDate.lt(val);
+            return user.createdDate.lt(val);
         }
         return null;
     }
@@ -262,7 +287,7 @@ public class DealPostQueryRepository {
             oper_tk.nextToken(); // pass ':'
             while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
             LocalDateTime val= LocalDateTime.parse(time.toString());
-            return dealPost.createdDate.loe(val);
+            return user.createdDate.loe(val);
         }
         return null;
     }
@@ -277,7 +302,7 @@ public class DealPostQueryRepository {
             oper_tk.nextToken(); // pass ':'
             while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
             LocalDateTime val= LocalDateTime.parse(time.toString());
-            return dealPost.createdDate.gt(val);
+            return user.createdDate.gt(val);
         }
         return null;
     }
@@ -292,7 +317,7 @@ public class DealPostQueryRepository {
             oper_tk.nextToken(); // pass ':'
             while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
             LocalDateTime val= LocalDateTime.parse(time.toString());
-            return dealPost.createdDate.goe(val);
+            return user.createdDate.goe(val);
         }
         return null;
     }
@@ -308,12 +333,12 @@ public class DealPostQueryRepository {
                 time.append(op);
                 while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
                 LocalDateTime localDateTime=LocalDateTime.parse(time.toString());
-                return dealPost.modifiedDate.eq(localDateTime);
+                return user.modifiedDate.eq(localDateTime);
             }
             oper_tk.nextToken(); // pass ':'
             while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
             LocalDateTime val= LocalDateTime.parse(time.toString());
-            if(op.equals("eq")) return dealPost.modifiedDate.eq(val);
+            if(op.equals("eq")) return user.modifiedDate.eq(val);
         }
         return null;
     }
@@ -328,7 +353,7 @@ public class DealPostQueryRepository {
             oper_tk.nextToken(); // pass ':'
             while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
             LocalDateTime val= LocalDateTime.parse(time.toString());
-            return dealPost.modifiedDate.lt(val);
+            return user.modifiedDate.lt(val);
         }
         return null;
     }
@@ -343,7 +368,7 @@ public class DealPostQueryRepository {
             oper_tk.nextToken(); // pass ':'
             while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
             LocalDateTime val= LocalDateTime.parse(time.toString());
-            return dealPost.modifiedDate.loe(val);
+            return user.modifiedDate.loe(val);
         }
         return null;
     }
@@ -358,7 +383,7 @@ public class DealPostQueryRepository {
             oper_tk.nextToken(); // pass ':'
             while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
             LocalDateTime val= LocalDateTime.parse(time.toString());
-            return dealPost.modifiedDate.gt(val);
+            return user.modifiedDate.gt(val);
         }
         return null;
     }
@@ -373,7 +398,7 @@ public class DealPostQueryRepository {
             oper_tk.nextToken(); // pass ':'
             while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
             LocalDateTime val= LocalDateTime.parse(time.toString());
-            return dealPost.modifiedDate.goe(val);
+            return user.modifiedDate.goe(val);
         }
         return null;
     }

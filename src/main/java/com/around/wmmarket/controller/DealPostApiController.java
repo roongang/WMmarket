@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -50,7 +51,7 @@ public class DealPostApiController {
 
     @ApiOperation(value = "거래 글 반환") // SWAGGER
     @ApiResponses({
-            @ApiResponse(code = 200,message = "return body : dealPost info",response = DealPostGetResponseDto.class),
+            @ApiResponse(code = 200,message = "return data : dealPost info",response = DealPostGetResponseDto.class),
     }) // SWAGGER
     @GetMapping("/deal-posts/{dealPostId}")
     public ResponseEntity<?> get(
@@ -65,7 +66,7 @@ public class DealPostApiController {
 
     @ApiOperation(value = "거래 글 이미지 리스트 반환") // SWAGGER
     @ApiResponses({
-            @ApiResponse(code = 200,message = "return body : List dealPostImageId",response = ArrayList.class),
+            @ApiResponse(code = 200,message = "return data : List dealPostImageId",response = ArrayList.class),
     }) // SWAGGER
     @GetMapping("/deal-posts/{dealPostId}/images")
     public ResponseEntity<?> getImages(
@@ -99,6 +100,10 @@ public class DealPostApiController {
                 .build());
     }
 
+    @ApiOperation(value = "거래 글 검색") // SWAGGER
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "return data : slice",response = Slice.class),
+    })
     @GetMapping("/deal-posts")
     public ResponseEntity<Object> searchDealPost(DealPostSearchRequestDto requestDto){
         // TODO : filter validation 은?
