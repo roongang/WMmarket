@@ -11,6 +11,6 @@ public abstract class PagingRequestDto {
     private String size="10";
     @ApiParam(value = "페이지 인덱스",example = "0",defaultValue = "0",required = false)
     private String page="0";
-    @ApiParam(value = "정렬방법",example = "price:desc, createdDate:asc",defaultValue = "id:asc",required = false)
+    @ApiParam(value = "정렬방법",example = "price:desc, createdDate:asc",required = false)
     private String sort;
 }
