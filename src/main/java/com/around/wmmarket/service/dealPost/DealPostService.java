@@ -113,6 +113,7 @@ public class DealPostService {
             // update dealState
             this.updateDealState(dealPost,DealState.valueOf(requestDto.getDealState()),buyer);
         }
+        if(requestDto.getViewCnt()!=null) dealPost.increaseViewCnt(requestDto.getViewCnt());
     }
 
     @Transactional
