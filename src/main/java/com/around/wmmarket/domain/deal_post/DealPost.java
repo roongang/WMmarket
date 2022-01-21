@@ -54,6 +54,9 @@ public class DealPost extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer pullingCnt;
 
+    @Column(nullable = false)
+    private Integer viewCnt;
+
     @OneToOne(mappedBy = "dealPost")
     private DealSuccess dealSuccess;
 
@@ -78,6 +81,7 @@ public class DealPost extends BaseTimeEntity {
     public void prePersist(){
         this.pullingCnt=(this.pullingCnt==null)?0:this.pullingCnt;
         this.pullingDate=(this.pullingDate==null)?LocalDateTime.now():this.pullingDate;
+        this.viewCnt=(this.viewCnt==null)?0:this.viewCnt;
     }
 
     // setter
@@ -93,6 +97,7 @@ public class DealPost extends BaseTimeEntity {
     public void setContent(String content){this.content=content;}
     public void setDealState(DealState dealState){this.dealState=dealState;}
     public void setDealSuccess(DealSuccess dealSuccess){this.dealSuccess=dealSuccess;}
+    public void increaseViewCnt(Integer cnt){this.viewCnt+=cnt;}
     // delete
     @PreRemove
     public void deleteRelation(){

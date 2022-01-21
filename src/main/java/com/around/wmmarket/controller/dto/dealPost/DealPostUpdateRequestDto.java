@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 @Getter
@@ -30,4 +31,7 @@ public class DealPostUpdateRequestDto {
     @ApiModelProperty(value = "거래 글 상태",example = "DONE",required = false)
     @Enum(enumClass = DealState.class,isNullable = true)
     private final String dealState;
+    @ApiModelProperty(value = "거래 글 조회수 증가",example = "1",required = false)
+    @Min(0) @Max(100)
+    private final Integer viewCnt;
 }

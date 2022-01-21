@@ -25,6 +25,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 // TODO : @AuthenticationPrincipal adapter 패턴으로 감싸야하는가 의문
 @Validated
@@ -61,7 +62,7 @@ public class DealPostApiController {
                 .message("거래글 반환 성공하였습니다.")
                 .data(dealPostService.getDealPostDto(dealPostId)!=null
                         ? dealPostService.getDealPostDto(dealPostId)
-                        : Arrays.asList()).build());
+                        : Collections.emptyList()).build());
     }
 
     @ApiOperation(value = "거래 글 이미지 리스트 반환") // SWAGGER
