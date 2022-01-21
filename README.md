@@ -5,6 +5,7 @@
 3. [SWAGGER](#swagger)
 4. [DOCUMENT](#document)
 5. [CODE REVIEW](#code-review)
+6. [WIKI](https://github.com/roongang/WMmarket/wiki)
 
 # DEV SERVER
 ## 서버링크 (https://wm-market.herokuapp.com/)
