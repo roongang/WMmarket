@@ -8,6 +8,7 @@ import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.user.*;
 import com.around.wmmarket.domain.user.SignedUser;
+import com.around.wmmarket.service.user.AuthService;
 import com.around.wmmarket.service.user.CustomUserDetailsService;
 import com.around.wmmarket.service.user.UserService;
 import io.swagger.annotations.ApiOperation;
@@ -54,6 +55,7 @@ import java.util.Arrays;
 public class UserApiController {
     private final UserService userService;
     private final CustomUserDetailsService customUserDetailsService;
+    private final AuthService authService;
 
     private final AuthenticationManager authenticationManager;
     private final ResourceLoader resourceLoader;
@@ -278,6 +280,15 @@ public class UserApiController {
                 .status(HttpStatus.OK)
                 .message("유저 검색 성공했습니다.")
                 .data(userService.findByFilter(requestDto))
+                .build());
+    }
+    // auth
+    @PostMapping("/auth")
+    public ResponseEntity<Object> authUser(){
+        authService.sendMail();
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("인증 메일 발송 성공했습니다.")
                 .build());
     }
 }
