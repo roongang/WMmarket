@@ -221,6 +221,7 @@ public class UserService{
         filter.put("sort",requestDto.getSort());
         filter.put("email",requestDto.getEmail());
         filter.put("nickname",requestDto.getNickname());
+        filter.put("role",requestDto.getRole());
         filter.put("city-1",requestDto.getCity_1());
         filter.put("town-1",requestDto.getTown_1());
         filter.put("city-2",requestDto.getCity_2());

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -42,7 +43,32 @@ public class UserQueryRepository {
                         user.modifiedDate))
                 .from(user)
                 .where(
-                        emailEq(filter.get("email"))
+                        emailEq(filter.get("email")),
+                        emailCt(filter.get("email")),
+                        nicknameEq(filter.get("nickname")),
+                        nicknameCt(filter.get("nickname")),
+                        roleEq(filter.get("role")),
+                        city_1Eq(filter.get("city-1")),
+                        city_1Ct(filter.get("city-1")),
+                        town_1Eq(filter.get("town-1")),
+                        town_1Ct(filter.get("town-1")),
+                        city_2Eq(filter.get("city-2")),
+                        city_2Ct(filter.get("city-2")),
+                        town_2Eq(filter.get("town-2")),
+                        town_2Ct(filter.get("town-2")),
+                        isAuthEq(filter.get("isAuth")),
+                        // createdDate
+                        createdDateEq(filter.get("createdDate")),
+                        createdDateLt(filter.get("createdDate")),
+                        createdDateLoe(filter.get("createdDate")),
+                        createdDateGt(filter.get("createdDate")),
+                        createdDateGoe(filter.get("createdDate")),
+                        // modifiedDate
+                        modifiedDateEq(filter.get("modifiedDate")),
+                        modifiedDateLt(filter.get("modifiedDate")),
+                        modifiedDateLoe(filter.get("modifiedDate")),
+                        modifiedDateGt(filter.get("modifiedDate")),
+                        modifiedDateGoe(filter.get("modifiedDate"))
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize()+1)
@@ -65,8 +91,314 @@ public class UserQueryRepository {
             StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
             String op=oper_tk.nextToken();
             if(!oper_tk.hasMoreTokens()) return user.email.eq(op);
+            if(!op.equals("eq")) continue;
             String val=oper_tk.nextToken();
-            if(op.equals("eq")) return user.email.eq(val);
+            return user.email.eq(val);
+        }
+        return null;
+    }
+    private BooleanExpression emailCt(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            String op=oper_tk.nextToken();
+            if(!op.equals("ct")) continue;
+            String val=oper_tk.nextToken();
+            return user.email.contains(val);
+        }
+        return null;
+    }
+    private BooleanExpression nicknameEq(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            String op=oper_tk.nextToken();
+            if(!oper_tk.hasMoreTokens()) return user.nickname.eq(op);
+            if(!op.equals("eq")) continue;
+            String val=oper_tk.nextToken();
+            return user.nickname.eq(val);
+        }
+        return null;
+    }
+    private BooleanExpression nicknameCt(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            String op=oper_tk.nextToken();
+            if(!op.equals("ct")) continue;
+            String val=oper_tk.nextToken();
+            return user.nickname.contains(val);
+        }
+        return null;
+    }
+    private BooleanExpression roleEq(String role){
+        return hasText(role)?user.role.eq(Role.valueOf(role)):null;
+    }
+    private BooleanExpression city_1Eq(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            String op=oper_tk.nextToken();
+            if(!oper_tk.hasMoreTokens()) return user.city_1.eq(op);
+            if(!op.equals("eq")) continue;
+            String val=oper_tk.nextToken();
+            return user.city_1.eq(val);
+        }
+        return null;
+    }
+    private BooleanExpression city_1Ct(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            String op=oper_tk.nextToken();
+            if(!op.equals("ct")) continue;
+            String val=oper_tk.nextToken();
+            return user.city_1.contains(val);
+        }
+        return null;
+    }
+    private BooleanExpression town_1Eq(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            String op=oper_tk.nextToken();
+            if(!oper_tk.hasMoreTokens()) return user.town_1.eq(op);
+            if(!op.equals("eq")) continue;
+            String val=oper_tk.nextToken();
+            return user.town_1.eq(val);
+        }
+        return null;
+    }
+    private BooleanExpression town_1Ct(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            String op=oper_tk.nextToken();
+            if(!op.equals("ct")) continue;
+            String val=oper_tk.nextToken();
+            return user.town_1.contains(val);
+        }
+        return null;
+    }
+    private BooleanExpression city_2Eq(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            String op=oper_tk.nextToken();
+            if(!oper_tk.hasMoreTokens()) return user.city_2.eq(op);
+            if(!op.equals("eq")) continue;
+            String val=oper_tk.nextToken();
+            return user.city_2.eq(val);
+        }
+        return null;
+    }
+    private BooleanExpression city_2Ct(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            String op=oper_tk.nextToken();
+            if(!op.equals("ct")) continue;
+            String val=oper_tk.nextToken();
+            return user.city_2.contains(val);
+        }
+        return null;
+    }
+    private BooleanExpression town_2Eq(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            String op=oper_tk.nextToken();
+            if(!oper_tk.hasMoreTokens()) return user.town_2.eq(op);
+            if(!op.equals("eq")) continue;
+            String val=oper_tk.nextToken();
+            return user.town_2.eq(val);
+        }
+        return null;
+    }
+    private BooleanExpression town_2Ct(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            String op=oper_tk.nextToken();
+            if(!op.equals("ct")) continue;
+            String val=oper_tk.nextToken();
+            return user.town_2.contains(val);
+        }
+        return null;
+    }
+    private BooleanExpression isAuthEq(String isAuth){
+        return hasText(isAuth)?user.isAuth.eq(Integer.parseInt(isAuth)):null;
+    }
+    private BooleanExpression createdDateEq(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(), ":",true);
+            String op=oper_tk.nextToken();
+            if(!hasText(op)) return null;
+            StringBuilder time=new StringBuilder();
+            if(!op.equals("eq") && !op.equals("gt") && !op.equals("goe") && !op.equals("lt") && !op.equals("loe")){
+                time.append(op);
+                while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+                LocalDateTime localDateTime=LocalDateTime.parse(time.toString());
+                return user.createdDate.eq(localDateTime);
+            }
+            oper_tk.nextToken(); // pass ':'
+            while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+            LocalDateTime val= LocalDateTime.parse(time.toString());
+            if(op.equals("eq")) return user.createdDate.eq(val);
+        }
+        return null;
+    }
+    private BooleanExpression createdDateLt(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":",true);
+            String op=oper_tk.nextToken();
+            if(!op.equals("lt")) continue;
+            StringBuilder time=new StringBuilder();
+            oper_tk.nextToken(); // pass ':'
+            while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+            LocalDateTime val= LocalDateTime.parse(time.toString());
+            return user.createdDate.lt(val);
+        }
+        return null;
+    }
+    private BooleanExpression createdDateLoe(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":",true);
+            String op=oper_tk.nextToken();
+            if(!op.equals("loe")) continue;
+            StringBuilder time=new StringBuilder();
+            oper_tk.nextToken(); // pass ':'
+            while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+            LocalDateTime val= LocalDateTime.parse(time.toString());
+            return user.createdDate.loe(val);
+        }
+        return null;
+    }
+    private BooleanExpression createdDateGt(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":",true);
+            String op=oper_tk.nextToken();
+            if(!op.equals("gt")) continue;
+            StringBuilder time=new StringBuilder();
+            oper_tk.nextToken(); // pass ':'
+            while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+            LocalDateTime val= LocalDateTime.parse(time.toString());
+            return user.createdDate.gt(val);
+        }
+        return null;
+    }
+    private BooleanExpression createdDateGoe(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":",true);
+            String op=oper_tk.nextToken();
+            if(!op.equals("goe")) continue;
+            StringBuilder time=new StringBuilder();
+            oper_tk.nextToken(); // pass ':'
+            while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+            LocalDateTime val= LocalDateTime.parse(time.toString());
+            return user.createdDate.goe(val);
+        }
+        return null;
+    }
+    private BooleanExpression modifiedDateEq(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(), ":",true);
+            String op=oper_tk.nextToken();
+            if(!hasText(op)) return null;
+            StringBuilder time=new StringBuilder();
+            if(!op.equals("eq") && !op.equals("gt") && !op.equals("goe") && !op.equals("lt") && !op.equals("loe")){
+                time.append(op);
+                while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+                LocalDateTime localDateTime=LocalDateTime.parse(time.toString());
+                return user.modifiedDate.eq(localDateTime);
+            }
+            oper_tk.nextToken(); // pass ':'
+            while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+            LocalDateTime val= LocalDateTime.parse(time.toString());
+            if(op.equals("eq")) return user.modifiedDate.eq(val);
+        }
+        return null;
+    }
+    private BooleanExpression modifiedDateLt(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":",true);
+            String op=oper_tk.nextToken();
+            if(!op.equals("lt")) continue;
+            StringBuilder time=new StringBuilder();
+            oper_tk.nextToken(); // pass ':'
+            while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+            LocalDateTime val= LocalDateTime.parse(time.toString());
+            return user.modifiedDate.lt(val);
+        }
+        return null;
+    }
+    private BooleanExpression modifiedDateLoe(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":",true);
+            String op=oper_tk.nextToken();
+            if(!op.equals("loe")) continue;
+            StringBuilder time=new StringBuilder();
+            oper_tk.nextToken(); // pass ':'
+            while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+            LocalDateTime val= LocalDateTime.parse(time.toString());
+            return user.modifiedDate.loe(val);
+        }
+        return null;
+    }
+    private BooleanExpression modifiedDateGt(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":",true);
+            String op=oper_tk.nextToken();
+            if(!op.equals("gt")) continue;
+            StringBuilder time=new StringBuilder();
+            oper_tk.nextToken(); // pass ':'
+            while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+            LocalDateTime val= LocalDateTime.parse(time.toString());
+            return user.modifiedDate.gt(val);
+        }
+        return null;
+    }
+    private BooleanExpression modifiedDateGoe(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":",true);
+            String op=oper_tk.nextToken();
+            if(!op.equals("goe")) continue;
+            StringBuilder time=new StringBuilder();
+            oper_tk.nextToken(); // pass ':'
+            while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+            LocalDateTime val= LocalDateTime.parse(time.toString());
+            return user.modifiedDate.goe(val);
         }
         return null;
     }
