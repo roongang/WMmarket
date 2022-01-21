@@ -222,10 +222,10 @@ public class UserService{
         filter.put("email",requestDto.getEmail());
         filter.put("nickname",requestDto.getNickname());
         filter.put("role",requestDto.getRole());
-        filter.put("city-1",requestDto.getCity_1());
-        filter.put("town-1",requestDto.getTown_1());
-        filter.put("city-2",requestDto.getCity_2());
-        filter.put("town-2",requestDto.getTown_2());
+        filter.put("city_1",requestDto.getCity_1());
+        filter.put("town_1",requestDto.getTown_1());
+        filter.put("city_2",requestDto.getCity_2());
+        filter.put("town_2",requestDto.getTown_2());
         filter.put("isAuth",requestDto.getIsAuth());
         filter.put("createdDate",requestDto.getCreatedDate());
         filter.put("modifiedDate",requestDto.getModifiedDate());
