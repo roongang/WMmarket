@@ -65,6 +65,7 @@ public class DealPostService {
                 .modifiedDate(dealPost.getModifiedDate())
                 .imageIds(dealPost.getDealPostImages().stream()
                         .map(DealPostImage::getId).collect(Collectors.toList()))
+                .viewCnt(dealPost.getViewCnt())
                 .build();
     }
 
@@ -160,6 +161,7 @@ public class DealPostService {
         filter.put("category",requestDto.getCategory());
         filter.put("title",requestDto.getTitle());
         filter.put("price",requestDto.getPrice());
+        filter.put("viewCnt",requestDto.getViewCnt());
         filter.put("content",requestDto.getContent());
         filter.put("dealState",requestDto.getDealState());
         filter.put("createdDate",requestDto.getCreatedDate());

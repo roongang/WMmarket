@@ -53,6 +53,12 @@ public class DealPostQueryRepository {
                         priceLoe(filter.get("price")),
                         priceGt(filter.get("price")),
                         priceGoe(filter.get("price")),
+                        // viewCnt
+                        viewCntEq(filter.get("viewCnt")),
+                        viewCntGt(filter.get("viewCnt")),
+                        viewCntGoe(filter.get("viewCnt")),
+                        viewCntLt(filter.get("viewCnt")),
+                        viewCntLoe(filter.get("viewCnt")),
                         // createdDate
                         createdDateEq(filter.get("createdDate")),
                         createdDateLt(filter.get("createdDate")),
@@ -87,6 +93,7 @@ public class DealPostQueryRepository {
                                 .innerJoin(dealPostImage.dealPost,dealPost)
                                 .where(dealPostImage.dealPost.id.eq(dealPostEntity.getId()))
                                 .fetch())
+                        .viewCnt(dealPostEntity.getViewCnt())
                         .build())
                 .collect(Collectors.toList());
         boolean hasNext=false;
@@ -212,6 +219,66 @@ public class DealPostQueryRepository {
             String op=oper_tk.nextToken();
             Integer val=Integer.parseInt(oper_tk.nextToken());
             if(op.equals("goe")) return dealPost.price.goe(val);
+        }
+        return null;
+    }
+    private BooleanExpression viewCntEq(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            String op=oper_tk.nextToken();
+            if(!oper_tk.hasMoreTokens()) return dealPost.viewCnt.eq(Integer.parseInt(op));
+            Integer val=Integer.parseInt(oper_tk.nextToken());
+            if(op.equals("eq")) return dealPost.viewCnt.eq(val);
+        }
+        return null;
+    }
+    private BooleanExpression viewCntLt(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            if(oper_tk.countTokens()<2) continue;
+            String op=oper_tk.nextToken();
+            Integer val=Integer.parseInt(oper_tk.nextToken());
+            if(op.equals("lt")) return dealPost.viewCnt.lt(val);
+        }
+        return null;
+    }
+    private BooleanExpression viewCntLoe(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            if(oper_tk.countTokens()<2) continue;
+            String op=oper_tk.nextToken();
+            Integer val=Integer.parseInt(oper_tk.nextToken());
+            if(op.equals("loe")) return dealPost.viewCnt.loe(val);
+        }
+        return null;
+    }
+    private BooleanExpression viewCntGt(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            if(oper_tk.countTokens()<2) continue;
+            String op=oper_tk.nextToken();
+            Integer val=Integer.parseInt(oper_tk.nextToken());
+            if(op.equals("gt")) return dealPost.viewCnt.gt(val);
+        }
+        return null;
+    }
+    private BooleanExpression viewCntGoe(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            if(oper_tk.countTokens()<2) continue;
+            String op=oper_tk.nextToken();
+            Integer val=Integer.parseInt(oper_tk.nextToken());
+            if(op.equals("goe")) return dealPost.viewCnt.goe(val);
         }
         return null;
     }

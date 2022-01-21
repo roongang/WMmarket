@@ -16,6 +16,8 @@ public class DealPostSearchRequestDto extends PagingRequestDto {
     private String title;
     @ApiParam(value = "거래 글 가격",example = "goe:1000,lt:2000",required = false)
     private String price;
+    @ApiParam(value = "거래 글 조회수",example = "goe:1",required = false)
+    private String viewCnt;
     @ApiParam(value = "거래 글 내용",example = "ct:content",required = false)
     private String content;
     @ApiParam(value = "거래 글 상태",example = "ONGOING",required = false)
