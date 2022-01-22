@@ -24,7 +24,6 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 // TODO : @AuthenticationPrincipal adapter 패턴으로 감싸야하는가 의문
@@ -105,7 +104,7 @@ public class DealPostApiController {
     @ApiResponses({
             @ApiResponse(code = 200,message = "return data : slice",response = Slice.class),
     })
-    @GetMapping("/deal-posts")
+    @GetMapping("/deal-posts/page")
     public ResponseEntity<Object> searchDealPost(DealPostSearchRequestDto requestDto){
         // TODO : filter validation 은?
         return ResponseHandler.toResponse(SuccessResponse.builder()

@@ -79,6 +79,30 @@ public class UserService{
                 .build();
     }
 
+    public UserGetResponseDto getUserDto(UserGetRequestDto requestDto){
+        User user;
+        if(requestDto.getId()!=null) user=userRepository.findById(requestDto.getId()).orElse(null);
+        else if(requestDto.getEmail()!=null) user=userRepository.findByEmail(requestDto.getEmail()).orElse(null);
+        else if(requestDto.getNickname()!=null) user=userRepository.findByNickname(requestDto.getNickname()).orElse(null);
+        else user=null;
+
+        return user!=null
+                ? UserGetResponseDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .role(user.getRole())
+                .city_1(user.getCity_1())
+                .town_1(user.getTown_1())
+                .city_2(user.getCity_2())
+                .town_2(user.getTown_2())
+                .isAuth(user.getIsAuth())
+                .createdDate(user.getCreatedDate())
+                .modifiedDate(user.getModifiedDate())
+                .build()
+                : null;
+    }
+
     public User getUser(String email){
         return userRepository.findByEmail(email)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));

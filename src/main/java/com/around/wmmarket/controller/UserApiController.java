@@ -44,7 +44,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 
 @Validated
 @RequestMapping(Constants.API_PATH)
@@ -118,12 +118,30 @@ public class UserApiController {
     @GetMapping("/users/{userId}")
     public ResponseEntity<Object> get(
             @Min(1) @PathVariable("userId") Integer userId){
+        UserGetResponseDto responseDto=userService.getUserDto(userId);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 반환 성공했습니다.")
-                .data(userService.getUserDto(userId)!=null
-                        ? userService.getUserDto(userId)
-                        : Arrays.asList()).build());
+                .data(responseDto!=null
+                        ? responseDto
+                        : Collections.emptyList())
+                .build());
+    }
+
+    @ApiOperation(value = "유저 반환") // SWAGGER
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "return data : user info",response = UserGetResponseDto.class),
+    }) // SWAGGER
+    @GetMapping("/users")
+    public ResponseEntity<Object> getByQuery(@Valid UserGetRequestDto requestDto) {
+        UserGetResponseDto responseDto=userService.getUserDto(requestDto);
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("유저 반환 성공했습니다.")
+                .data(responseDto!=null
+                        ? responseDto
+                        : Collections.emptyList())
+                .build());
     }
 
     @ApiOperation(value = "유저 수정") // SWAGGER
@@ -271,7 +289,7 @@ public class UserApiController {
     @ApiResponses({
             @ApiResponse(code = 200,message = "return data : slice",response = Slice.class),
     })
-    @GetMapping("/users")
+    @GetMapping("/users/page")
     public ResponseEntity<Object> searchUser(UserSearchRequestDto requestDto){
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
