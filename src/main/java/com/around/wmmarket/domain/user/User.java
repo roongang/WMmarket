@@ -115,6 +115,7 @@ public class User extends BaseTimeEntity {
     public void setCity_2(String city_2){this.city_2=city_2;}
     public void setTown_2(String town_2){this.town_2=town_2;}
     public void setCode(String code){this.code=code;}
+    public void setIsAuth(Integer isAuth){this.isAuth=isAuth;}
     // delete
     @PreRemove
     public void makeChildNull(){

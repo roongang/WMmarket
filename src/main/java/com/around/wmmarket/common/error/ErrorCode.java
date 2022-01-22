@@ -33,6 +33,7 @@ public enum ErrorCode {
     DUPLICATED_USER_LIKE(BAD_REQUEST,"U008","이미 좋아요를 누른 글입니다."),
     USER_LIKE_NOT_FOUND(BAD_REQUEST,"U009","좋아요를 찾을 수 없습니다."),
     DUPLICATED_USER_AUTH(BAD_REQUEST,"U010","이미 인증된 회원입니다."),
+    INVALID_AUTH_CODE(BAD_REQUEST,"U011","인증 코드가 일치하지 않습니다."),
 
     // Deal
     UNAUTHORIZED_USER_TO_DEALPOST(FORBIDDEN,"D001","거래글에대한 권한이 없습니다."),

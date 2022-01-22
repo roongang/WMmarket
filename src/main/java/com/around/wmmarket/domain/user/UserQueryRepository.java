@@ -38,7 +38,6 @@ public class UserQueryRepository {
                         user.city_2,
                         user.town_2,
                         user.isAuth,
-                        user.code,
                         user.createdDate,
                         user.modifiedDate))
                 .from(user)
