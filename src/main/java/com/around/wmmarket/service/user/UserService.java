@@ -1,6 +1,7 @@
 package com.around.wmmarket.service.user;
 
 import com.around.wmmarket.common.Constants;
+import com.around.wmmarket.common.EmailHandler;
 import com.around.wmmarket.common.FileHandler;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
@@ -23,6 +24,7 @@ import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,11 +39,12 @@ public class UserService{
 
     private final PasswordEncoder passwordEncoder;
     private final FileHandler fileHandler;
+    private final EmailHandler emailHandler;
 
     @Transactional
     public UserSaveResponseDto save(UserSaveRequestDto requestDto){
         // check duplicate user
-        if(userRepository.findByEmail(requestDto.getEmail()).isPresent()) throw new CustomException(ErrorCode.DUPLICATE_USER_EMAIL);
+        if(userRepository.findByEmail(requestDto.getEmail()).isPresent()) throw new CustomException(ErrorCode.DUPLICATED_USER_EMAIL);
 
         User user = User.builder()
                 .email(requestDto.getEmail())
@@ -57,25 +60,6 @@ public class UserService{
         return new UserSaveResponseDto(userRepository.save(user).getId());
     }
 
-    public UserGetResponseDto getUserDto(String email){
-        User user = userRepository.findByEmail(email)
-                .orElse(null);
-        if(user==null) return null;
-        return UserGetResponseDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .nickname(user.getNickname())
-                .role(user.getRole())
-                .city_1(user.getCity_1())
-                .town_1(user.getTown_1())
-                .city_2(user.getCity_2())
-                .town_2(user.getTown_2())
-                .isAuth(user.getIsAuth())
-                .code(user.getCode())
-                .createdDate(user.getCreatedDate())
-                .modifiedDate(user.getModifiedDate())
-                .build();
-    }
     public UserGetResponseDto getUserDto(Integer id){
         User user = userRepository.findById(id)
                 .orElse(null);
@@ -90,7 +74,8 @@ public class UserService{
                 .city_2(user.getCity_2())
                 .town_2(user.getTown_2())
                 .isAuth(user.getIsAuth())
-                .code(user.getCode())
+                .createdDate(user.getCreatedDate())
+                .modifiedDate(user.getModifiedDate())
                 .build();
     }
 
@@ -101,12 +86,6 @@ public class UserService{
     public User getUser(Integer userId){
         return userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
-    }
-
-    public String getUserEmail(int userId){
-        User user=userRepository.findById(userId)
-                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
-        return user.getEmail();
     }
 
     @Transactional
@@ -230,5 +209,45 @@ public class UserService{
         filter.put("createdDate",requestDto.getCreatedDate());
         filter.put("modifiedDate",requestDto.getModifiedDate());
         return userQueryRepository.findByFilter(filter);
+    }
+
+    // auth
+    @Transactional
+    public void setAuthCode(SignedUser signedUser, Integer userId){
+        // check
+        User user=userRepository.findById(userId)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        if(user.getIsAuth()!=0) throw new CustomException(ErrorCode.DUPLICATED_USER_AUTH);
+        if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+        // set auth code
+        String code=generateCode();
+        user.setCode(code);
+        // send email
+        emailHandler.sendSimpleEmail(Constants.WM_EMAIL,user.getEmail(),
+                "[회원인증] WM-market 회원 인증 이메일입니다.",
+                String.format("사랑합니다 고객님\n"
+                        +"수박맛 중고거래 수박 마켓입니다\n"
+                        +"이메일 인증을 통해 소중한 수박 마켓의 정회원이 되어주세요!\n"
+                        +"인증번호 : %s\n" , code));
+    }
+    @Transactional
+    public void authUser(SignedUser signedUser,Integer userId,String code){
+        // check
+        User user=userRepository.findById(userId)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        if(user.getIsAuth()!=0) throw new CustomException(ErrorCode.DUPLICATED_USER_AUTH);
+        if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+        // auth
+        if(user.getCode().equals(code)) user.setIsAuth(1);
+        else throw new CustomException(ErrorCode.INVALID_AUTH_CODE);
+    }
+    private String generateCode(){
+        byte[] bytes=new byte[4];
+        new Random().nextBytes(bytes);
+        StringBuilder builder=new StringBuilder();
+        for(byte b:bytes){
+            builder.append(String.format("%02x",b));
+        }
+        return builder.toString();
     }
 }

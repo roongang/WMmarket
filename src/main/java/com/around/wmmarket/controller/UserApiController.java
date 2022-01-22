@@ -10,6 +10,7 @@ import com.around.wmmarket.controller.dto.user.*;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.user.CustomUserDetailsService;
 import com.around.wmmarket.service.user.UserService;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -37,9 +38,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
@@ -86,7 +85,7 @@ public class UserApiController {
                                          @ApiIgnore HttpSession session){
         // 이미 로그인한 유저면 반환
         if(session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY)!=null){
-            throw new CustomException(ErrorCode.DUPLICATE_SIGN_IN); }
+            throw new CustomException(ErrorCode.DUPLICATED_SIGN_IN); }
         SignedUser signedUser;
         try { signedUser = customUserDetailsService.getSignedUser(requestDto);}
         catch (UsernameNotFoundException e) {
@@ -278,6 +277,29 @@ public class UserApiController {
                 .status(HttpStatus.OK)
                 .message("유저 검색 성공했습니다.")
                 .data(userService.findByFilter(requestDto))
+                .build());
+    }
+    // auth
+    @ApiOperation(value = "유저 인증 코드 발송")
+    @PostMapping("/users/{userId}/code")
+    public ResponseEntity<Object> sendCode(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser
+            ,@Min(1) @PathVariable Integer userId){
+        userService.setAuthCode(signedUser,userId);
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.CREATED)
+                .message("유저 인증 메일 발송 성공했습니다.")
+                .build());
+    }
+
+    @ApiOperation(value = "유저 인증")
+    @PostMapping("/users/{userId}/auth")
+    public ResponseEntity<Object> authUser(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
+                                           @Min(1) @PathVariable Integer userId,
+                                           @RequestBody ObjectNode json){
+        userService.authUser(signedUser,userId,json.get("code")!=null?json.get("code").asText():null);
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.CREATED)
+                .message("유저 인증 성공했습니다.")
                 .build());
     }
 }

@@ -58,6 +58,8 @@ dependencies {
     annotationProcessor("javax.persistence:javax.persistence-api",
             "javax.annotation:javax.annotation-api",
             "com.querydsl:querydsl-apt:${queryDslVersion}:jpa")
+    // email
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
     // test security (권한을 필요로하는 api 호출을 위한)
     testImplementation('org.springframework.security:spring-security-test')
     // test
