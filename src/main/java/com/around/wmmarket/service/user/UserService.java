@@ -45,6 +45,7 @@ public class UserService{
     public UserSaveResponseDto save(UserSaveRequestDto requestDto){
         // check duplicate user
         if(userRepository.findByEmail(requestDto.getEmail()).isPresent()) throw new CustomException(ErrorCode.DUPLICATED_USER_EMAIL);
+        if(userRepository.findByNickname(requestDto.getNickname()).isPresent()) throw new CustomException(ErrorCode.DUPLICATED_USER_NICKNAME);
 
         User user = User.builder()
                 .email(requestDto.getEmail())
@@ -123,7 +124,10 @@ public class UserService{
 
         // update logic
         if(requestDto.getPassword()!=null) user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
-        if(requestDto.getNickname()!=null) user.setNickname(requestDto.getNickname());
+        if(requestDto.getNickname()!=null){
+            if(userRepository.existsByNickname(requestDto.getNickname())) throw new CustomException(ErrorCode.DUPLICATED_USER_NICKNAME);
+            user.setNickname(requestDto.getNickname());
+        }
         if(requestDto.getRole()!=null) user.setRole(Role.valueOf(requestDto.getRole()));
         if(requestDto.getCity_1()!=null) user.setCity_1(requestDto.getCity_1());
         if(requestDto.getTown_1()!=null) user.setTown_1(requestDto.getTown_1());

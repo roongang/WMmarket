@@ -26,7 +26,7 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
@@ -35,7 +35,7 @@ public class User extends BaseTimeEntity {
     @Column
     private String image;
 
-    @Column(nullable = false, length=100)
+    @Column(nullable = false, length=100, unique = true)
     private String nickname;
 
     // TODO : 권한도 List 로 가져야함

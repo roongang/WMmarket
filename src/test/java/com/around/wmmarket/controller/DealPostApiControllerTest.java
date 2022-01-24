@@ -164,7 +164,7 @@ public class DealPostApiControllerTest {
         User buyer=User.builder()
                 .email("buyer@email")
                 .password(passwordEncoder.encode("password"))
-                .nickname("nickname")
+                .nickname("nickname1")
                 .role(Role.USER).build();
         userRepository.save(buyer);
         int buyerId=userRepository.findByEmail("buyer@email").orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND))
@@ -204,7 +204,7 @@ public class DealPostApiControllerTest {
         userRepository.save(User.builder()
                 .email("user@email2")
                 .password(passwordEncoder.encode("password"))
-                .nickname("nickname")
+                .nickname("nickname2")
                 .role(Role.USER).build());
         User user2=userRepository.findByEmail("user@email2")
                 .orElseThrow(()->new UsernameNotFoundException("user@email2 없음"));
@@ -241,7 +241,7 @@ public class DealPostApiControllerTest {
         userRepository.save(User.builder()
                 .email("user@email3")
                 .password(passwordEncoder.encode("password"))
-                .nickname("nickname")
+                .nickname("nickname3")
                 .role(Role.USER).build());
         User user3=userRepository.findByEmail("user@email3")
                 .orElseThrow(()->new UsernameNotFoundException("user@email3 없음"));
@@ -278,7 +278,7 @@ public class DealPostApiControllerTest {
         userRepository.save(User.builder()
                 .email("user@email2")
                 .password(passwordEncoder.encode("password"))
-                .nickname("nickname")
+                .nickname("nickname2")
                 .role(Role.USER).build());
         User user2=userRepository.findByEmail("user@email2")
                 .orElseThrow(()->new UsernameNotFoundException("user@email2 없음"));

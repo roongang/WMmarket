@@ -90,7 +90,7 @@ public class UserApiControllerTest {
         userRepository.save(User.builder()
                 .email("deleteUser@email")
                 .password(passwordEncoder.encode("password"))
-                .nickname("nickname")
+                .nickname("nickname1")
                 .role(Role.USER).build());
     }
     @Before
