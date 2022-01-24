@@ -113,4 +113,14 @@ public class DealPostApiController {
                 .data(dealPostService.findByFilter(requestDto))
                 .build());
     }
+    // pulling
+    @PutMapping("/deal-posts/{dealPostId}/pulling")
+    public ResponseEntity<Object> pullDealPost(@AuthenticationPrincipal SignedUser signedUser,
+                                                @PathVariable("dealPostId") Integer dealPostId){
+        dealPostService.pull(signedUser,dealPostId);
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("거래 글 끌어올리기 성공해습니다.")
+                .build());
+    }
 }

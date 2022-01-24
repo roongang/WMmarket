@@ -168,4 +168,15 @@ public class DealPostService {
         filter.put("modifiedDate",requestDto.getModifiedDate());
         return dealPostQueryRepository.findByFilter(filter);
     }
+
+    public void pull(SignedUser signedUser,Integer dealPostId){
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        DealPost dealPost=dealPostRepository.findById(dealPostId)
+                .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
+        if(dealPost.getUser()==null) throw new CustomException(ErrorCode.DEALPOST_USER_NOT_FOUND);
+        if(!dealPost.getUser().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEALPOST);
+        // pull
+        dealPost.increasePullingCnt();
+    }
 }

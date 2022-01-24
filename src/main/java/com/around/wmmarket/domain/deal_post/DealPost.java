@@ -98,6 +98,10 @@ public class DealPost extends BaseTimeEntity {
     public void setDealState(DealState dealState){this.dealState=dealState;}
     public void setDealSuccess(DealSuccess dealSuccess){this.dealSuccess=dealSuccess;}
     public void increaseViewCnt(Integer cnt){this.viewCnt+=cnt;}
+    public void increasePullingCnt(){
+        this.pullingCnt+=1;
+        this.pullingDate=LocalDateTime.now();
+    }
     // delete
     @PreRemove
     public void deleteRelation(){
