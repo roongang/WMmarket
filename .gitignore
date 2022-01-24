@@ -7,9 +7,6 @@ build/
 ### Image
 /src/main/resources/images/
 
-### Propertites
-/src/main/resources/application-email.properties
-
 ### STS ###
 .apt_generated
 .classpath
