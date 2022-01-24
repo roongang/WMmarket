@@ -36,4 +36,8 @@ public class DealPostGetResponseDto {
     private List<Integer> imageIds;
     @ApiModelProperty(value = "거래 글 조회수",example = "10",required = true)
     private Integer viewCnt;
+    @ApiModelProperty(value = "거래 글 끌어올리기 횟수",example = "0",required = true)
+    private Integer pullingCnt;
+    @ApiModelProperty(value = "거래 글 끌어올리기 수정시간",example = "2022-01-04 09:38:32.470811",required = true)
+    private LocalDateTime pullingDate;
 }

@@ -37,6 +37,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -327,5 +328,31 @@ public class DealPostApiControllerTest {
                 .andExpect(status().isOk());
         // then
         assertThat(dealPostRepository.findAll().isEmpty()).isTrue();
+    }
+
+    @Test
+    @Transactional
+    @WithUserDetails(value = "user@email")
+    public void dealPostPullTest() throws Exception{
+        // given
+        dealPostRepository.save(DealPost.builder()
+                .user(user)
+                .category(Category.A)
+                .title("title")
+                .price(1000)
+                .content("content")
+                .dealState(DealState.ONGOING).build());
+        DealPost dealPost=dealPostRepository.findAll().get(0);
+        int dealPostId=dealPost.getId();
+        int beforePullingCnt=dealPost.getPullingCnt();
+        LocalDateTime beforePullingDate=dealPost.getPullingDate();
+        String url = "http://localhost:"+port+"/api/v1/deal-posts/"+dealPostId+"/pulling";
+        // when
+        mvc.perform(put(url))
+                .andExpect(status().isOk());
+        // then
+        dealPost=dealPostRepository.findAll().get(0);
+        assertThat(dealPost.getPullingCnt()).isEqualTo(beforePullingCnt+1);
+        assertThat(dealPost.getPullingDate()).isAfterOrEqualTo(beforePullingDate);
     }
 }
