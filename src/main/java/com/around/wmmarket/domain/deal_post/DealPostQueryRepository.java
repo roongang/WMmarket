@@ -70,7 +70,19 @@ public class DealPostQueryRepository {
                         modifiedDateLt(filter.get("modifiedDate")),
                         modifiedDateLoe(filter.get("modifiedDate")),
                         modifiedDateGt(filter.get("modifiedDate")),
-                        modifiedDateGoe(filter.get("modifiedDate"))
+                        modifiedDateGoe(filter.get("modifiedDate")),
+                        // pullingCnt
+                        pullingCntEq(filter.get("pullingCnt")),
+                        pullingCntGt(filter.get("pullingCnt")),
+                        pullingCntGoe(filter.get("pullingCnt")),
+                        pullingCntLt(filter.get("pullingCnt")),
+                        pullingCntLoe(filter.get("pullingCnt")),
+                        // pullingDate
+                        pullingDateEq(filter.get("pullingDate")),
+                        pullingDateGt(filter.get("pullingDate")),
+                        pullingDateGoe(filter.get("pullingDate")),
+                        pullingDateLt(filter.get("pullingDate")),
+                        pullingDateLoe(filter.get("pullingDate"))
                 )
                 .orderBy(QueryDslUtil.getOrderSpecifiers(filter.get("sort"),dealPost)
                         .toArray(new OrderSpecifier[0]))
@@ -94,6 +106,8 @@ public class DealPostQueryRepository {
                                 .on(dealPostImage.dealPost.id.eq(dealPostEntity.getId()))
                                 .fetch())
                         .viewCnt(dealPostEntity.getViewCnt())
+                        .pullingCnt(dealPostEntity.getPullingCnt())
+                        .pullingDate(dealPostEntity.getPullingDate())
                         .build())
                 .collect(Collectors.toList());
         boolean hasNext=false;
@@ -441,6 +455,147 @@ public class DealPostQueryRepository {
             while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
             LocalDateTime val= LocalDateTime.parse(time.toString());
             return dealPost.modifiedDate.goe(val);
+        }
+        return null;
+    }
+    private BooleanExpression pullingCntEq(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            String op=oper_tk.nextToken();
+            if(!oper_tk.hasMoreTokens()) return dealPost.pullingCnt.eq(Integer.parseInt(op));
+            Integer val=Integer.parseInt(oper_tk.nextToken());
+            if(op.equals("eq")) return dealPost.pullingCnt.eq(val);
+        }
+        return null;
+    }
+    private BooleanExpression pullingCntLt(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            if(oper_tk.countTokens()<2) continue;
+            String op=oper_tk.nextToken();
+            Integer val=Integer.parseInt(oper_tk.nextToken());
+            if(op.equals("lt")) return dealPost.pullingCnt.lt(val);
+        }
+        return null;
+    }
+    private BooleanExpression pullingCntLoe(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            if(oper_tk.countTokens()<2) continue;
+            String op=oper_tk.nextToken();
+            Integer val=Integer.parseInt(oper_tk.nextToken());
+            if(op.equals("loe")) return dealPost.pullingCnt.loe(val);
+        }
+        return null;
+    }
+    private BooleanExpression pullingCntGt(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            if(oper_tk.countTokens()<2) continue;
+            String op=oper_tk.nextToken();
+            Integer val=Integer.parseInt(oper_tk.nextToken());
+            if(op.equals("gt")) return dealPost.pullingCnt.gt(val);
+        }
+        return null;
+    }
+    private BooleanExpression pullingCntGoe(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":");
+            if(oper_tk.countTokens()<2) continue;
+            String op=oper_tk.nextToken();
+            Integer val=Integer.parseInt(oper_tk.nextToken());
+            if(op.equals("goe")) return dealPost.pullingCnt.goe(val);
+        }
+        return null;
+    }
+    private BooleanExpression pullingDateEq(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(), ":",true);
+            String op=oper_tk.nextToken();
+            if(!hasText(op)) return null;
+            StringBuilder time=new StringBuilder();
+            if(!op.equals("eq") && !op.equals("gt") && !op.equals("goe") && !op.equals("lt") && !op.equals("loe")){
+                time.append(op);
+                while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+                LocalDateTime localDateTime=LocalDateTime.parse(time.toString());
+                return dealPost.pullingDate.eq(localDateTime);
+            }
+            oper_tk.nextToken(); // pass ':'
+            while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+            LocalDateTime val= LocalDateTime.parse(time.toString());
+            if(op.equals("eq")) return dealPost.pullingDate.eq(val);
+        }
+        return null;
+    }
+    private BooleanExpression pullingDateLt(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":",true);
+            String op=oper_tk.nextToken();
+            if(!op.equals("lt")) continue;
+            StringBuilder time=new StringBuilder();
+            oper_tk.nextToken(); // pass ':'
+            while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+            LocalDateTime val= LocalDateTime.parse(time.toString());
+            return dealPost.pullingDate.lt(val);
+        }
+        return null;
+    }
+    private BooleanExpression pullingDateLoe(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":",true);
+            String op=oper_tk.nextToken();
+            if(!op.equals("loe")) continue;
+            StringBuilder time=new StringBuilder();
+            oper_tk.nextToken(); // pass ':'
+            while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+            LocalDateTime val= LocalDateTime.parse(time.toString());
+            return dealPost.pullingDate.loe(val);
+        }
+        return null;
+    }
+    private BooleanExpression pullingDateGt(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":",true);
+            String op=oper_tk.nextToken();
+            if(!op.equals("gt")) continue;
+            StringBuilder time=new StringBuilder();
+            oper_tk.nextToken(); // pass ':'
+            while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+            LocalDateTime val= LocalDateTime.parse(time.toString());
+            return dealPost.pullingDate.gt(val);
+        }
+        return null;
+    }
+    private BooleanExpression pullingDateGoe(String opers){
+        if(!hasText(opers)) return null;
+        StringTokenizer opers_tk=new StringTokenizer(opers,",");
+        while(opers_tk.hasMoreTokens()){
+            StringTokenizer oper_tk=new StringTokenizer(opers_tk.nextToken(),":",true);
+            String op=oper_tk.nextToken();
+            if(!op.equals("goe")) continue;
+            StringBuilder time=new StringBuilder();
+            oper_tk.nextToken(); // pass ':'
+            while(oper_tk.hasMoreTokens()) time.append(oper_tk.nextToken());
+            LocalDateTime val= LocalDateTime.parse(time.toString());
+            return dealPost.pullingDate.goe(val);
         }
         return null;
     }

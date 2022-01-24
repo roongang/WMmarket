@@ -66,6 +66,8 @@ public class DealPostService {
                 .imageIds(dealPost.getDealPostImages().stream()
                         .map(DealPostImage::getId).collect(Collectors.toList()))
                 .viewCnt(dealPost.getViewCnt())
+                .pullingCnt(dealPost.getPullingCnt())
+                .pullingDate(dealPost.getPullingDate())
                 .build();
     }
 
@@ -166,6 +168,8 @@ public class DealPostService {
         filter.put("dealState",requestDto.getDealState());
         filter.put("createdDate",requestDto.getCreatedDate());
         filter.put("modifiedDate",requestDto.getModifiedDate());
+        filter.put("pullingCnt",requestDto.getPullingCnt());
+        filter.put("pullingDate",requestDto.getPullingDate());
         return dealPostQueryRepository.findByFilter(filter);
     }
 

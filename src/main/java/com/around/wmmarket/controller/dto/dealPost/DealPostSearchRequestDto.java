@@ -26,4 +26,8 @@ public class DealPostSearchRequestDto extends PagingRequestDto {
     private String createdDate;
     @ApiParam(value = "거래 글 수정시간",example = "2022-01-04 09:38:32.470811",required = false)
     private String modifiedDate;
+    @ApiParam(value = "거래 글 끌어올리기 횟수",example = "0",required = false)
+    private String pullingCnt;
+    @ApiParam(value = "거래 글 끌어올리기 수정시간",example = "2022-01-04 09:38:32.470811",required = false)
+    private String pullingDate;
 }
