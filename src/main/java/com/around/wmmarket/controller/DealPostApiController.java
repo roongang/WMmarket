@@ -114,6 +114,7 @@ public class DealPostApiController {
                 .build());
     }
     // pulling
+    @ApiOperation(value = "거래 글 끌어올리기") // SWAGGER
     @PutMapping("/deal-posts/{dealPostId}/pulling")
     public ResponseEntity<Object> pullDealPost(@AuthenticationPrincipal SignedUser signedUser,
                                                 @PathVariable("dealPostId") Integer dealPostId){

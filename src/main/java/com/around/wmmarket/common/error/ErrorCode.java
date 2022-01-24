@@ -54,6 +54,7 @@ public enum ErrorCode {
     INVALID_INPUT_VALUE(BAD_REQUEST,"C002","Invalid Input Value"),
     NOTHING_HAPPEN_BECAUSE_EMPTY(BAD_REQUEST,"C003","비어있어 처리할것이 없습니다."),
     SESSION_NULL(BAD_REQUEST,"C004","session 이 null 입니다."),
+    SESSION_ALREADY_INVALIDATED(BAD_REQUEST,"C005","session 이 이미 비활성화 되었습니다."),
 
     // Server
     UNDEFINED_ERROR(INTERNAL_SERVER_ERROR, "S001", "정의되지 않은 에러입니다."),

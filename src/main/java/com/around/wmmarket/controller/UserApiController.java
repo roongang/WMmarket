@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -46,6 +47,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 
+@Slf4j
 @Validated
 @RequestMapping(Constants.API_PATH)
 @RequiredArgsConstructor
@@ -84,8 +86,8 @@ public class UserApiController {
     public ResponseEntity<Object> signin(@Valid @RequestBody UserSignInRequestDto requestDto,
                                          @ApiIgnore HttpSession session){
         // 이미 로그인한 유저면 반환
-        if(session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY)!=null){
-            throw new CustomException(ErrorCode.DUPLICATED_SIGN_IN); }
+        if(session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY)!=null) throw new CustomException(ErrorCode.DUPLICATED_SIGN_IN);
+
         SignedUser signedUser;
         try { signedUser = customUserDetailsService.getSignedUser(requestDto);}
         catch (UsernameNotFoundException e) {
@@ -109,6 +111,18 @@ public class UserApiController {
         return ResponseHandler.toResponse(SuccessResponse.builder()
                         .status(HttpStatus.CREATED)
                         .message("유저 로그인 성공했습니다.").build());
+    }
+    @ApiOperation(value = "유저 로그아웃") // SWAGGER
+    @PostMapping("/signout")
+    public ResponseEntity<Object> signout(@ApiIgnore HttpSession session){
+        if(session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY)==null){
+            throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        }
+        session.invalidate();
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("유저 로그아웃 성공했습니다.")
+                .build());
     }
 
     @ApiOperation(value = "유저 반환") // SWAGGER

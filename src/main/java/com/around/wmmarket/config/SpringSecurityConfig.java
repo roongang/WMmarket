@@ -1,11 +1,7 @@
 package com.around.wmmarket.config;
 
-import com.around.wmmarket.common.Constants;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.service.user.CustomUserDetailsService;
-import com.around.wmmarket.service.user.UserService;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +13,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @RequiredArgsConstructor
 @Configuration
@@ -40,11 +35,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .formLogin()
                     .permitAll()
-                .and()
-                    .logout()
-                    .logoutRequestMatcher(new AntPathRequestMatcher(Constants.API_PATH+"/signout"))
-                    .invalidateHttpSession(true)
-                    .deleteCookies("JSESSIONID")
                 .and() // 기본 auth 사용
                     .httpBasic();
     }
