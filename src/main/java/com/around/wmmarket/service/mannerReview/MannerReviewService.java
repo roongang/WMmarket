@@ -2,6 +2,7 @@ package com.around.wmmarket.service.mannerReview;
 
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
+import com.around.wmmarket.controller.dto.mannerReview.MannerReviewGetResponseDto;
 import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveRequestDto;
 import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveResponseDto;
 import com.around.wmmarket.domain.deal_post.DealPost;
@@ -13,6 +14,8 @@ import com.around.wmmarket.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @RequiredArgsConstructor
 @Service
 public class MannerReviewService {
@@ -20,6 +23,7 @@ public class MannerReviewService {
     private final UserRepository userRepository;
 
     // save
+    @Transactional
     public MannerReviewSaveResponseDto save(SignedUser signedUser, MannerReviewSaveRequestDto requestDto){
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
@@ -45,5 +49,28 @@ public class MannerReviewService {
                 .manner(requestDto.getManner()).build();
         mannerReviewRepository.save(mannerReview);
         return new MannerReviewSaveResponseDto(mannerReview.getId());
+    }
+
+    public MannerReviewGetResponseDto get(Integer id){
+        MannerReview mannerReview=mannerReviewRepository.findById(id)
+                .orElse(null);
+        if(mannerReview==null) return null;
+        return MannerReviewGetResponseDto.builder()
+                .buyerId(mannerReview.getBuyer()!=null?mannerReview.getBuyer().getId():null)
+                .sellerId(mannerReview.getSeller()!=null?mannerReview.getSeller().getId():null)
+                .manner(mannerReview.getManner())
+                .build();
+    }
+
+    @Transactional
+    public void delete(SignedUser signedUser,Integer id){
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        MannerReview mannerReview=mannerReviewRepository.findById(id)
+                .orElseThrow(()->new CustomException(ErrorCode.MANNER_REVIEW_NOT_FOUND));
+        if(mannerReview.getBuyer()==null) throw new CustomException(ErrorCode.USER_NOT_FOUND,"구매자를 찾을 수 없습니다.");
+        if(!mannerReview.getBuyer().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_MANNER_REVIEW,"해당 유저는 매너리뷰에 대한 권한이 없습니다.");
+        // delete
+        mannerReviewRepository.delete(mannerReview);
     }
 }

@@ -49,6 +49,7 @@ public enum ErrorCode {
     DEALPOST_USER_NOT_FOUND(BAD_REQUEST,"D010","거래글 작성자가 존재하지 않습니다."),
     DEALPOST_STATE_SAME(BAD_REQUEST,"D011","거래글 상태가 이전과 동일합니다."),
     UNAUTHORIZED_USER_TO_MANNER_REVIEW(BAD_REQUEST,"D012","매너 리뷰에대한 권한이 없습니다."),
+    MANNER_REVIEW_NOT_FOUND(BAD_REQUEST,"D013","매너 리뷰를 찾을 수 없습니다."),
 
     // Common
     INVALID_TYPE_VALUE(BAD_REQUEST, "C001", "Invalid Type Value"),

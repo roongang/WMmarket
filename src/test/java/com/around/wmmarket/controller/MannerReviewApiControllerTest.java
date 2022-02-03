@@ -8,6 +8,7 @@ import com.around.wmmarket.domain.deal_post.DealState;
 import com.around.wmmarket.domain.deal_success.DealSuccess;
 import com.around.wmmarket.domain.deal_success.DealSuccessRepository;
 import com.around.wmmarket.domain.manner_review.Manner;
+import com.around.wmmarket.domain.manner_review.MannerReview;
 import com.around.wmmarket.domain.manner_review.MannerReviewRepository;
 import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.User;
@@ -28,6 +29,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -36,7 +38,7 @@ import javax.transaction.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -69,15 +71,11 @@ public class MannerReviewApiControllerTest {
                 .password(passwordEncoder.encode("password"))
                 .nickname("seller nickname")
                 .role(Role.USER).build());
-        User seller=userRepository.findByEmail("seller@email")
-                .orElseThrow(()->new UsernameNotFoundException("seller@email"));
         userRepository.save(User.builder()
                 .email("buyer@email")
                 .password(passwordEncoder.encode("password"))
                 .nickname("buyer nickname")
                 .role(Role.USER).build());
-        User buyer=userRepository.findByEmail("buyer@email")
-                .orElseThrow(()->new UsernameNotFoundException("buyer@email"));
     }
 
     @AfterTransaction
@@ -99,6 +97,24 @@ public class MannerReviewApiControllerTest {
         session = new MockHttpSession();
     }
 
+    @Transactional
+    public void makeSuccessDealPost(User buyer,User seller) {
+        DealPost dealPost=dealPostRepository.save(DealPost.builder()
+                .user(seller)
+                .price(1000)
+                .content("content")
+                .title("title")
+                .category(Category.A)
+                .dealState(DealState.DONE).build());
+        dealSuccessRepository.save(DealSuccess.builder()
+                .buyer(buyer)
+                .dealPost(dealPost)
+                .build());
+    }
+    @Transactional
+    public void makeMannerReview(User buyer,User seller,Manner manner){
+
+    }
     @Test
     @Transactional
     @WithUserDetails(value = "buyer@email")
@@ -109,18 +125,7 @@ public class MannerReviewApiControllerTest {
         User buyer=userRepository.findByEmail("buyer@email")
                 .orElseThrow(()->new UsernameNotFoundException("buyer@email"));
 
-        dealPostRepository.save(DealPost.builder()
-                .user(seller)
-                .price(1000)
-                .content("content")
-                .title("title")
-                .category(Category.A)
-                .dealState(DealState.DONE).build());
-        DealPost dealPost=dealPostRepository.findAll().get(0);
-        dealSuccessRepository.save(DealSuccess.builder()
-                .buyer(buyer)
-                .dealPost(dealPost)
-                .build());
+        makeSuccessDealPost(buyer,seller);
 
         MannerReviewSaveRequestDto requestDto=MannerReviewSaveRequestDto.builder()
                 .sellerId(seller.getId())
@@ -135,5 +140,51 @@ public class MannerReviewApiControllerTest {
                 .andExpect(status().isCreated());
         // then
         assertThat(mannerReviewRepository.findAll()).isNotNull();
+    }
+    @Test
+    @Transactional
+    public void mannerReviewGetTest() throws Exception{
+        // given
+        User seller=userRepository.findByEmail("seller@email")
+                .orElseThrow(()->new UsernameNotFoundException("seller@email"));
+        User buyer=userRepository.findByEmail("buyer@email")
+                .orElseThrow(()->new UsernameNotFoundException("buyer@email"));
+
+        makeSuccessDealPost(buyer,seller);
+        MannerReview mannerReview=mannerReviewRepository.save(MannerReview.builder()
+                .buyer(buyer)
+                .seller(seller)
+                .manner(Manner.GOOD_KIND).build());
+        String url="http://localhost"+port+"/api/v1/manner-reviews/"+mannerReview.getId();
+        // when
+        MvcResult result=mvc.perform(get(url))
+                .andExpect(status().isOk())
+                .andReturn();
+        // then
+        assertThat(result.getResponse().getContentAsString()).contains("buyerId");
+    }
+
+    @Test
+    @Transactional
+    @WithUserDetails(value = "buyer@email")
+    public void mannerReviewDeleteTest() throws Exception{
+        // given
+        User seller=userRepository.findByEmail("seller@email")
+                .orElseThrow(()->new UsernameNotFoundException("seller@email"));
+        User buyer=userRepository.findByEmail("buyer@email")
+                .orElseThrow(()->new UsernameNotFoundException("buyer@email"));
+
+        makeSuccessDealPost(buyer,seller);
+        MannerReview mannerReview=mannerReviewRepository.save(MannerReview.builder()
+                .buyer(buyer)
+                .seller(seller)
+                .manner(Manner.GOOD_KIND).build());
+        int mannerReviewId=mannerReview.getId();
+        String url="http://localhost"+port+"/api/v1/manner-reviews/"+mannerReview.getId();
+        // when
+        mvc.perform(delete(url))
+                .andExpect(status().isOk());
+        // then
+        assertThat(mannerReviewRepository.findById(mannerReviewId).isPresent()).isFalse();
     }
 }
