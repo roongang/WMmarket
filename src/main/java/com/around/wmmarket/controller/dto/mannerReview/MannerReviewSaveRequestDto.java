@@ -1,5 +1,6 @@
 package com.around.wmmarket.controller.dto.mannerReview;
 
+import com.around.wmmarket.common.validation.Enum;
 import com.around.wmmarket.domain.manner_review.Manner;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,5 +12,6 @@ import lombok.Getter;
 public class MannerReviewSaveRequestDto {
     private final Integer buyerId;
     private final Integer sellerId;
+    @Enum(enumClass = Manner.class)
     private final Manner manner;
 }

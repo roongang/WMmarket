@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,13 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class MannerReviewApiController {
     private final MannerReviewService mannerReviewService;
     // save
+    @PostMapping("/manner-reviews")
     public ResponseEntity<Object> save(@AuthenticationPrincipal SignedUser signedUser,
-                                       MannerReviewSaveRequestDto requestDto){
-        // save
-        mannerReviewService.save(signedUser,requestDto);
+                                       @RequestBody MannerReviewSaveRequestDto requestDto){
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.CREATED)
                 .message("매너 리뷰 삽입 성공했습니다.")
+                .data(mannerReviewService.save(signedUser,requestDto))
                 .build());
     }
 }
