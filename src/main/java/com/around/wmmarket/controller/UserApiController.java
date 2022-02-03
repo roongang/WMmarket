@@ -294,8 +294,29 @@ public class UserApiController {
             @Min(1) @PathVariable("userId") Integer userId){
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
-                .message("유저 거래글 ID 리스트 반환 성공했습니다.")
+                .message("유저 거래글 리스트 반환 성공했습니다.")
                 .data(userService.getDealPosts(userId))
+                .build());
+    }
+
+    // manner review
+    @ApiOperation(value = "유저 판매 매너 리뷰 반환")
+    @GetMapping("/users/{userId}/sell-manner-reviews")
+    public ResponseEntity<Object> getSellMannerReviews(@Min(1) @PathVariable Integer userId){
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("유저 판매 매너 리뷰 리스트 반환 성공했습니다.")
+                .data(userService.getSellMannerReviews(userId))
+                .build());
+    }
+
+    @ApiOperation(value = "유저 구매 매너 리뷰 반환")
+    @GetMapping("/users/{userId}/buy-manner-reviews")
+    public ResponseEntity<Object> getBuyMannerReviews(@Min(1) @PathVariable Integer userId){
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("유저 구매 매너 리뷰 리스트 반환 성공했습니다.")
+                .data(userService.getBuyMannerReviews(userId))
                 .build());
     }
 

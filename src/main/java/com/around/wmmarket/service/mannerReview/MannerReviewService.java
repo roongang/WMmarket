@@ -6,6 +6,7 @@ import com.around.wmmarket.controller.dto.mannerReview.MannerReviewGetResponseDt
 import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveRequestDto;
 import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveResponseDto;
 import com.around.wmmarket.domain.deal_post.DealPost;
+import com.around.wmmarket.domain.manner_review.Manner;
 import com.around.wmmarket.domain.manner_review.MannerReview;
 import com.around.wmmarket.domain.manner_review.MannerReviewRepository;
 import com.around.wmmarket.domain.user.SignedUser;
@@ -46,7 +47,7 @@ public class MannerReviewService {
         MannerReview mannerReview=MannerReview.builder()
                 .buyer(buyer)
                 .seller(seller)
-                .manner(requestDto.getManner()).build();
+                .manner(Manner.valueOf(requestDto.getManner())).build();
         mannerReviewRepository.save(mannerReview);
         return new MannerReviewSaveResponseDto(mannerReview.getId());
     }
@@ -59,6 +60,8 @@ public class MannerReviewService {
                 .buyerId(mannerReview.getBuyer()!=null?mannerReview.getBuyer().getId():null)
                 .sellerId(mannerReview.getSeller()!=null?mannerReview.getSeller().getId():null)
                 .manner(mannerReview.getManner())
+                .createdDate(mannerReview.getCreatedDate())
+                .modifiedDate(mannerReview.getModifiedDate())
                 .build();
     }
 

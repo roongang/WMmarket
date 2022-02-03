@@ -1,5 +1,6 @@
 package com.around.wmmarket.domain.manner_review;
 
+import com.around.wmmarket.domain.BaseTimeEntity;
 import com.around.wmmarket.domain.user.User;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -12,7 +13,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "manner_review")
 @Entity
-public class MannerReview {
+public class MannerReview extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

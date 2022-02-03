@@ -111,10 +111,7 @@ public class MannerReviewApiControllerTest {
                 .dealPost(dealPost)
                 .build());
     }
-    @Transactional
-    public void makeMannerReview(User buyer,User seller,Manner manner){
 
-    }
     @Test
     @Transactional
     @WithUserDetails(value = "buyer@email")
@@ -130,7 +127,7 @@ public class MannerReviewApiControllerTest {
         MannerReviewSaveRequestDto requestDto=MannerReviewSaveRequestDto.builder()
                 .sellerId(seller.getId())
                 .buyerId(buyer.getId())
-                .manner(Manner.GOOD_KIND).build();
+                .manner("GOOD_KIND").build();
 
         String url="http://localhost"+port+"/api/v1/manner-reviews";
         // when

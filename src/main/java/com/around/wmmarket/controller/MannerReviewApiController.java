@@ -7,20 +7,24 @@ import com.around.wmmarket.controller.dto.mannerReview.MannerReviewGetResponseDt
 import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveRequestDto;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.mannerReview.MannerReviewService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 
+@Validated
 @RequestMapping(Constants.API_PATH)
 @RequiredArgsConstructor
 @RestController
 public class MannerReviewApiController {
     private final MannerReviewService mannerReviewService;
     // save
+    @ApiOperation(value = "매너 리뷰 삽입")
     @PostMapping("/manner-reviews")
     public ResponseEntity<Object> save(@AuthenticationPrincipal SignedUser signedUser,
                                        @RequestBody MannerReviewSaveRequestDto requestDto){
@@ -31,6 +35,7 @@ public class MannerReviewApiController {
                 .build());
     }
 
+    @ApiOperation(value = "매너 리뷰 반환")
     @GetMapping("/manner-reviews/{mannerReviewId}")
     public ResponseEntity<Object> get(@PathVariable Integer mannerReviewId){
         MannerReviewGetResponseDto responseDto=mannerReviewService.get(mannerReviewId);
@@ -43,6 +48,7 @@ public class MannerReviewApiController {
                 .build());
     }
 
+    @ApiOperation(value = "매너 리뷰 삭제")
     @DeleteMapping("/manner-reviews/{mannerReviewId}")
     public ResponseEntity<Object> delete(@AuthenticationPrincipal SignedUser signedUser,
                                          @PathVariable Integer mannerReviewId){

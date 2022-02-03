@@ -6,12 +6,15 @@ import com.around.wmmarket.common.FileHandler;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
+import com.around.wmmarket.controller.dto.mannerReview.MannerReviewGetResponseDto;
 import com.around.wmmarket.controller.dto.user.*;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
+import com.around.wmmarket.domain.manner_review.MannerReview;
 import com.around.wmmarket.domain.user.*;
 import com.around.wmmarket.domain.user_like.UserLike;
 import com.around.wmmarket.service.dealPost.DealPostService;
+import com.around.wmmarket.service.mannerReview.MannerReviewService;
 import com.around.wmmarket.service.userLike.UserLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
@@ -21,10 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +36,7 @@ public class UserService{
 
     private final UserLikeService userLikeService;
     private final DealPostService dealPostService;
+    private final MannerReviewService mannerReviewService;
 
     private final PasswordEncoder passwordEncoder;
     private final FileHandler fileHandler;
@@ -218,9 +219,30 @@ public class UserService{
         return user.getDealPosts().stream()
                 .map(DealPost::getId)
                 .map(dealPostService::getDealPostDto)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
+    // manner review
+    public List<MannerReviewGetResponseDto> getSellMannerReviews(Integer userId){
+        User user=userRepository.findById(userId)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        return user.getSellMannerReviews().stream()
+                .map(MannerReview::getId)
+                .map(mannerReviewService::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    public List<MannerReviewGetResponseDto> getBuyMannerReviews(Integer userId){
+        User user=userRepository.findById(userId)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        return user.getBuyMannerReviews().stream()
+                .map(MannerReview::getId)
+                .map(mannerReviewService::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
     public Slice<UserGetResponseDto> findByFilter(UserSearchRequestDto requestDto){
         Map<String,String> filter=new HashMap<>();
         filter.put("page",requestDto.getPage());
