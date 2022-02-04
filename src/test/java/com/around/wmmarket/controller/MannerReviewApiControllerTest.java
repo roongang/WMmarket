@@ -129,7 +129,7 @@ public class MannerReviewApiControllerTest {
                 .buyerId(buyer.getId())
                 .manner("GOOD_KIND").build();
 
-        String url="http://localhost"+port+"/api/v1/manner-reviews";
+        String url="http://localhost:"+port+"/api/v1/manner-reviews";
         // when
         mvc.perform(post(url)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -152,7 +152,7 @@ public class MannerReviewApiControllerTest {
                 .buyer(buyer)
                 .seller(seller)
                 .manner(Manner.GOOD_KIND).build());
-        String url="http://localhost"+port+"/api/v1/manner-reviews/"+mannerReview.getId();
+        String url="http://localhost:"+port+"/api/v1/manner-reviews/"+mannerReview.getId();
         // when
         MvcResult result=mvc.perform(get(url))
                 .andExpect(status().isOk())
@@ -177,7 +177,7 @@ public class MannerReviewApiControllerTest {
                 .seller(seller)
                 .manner(Manner.GOOD_KIND).build());
         int mannerReviewId=mannerReview.getId();
-        String url="http://localhost"+port+"/api/v1/manner-reviews/"+mannerReview.getId();
+        String url="http://localhost:"+port+"/api/v1/manner-reviews/"+mannerReview.getId();
         // when
         mvc.perform(delete(url))
                 .andExpect(status().isOk());
