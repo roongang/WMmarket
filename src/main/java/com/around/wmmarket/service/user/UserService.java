@@ -7,6 +7,8 @@ import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
 import com.around.wmmarket.controller.dto.mannerReview.MannerReviewGetResponseDto;
+import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveRequestDto;
+import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveResponseDto;
 import com.around.wmmarket.controller.dto.user.*;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
@@ -224,6 +226,13 @@ public class UserService{
     }
 
     // manner review
+    public MannerReviewSaveResponseDto saveBuyMannerReview(SignedUser signedUser, Integer userId, MannerReviewSaveRequestDto requestDto){
+        // check
+        User user=userRepository.findById(userId)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_MANNER_REVIEW);
+        return mannerReviewService.save(signedUser,requestDto);
+    }
     public List<MannerReviewGetResponseDto> getSellMannerReviews(Integer userId){
         User user=userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -242,6 +251,14 @@ public class UserService{
                 .map(mannerReviewService::get)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+    public void deleteBuyMannerReview(SignedUser signedUser,Integer userId,Integer mannerReviewId){
+        // check
+        User user=userRepository.findById(userId)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_MANNER_REVIEW);
+        // delete
+        mannerReviewService.delete(signedUser,mannerReviewId);
     }
     public Slice<UserGetResponseDto> findByFilter(UserSearchRequestDto requestDto){
         Map<String,String> filter=new HashMap<>();

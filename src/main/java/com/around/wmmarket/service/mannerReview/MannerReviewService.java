@@ -42,12 +42,14 @@ public class MannerReviewService {
             }
         }
         if(!isBuyer) throw new CustomException(ErrorCode.BUYER_NOT_FOUND,"구매자를 찾을 수 없습니다. id : "+requestDto.getBuyerId());
-
+        // duplicate
+        Manner manner=Manner.valueOf(requestDto.getManner());
+        if(mannerReviewRepository.findBySellerAndBuyerAndManner(seller,buyer,manner).isPresent()) throw new CustomException(ErrorCode.DUPLICATED_RESOURCE,"중복된 매너 리뷰가 존재합니다.");
         // save
         MannerReview mannerReview=MannerReview.builder()
                 .buyer(buyer)
                 .seller(seller)
-                .manner(Manner.valueOf(requestDto.getManner())).build();
+                .manner(manner).build();
         mannerReviewRepository.save(mannerReview);
         return new MannerReviewSaveResponseDto(mannerReview.getId());
     }

@@ -1,5 +1,6 @@
 package com.around.wmmarket.controller;
 
+import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveRequestDto;
 import com.around.wmmarket.controller.dto.user.UserSignInRequestDto;
 import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.Category;
@@ -20,6 +21,7 @@ import com.around.wmmarket.domain.user_like.UserLikeRepository;
 import com.around.wmmarket.common.FileHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -448,6 +450,31 @@ public class UserApiControllerTest {
     }
     @Test
     @Transactional
+    @WithUserDetails(value = "buyer@email")
+    public void userMannerReviewSaveTest() throws Exception{
+        // given
+        User seller=userRepository.findByEmail("seller@email")
+                .orElseThrow(()->new UsernameNotFoundException("seller@email"));
+        User buyer=userRepository.findByEmail("buyer@email")
+                .orElseThrow(()->new UsernameNotFoundException("buyer@email"));
+
+        makeSuccessDealPost(buyer,seller);
+
+        MannerReviewSaveRequestDto requestDto=MannerReviewSaveRequestDto.builder()
+                .sellerId(seller.getId())
+                .buyerId(buyer.getId())
+                .manner("GOOD_KIND").build();
+        String url="http://localhost:"+port+"/api/v1/users/"+buyer.getId()+"/buy-manner-reviews";
+        // when
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(new ObjectMapper().writeValueAsString(requestDto)))
+                .andExpect(status().isCreated());
+        // then
+        Assertions.assertThat(mannerReviewRepository.findAll()).isNotNull();
+    }
+    @Test
+    @Transactional
     public void userSellMannerReviewGetTest() throws Exception{
         // given
         User seller=userRepository.findByEmail("seller@email")
@@ -491,5 +518,28 @@ public class UserApiControllerTest {
         // then
         assertThat(result.getResponse().getContentAsString()).contains("sellerId");
         assertThat(result.getResponse().getContentAsString()).contains("buyerId");
+    }
+    @Test
+    @Transactional
+    @WithUserDetails(value = "buyer@email")
+    public void userBuyMannerReviewDeleteTest() throws Exception{
+        // given
+        User seller=userRepository.findByEmail("seller@email")
+                .orElseThrow(()->new UsernameNotFoundException("seller@email"));
+        User buyer=userRepository.findByEmail("buyer@email")
+                .orElseThrow(()->new UsernameNotFoundException("buyer@email"));
+
+        makeSuccessDealPost(buyer,seller);
+        MannerReview mannerReview=mannerReviewRepository.save(MannerReview.builder()
+                .buyer(buyer)
+                .seller(seller)
+                .manner(Manner.GOOD_KIND).build());
+        Integer mannerReviewId=mannerReview.getId();
+        String url="http://localhost:"+port+"/api/v1/users/"+buyer.getId()+"/buy-manner-reviews/"+mannerReviewId;
+        // when
+        mvc.perform(delete(url))
+                .andExpect(status().isOk());
+        // then
+        assertThat(mannerReviewRepository.findById(mannerReviewId).isPresent()).isFalse();
     }
 }
