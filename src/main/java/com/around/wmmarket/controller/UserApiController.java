@@ -6,6 +6,7 @@ import com.around.wmmarket.common.ResponseHandler;
 import com.around.wmmarket.common.SuccessResponse;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
+import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveRequestDto;
 import com.around.wmmarket.controller.dto.user.*;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.service.user.CustomUserDetailsService;
@@ -294,8 +295,51 @@ public class UserApiController {
             @Min(1) @PathVariable("userId") Integer userId){
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
-                .message("유저 거래글 ID 리스트 반환 성공했습니다.")
+                .message("유저 거래글 리스트 반환 성공했습니다.")
                 .data(userService.getDealPosts(userId))
+                .build());
+    }
+
+    // manner review
+    @ApiOperation(value = "유저 구매 매너 리뷰 삽입")
+    @PostMapping("/users/{userId}/buy-manner-reviews")
+    public ResponseEntity<Object> saveBuyMannerReview(@AuthenticationPrincipal SignedUser signedUser,
+                                                       @Min(1) @PathVariable Integer userId,
+                                                       @RequestBody MannerReviewSaveRequestDto requestDto){
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.CREATED)
+                .message("매너 리뷰 삽입 성공했습니다.")
+                .data(userService.saveBuyMannerReview(signedUser,userId,requestDto))
+                .build());
+    }
+    
+    @ApiOperation(value = "유저 판매 매너 리뷰 반환")
+    @GetMapping("/users/{userId}/sell-manner-reviews")
+    public ResponseEntity<Object> getSellMannerReviews(@Min(1) @PathVariable Integer userId){
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("유저 판매 매너 리뷰 리스트 반환 성공했습니다.")
+                .data(userService.getSellMannerReviews(userId))
+                .build());
+    }
+
+    @ApiOperation(value = "유저 구매 매너 리뷰 반환")
+    @GetMapping("/users/{userId}/buy-manner-reviews")
+    public ResponseEntity<Object> getBuyMannerReviews(@Min(1) @PathVariable Integer userId){
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("유저 구매 매너 리뷰 리스트 반환 성공했습니다.")
+                .data(userService.getBuyMannerReviews(userId))
+                .build());
+    }
+    @DeleteMapping("/users/{userId}/buy-manner-reviews/{mannerReviewId}")
+    public ResponseEntity<Object> deleteBuyMannerReview(@AuthenticationPrincipal SignedUser signedUser,
+                                                        @Min(1) @PathVariable Integer userId,
+                                                        @Min(1) @PathVariable Integer mannerReviewId){
+        userService.deleteBuyMannerReview(signedUser,userId,mannerReviewId);
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("유저 구매 매너 리뷰 삭제 성공했습니다.")
                 .build());
     }
 

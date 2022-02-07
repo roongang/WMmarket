@@ -1,5 +1,6 @@
 package com.around.wmmarket.domain.manner_review;
 
+import com.around.wmmarket.domain.BaseTimeEntity;
 import com.around.wmmarket.domain.user.User;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -12,7 +13,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "manner_review")
 @Entity
-public class MannerReview {
+public class MannerReview extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -25,18 +26,34 @@ public class MannerReview {
     @JoinColumn(name = "BUYER_ID")
     private User buyer;
 
-    @Column(nullable = false)
-    private Integer mannerCnt;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Manner manner;
 
     @Builder
-    public MannerReview(User seller,User buyer,Integer mannerCnt,Manner manner){
+    public MannerReview(User seller,User buyer,Manner manner){
         this.seller=seller;
         this.buyer=buyer;
-        this.mannerCnt=mannerCnt;
         this.manner=manner;
     }
+
+    // delete
+    @PreRemove
+    public void deleteRelation(){
+        if(this.buyer!=null) this.buyer.getBuyMannerReviews().remove(this);
+        if(this.seller!=null) this.seller.getSellMannerReviews().remove(this);
+    }
+
+    public void setSeller(User seller){
+        if(this.seller!=null) this.seller.getSellMannerReviews().remove(this);
+        this.seller=seller;
+        if(seller!=null) seller.getSellMannerReviews().add(this);
+    }
+
+    public void setBuyer(User buyer){
+        if(this.buyer!=null) this.buyer.getBuyMannerReviews().remove(this);
+        this.buyer=buyer;
+        if(buyer!=null) buyer.getBuyMannerReviews().add(this);
+    }
+
 }

@@ -70,9 +70,11 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user")
     private final List<Keyword> keywords = new ArrayList<>();
 
-    // not yet
     @OneToMany(mappedBy = "seller")
-    private final List<MannerReview> mannerReviews = new ArrayList<>();
+    private final List<MannerReview> sellMannerReviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "buyer")
+    private final List<MannerReview> buyMannerReviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "seller")
     private final List<DealReview> sellDealReviews = new ArrayList<>();
@@ -125,5 +127,7 @@ public class User extends BaseTimeEntity {
         while(!this.buyDealReviews.isEmpty()) this.buyDealReviews.get(this.buyDealReviews.size()-1).setBuyer(null);
         while(!this.dealPosts.isEmpty()) this.dealPosts.get(this.dealPosts.size()-1).setUser(null);
         while(!this.dealSuccesses.isEmpty()) this.dealSuccesses.get(this.dealSuccesses.size()-1).setBuyer(null);
+        while(!this.sellMannerReviews.isEmpty()) this.sellMannerReviews.get(this.sellDealReviews.size()-1).setSeller(null);
+        while(!this.buyMannerReviews.isEmpty()) this.buyMannerReviews.get(this.buyMannerReviews.size()-1).setBuyer(null);
     }
 }
