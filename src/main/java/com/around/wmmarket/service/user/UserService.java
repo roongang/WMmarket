@@ -221,6 +221,45 @@ public class UserService{
                 .collect(Collectors.toList());
     }
 
+
+    // manner review
+    public MannerReviewSaveResponseDto saveBuyMannerReview(SignedUser signedUser, Integer userId, MannerReviewSaveRequestDto requestDto){
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        User user=userRepository.findById(userId)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_MANNER_REVIEW);
+        return mannerReviewService.save(signedUser,requestDto);
+    }
+    public List<MannerReviewGetResponseDto> getSellMannerReviews(Integer userId){
+        User user=userRepository.findById(userId)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        return user.getSellMannerReviews().stream()
+                .map(MannerReview::getId)
+                .map(mannerReviewService::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    public List<MannerReviewGetResponseDto> getBuyMannerReviews(Integer userId){
+        User user=userRepository.findById(userId)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        return user.getBuyMannerReviews().stream()
+                .map(MannerReview::getId)
+                .map(mannerReviewService::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+    public void deleteBuyMannerReview(SignedUser signedUser,Integer userId,Integer mannerReviewId){
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        User user=userRepository.findById(userId)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_MANNER_REVIEW);
+        // delete
+        mannerReviewService.delete(signedUser,mannerReviewId);
+    }
+
     public Slice<UserGetResponseDto> findByFilter(UserSearchRequestDto requestDto){
         Map<String,String> filter=new HashMap<>();
         filter.put("page",requestDto.getPage());
@@ -243,6 +282,7 @@ public class UserService{
     @Transactional
     public void setAuthCode(SignedUser signedUser, Integer userId){
         // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         User user=userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         if(user.getIsAuth()!=0) throw new CustomException(ErrorCode.DUPLICATED_USER_AUTH);
@@ -261,6 +301,7 @@ public class UserService{
     @Transactional
     public void authUser(SignedUser signedUser,Integer userId,String code){
         // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         User user=userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         if(user.getIsAuth()!=0) throw new CustomException(ErrorCode.DUPLICATED_USER_AUTH);
