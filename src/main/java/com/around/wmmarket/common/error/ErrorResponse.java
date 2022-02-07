@@ -29,17 +29,9 @@ public class ErrorResponse {
         this.errors=errors;
     }
 
-    private ErrorResponse(ErrorCode errorCode){
-        this.timestamp=LocalDateTime.now();
-        this.message=errorCode.getMessage();
-        this.status=errorCode.getStatus().value();
-        this.code=errorCode.getCode();
-        this.errors=new ArrayList<>(); // [] 이 돼야함
-    }
-
     private ErrorResponse(ErrorCode errorCode,String message){
         this.timestamp=LocalDateTime.now();
-        this.message=message;
+        this.message=message!=null ? message : errorCode.getMessage();
         this.status=errorCode.getStatus().value();
         this.code=errorCode.getCode();
         this.errors=new ArrayList<>();
@@ -50,7 +42,7 @@ public class ErrorResponse {
     }
 
     public static ErrorResponse of(ErrorCode errorCode){
-        return new ErrorResponse(errorCode);
+        return new ErrorResponse(errorCode,errorCode.getMessage());
     }
 
     public static ErrorResponse of(ErrorCode errorCode,List<FieldError> fieldErrors){

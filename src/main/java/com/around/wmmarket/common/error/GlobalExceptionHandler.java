@@ -8,7 +8,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @Slf4j
 @RestControllerAdvice
@@ -34,7 +33,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.class)
     protected ResponseEntity<Object> handleCustomException(CustomException e){
         log.error("CustomException : {}",e.getErrorCode());
-        return ResponseHandler.toResponse(ErrorResponse.of(e.getErrorCode()));
+        return (e.getMsg()==null)
+                ? ResponseHandler.toResponse(ErrorResponse.of(e.getErrorCode()))
+                : ResponseHandler.toResponse(ErrorResponse.of(e.getErrorCode(),e.getMsg()));
     }
 
     // other exception
