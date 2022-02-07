@@ -48,8 +48,6 @@ public enum ErrorCode {
     DEALPOST_NOT_DONE(BAD_REQUEST,"D009","거래글이 완료 상태가 아닙니다."),
     DEALPOST_USER_NOT_FOUND(BAD_REQUEST,"D010","거래글 작성자가 존재하지 않습니다."),
     DEALPOST_STATE_SAME(BAD_REQUEST,"D011","거래글 상태가 이전과 동일합니다."),
-    UNAUTHORIZED_USER_TO_MANNER_REVIEW(BAD_REQUEST,"D012","매너 리뷰에대한 권한이 없습니다."),
-    MANNER_REVIEW_NOT_FOUND(BAD_REQUEST,"D013","매너 리뷰를 찾을 수 없습니다."),
 
     // Common
     INVALID_TYPE_VALUE(BAD_REQUEST, "C001", "Invalid Type Value"),
@@ -57,7 +55,6 @@ public enum ErrorCode {
     NOTHING_HAPPEN_BECAUSE_EMPTY(BAD_REQUEST,"C003","비어있어 처리할것이 없습니다."),
     SESSION_NULL(BAD_REQUEST,"C004","session 이 null 입니다."),
     SESSION_ALREADY_INVALIDATED(BAD_REQUEST,"C005","session 이 이미 비활성화 되었습니다."),
-    DUPLICATED_RESOURCE(BAD_REQUEST,"C006","중복된 자원이 이미 존재합니다."),
 
     // Server
     UNDEFINED_ERROR(INTERNAL_SERVER_ERROR, "S001", "정의되지 않은 에러입니다."),
