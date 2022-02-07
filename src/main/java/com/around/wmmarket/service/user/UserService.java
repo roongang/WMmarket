@@ -228,6 +228,7 @@ public class UserService{
     // manner review
     public MannerReviewSaveResponseDto saveBuyMannerReview(SignedUser signedUser, Integer userId, MannerReviewSaveRequestDto requestDto){
         // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         User user=userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_MANNER_REVIEW);
@@ -254,6 +255,7 @@ public class UserService{
     }
     public void deleteBuyMannerReview(SignedUser signedUser,Integer userId,Integer mannerReviewId){
         // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         User user=userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_MANNER_REVIEW);
@@ -282,6 +284,7 @@ public class UserService{
     @Transactional
     public void setAuthCode(SignedUser signedUser, Integer userId){
         // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         User user=userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         if(user.getIsAuth()!=0) throw new CustomException(ErrorCode.DUPLICATED_USER_AUTH);
@@ -300,6 +303,7 @@ public class UserService{
     @Transactional
     public void authUser(SignedUser signedUser,Integer userId,String code){
         // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         User user=userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         if(user.getIsAuth()!=0) throw new CustomException(ErrorCode.DUPLICATED_USER_AUTH);
