@@ -60,6 +60,8 @@ dependencies {
             "com.querydsl:querydsl-apt:${queryDslVersion}:jpa")
     // email
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+    // websocket
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
     // test security (권한을 필요로하는 api 호출을 위한)
     testImplementation('org.springframework.security:spring-security-test')
     // test
