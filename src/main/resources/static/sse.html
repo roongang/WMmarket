@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SSE TEST</title>
+</head>
+<body>
+<input id="input"/>
+<button id="send">send</button>
+<pre id="messages"></pre>
+<script>
+    const eventSource = new EventSource(`/subs?id=${Math.random()}`);
+
+    eventSource.onopen = (e) => {
+        console.log('onopen');
+        console.log(e);
+    };
+
+    eventSource.onerror = (e) => {
+        console.log('onerror');
+        console.log(e);
+    };
+
+    eventSource.onmessage = (e) => {
+        console.log('lastEventId:'+e.lastEventId+', data:'+e.data);
+        document.querySelector("#messages").appendChild(document.createTextNode(e.data + "\n"));
+    };
+
+    document.querySelector("#send").addEventListener("click", () => {
+        console.log('send message');
+        fetch(`/pubs?message=${document.querySelector("#input").value}`);
+    });
+</script>
+</body>
+</html>
