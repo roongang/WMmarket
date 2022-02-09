@@ -26,12 +26,12 @@ public class DealPostUpdateRequestDto {
     @ApiModelProperty(value = "거래 글 내용",example = "수정한 거래 글 내용",required = false)
     private final String content;
     @ApiModelProperty(value = "구매자 아이디",example = "2",required = false)
-    @Min(0)
+    @Min(1)
     private final Integer buyerId;
     @ApiModelProperty(value = "거래 글 상태",example = "DONE",required = false)
     @Enum(enumClass = DealState.class,isNullable = true)
     private final String dealState;
     @ApiModelProperty(value = "거래 글 조회수 증가",example = "1",required = false)
-    @Min(0) @Max(100)
+    @Min(1) @Max(100)
     private final Integer viewCnt;
 }

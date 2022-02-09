@@ -1,11 +1,17 @@
 package com.around.wmmarket.controller;
 
+import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveRequestDto;
 import com.around.wmmarket.controller.dto.user.UserSignInRequestDto;
 import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.Category;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
 import com.around.wmmarket.domain.deal_post.DealState;
+import com.around.wmmarket.domain.deal_success.DealSuccess;
+import com.around.wmmarket.domain.deal_success.DealSuccessRepository;
+import com.around.wmmarket.domain.manner_review.Manner;
+import com.around.wmmarket.domain.manner_review.MannerReview;
+import com.around.wmmarket.domain.manner_review.MannerReviewRepository;
 import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
@@ -15,6 +21,7 @@ import com.around.wmmarket.domain.user_like.UserLikeRepository;
 import com.around.wmmarket.common.FileHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,16 +67,20 @@ public class UserApiControllerTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
+    private FileHandler fileHandler;
+    @Autowired
+    private WebApplicationContext context;
+
+    @Autowired
     private UserRepository userRepository;
     @Autowired
     private DealPostRepository dealPostRepository;
     @Autowired
     private UserLikeRepository userLikeRepository;
     @Autowired
-    private FileHandler fileHandler;
-
+    private DealSuccessRepository dealSuccessRepository;
     @Autowired
-    private WebApplicationContext context;
+    private MannerReviewRepository mannerReviewRepository;
 
     private MockHttpSession session;
     private MockMvc mvc;
@@ -92,6 +103,17 @@ public class UserApiControllerTest {
                 .password(passwordEncoder.encode("password"))
                 .nickname("nickname1")
                 .role(Role.USER).build());
+        // seller buyer
+        userRepository.save(User.builder()
+                .email("seller@email")
+                .password(passwordEncoder.encode("password"))
+                .nickname("seller nickname")
+                .role(Role.USER).build());
+        userRepository.save(User.builder()
+                .email("buyer@email")
+                .password(passwordEncoder.encode("password"))
+                .nickname("buyer nickname")
+                .role(Role.USER).build());
     }
     @Before
     public void setup(){
@@ -105,6 +127,9 @@ public class UserApiControllerTest {
 
     @AfterTransaction
     public void tearDown(){
+        mannerReviewRepository.deleteAll();
+        dealSuccessRepository.deleteAll();
+        dealPostRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -251,7 +276,7 @@ public class UserApiControllerTest {
 
         User user=userRepository.findByEmail("user@email")
                 .orElseThrow(()->new UsernameNotFoundException("user@email"));
-        String url="http://localhost"+port+"/api/v1/users/"+user.getId()+"/image";
+        String url="http://localhost:"+port+"/api/v1/users/"+user.getId()+"/image";
         // when
         MockMultipartHttpServletRequestBuilder builder=multipart(url);
         builder.with(new RequestPostProcessor() {
@@ -275,7 +300,7 @@ public class UserApiControllerTest {
         // given
         User user=userRepository.findByEmail("user@email")
                 .orElseThrow(()->new UsernameNotFoundException("user@email"));
-        String url="http://localhost"+port+"/api/v1/users/"+user.getId()+"/image";
+        String url="http://localhost:"+port+"/api/v1/users/"+user.getId()+"/image";
         // when
         mvc.perform(delete(url))
                 .andExpect(status().isOk());
@@ -303,7 +328,7 @@ public class UserApiControllerTest {
         User user=userRepository.findByEmail("user@email")
                 .orElseThrow(()->new UsernameNotFoundException("user@email"));
 
-        String url="http://localhost"+port+"/api/v1/users/"+user.getId()+"/likes";
+        String url="http://localhost:"+port+"/api/v1/users/"+user.getId()+"/likes";
         // when
         mvc.perform(post(url)
                 .param("dealPostId",dealPost.getId().toString()))
@@ -336,7 +361,7 @@ public class UserApiControllerTest {
                 .dealPost(dealPost)
                 .build());
 
-        String url="http://localhost"+port+"/api/v1/users/"+user.getId()+"/likes";
+        String url="http://localhost:"+port+"/api/v1/users/"+user.getId()+"/likes";
         // when
         MvcResult result=mvc.perform(get(url))
                 .andExpect(status().isOk())
@@ -371,7 +396,7 @@ public class UserApiControllerTest {
                 .dealPost(dealPost)
                 .build());
 
-        String url="http://localhost"+port+"/api/v1/users/"+user.getId()+"/likes";
+        String url="http://localhost:"+port+"/api/v1/users/"+user.getId()+"/likes";
         // when
         mvc.perform(delete(url)
                         .param("dealPostId",dealPost.getId().toString()))
@@ -398,7 +423,7 @@ public class UserApiControllerTest {
                     .content("content")
                     .dealState(DealState.ONGOING).build());
         }
-        String url="http://localhost"+port+"/api/v1/users/"+user.getId()+"/deal-posts";
+        String url="http://localhost:"+port+"/api/v1/users/"+user.getId()+"/deal-posts";
         // when
         MvcResult result=mvc.perform(get(url))
                 .andExpect(status().isOk())
@@ -408,5 +433,113 @@ public class UserApiControllerTest {
             String price=Integer.toString(i*1000);
             assertThat(result.getResponse().getContentAsString()).contains(price);
         }
+    }
+    @Transactional
+    public void makeSuccessDealPost(User buyer,User seller) {
+        DealPost dealPost=dealPostRepository.save(DealPost.builder()
+                .user(seller)
+                .price(1000)
+                .content("content")
+                .title("title")
+                .category(Category.A)
+                .dealState(DealState.DONE).build());
+        dealSuccessRepository.save(DealSuccess.builder()
+                .buyer(buyer)
+                .dealPost(dealPost)
+                .build());
+    }
+    @Test
+    @Transactional
+    @WithUserDetails(value = "buyer@email")
+    public void userMannerReviewSaveTest() throws Exception{
+        // given
+        User seller=userRepository.findByEmail("seller@email")
+                .orElseThrow(()->new UsernameNotFoundException("seller@email"));
+        User buyer=userRepository.findByEmail("buyer@email")
+                .orElseThrow(()->new UsernameNotFoundException("buyer@email"));
+
+        makeSuccessDealPost(buyer,seller);
+
+        MannerReviewSaveRequestDto requestDto=MannerReviewSaveRequestDto.builder()
+                .sellerId(seller.getId())
+                .buyerId(buyer.getId())
+                .manner("GOOD_KIND").build();
+        String url="http://localhost:"+port+"/api/v1/users/"+buyer.getId()+"/buy-manner-reviews";
+        // when
+        mvc.perform(post(url)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(new ObjectMapper().writeValueAsString(requestDto)))
+                .andExpect(status().isCreated());
+        // then
+        Assertions.assertThat(mannerReviewRepository.findAll()).isNotNull();
+    }
+    @Test
+    @Transactional
+    public void userSellMannerReviewGetTest() throws Exception{
+        // given
+        User seller=userRepository.findByEmail("seller@email")
+                .orElseThrow(()->new UsernameNotFoundException("seller@email"));
+        User buyer=userRepository.findByEmail("buyer@email")
+                .orElseThrow(()->new UsernameNotFoundException("buyer@email"));
+
+        makeSuccessDealPost(buyer,seller);
+        mannerReviewRepository.save(MannerReview.builder()
+                .buyer(buyer)
+                .seller(seller)
+                .manner(Manner.GOOD_KIND).build());
+        String url="http://localhost:"+port+"/api/v1/users/"+seller.getId()+"/sell-manner-reviews";
+        // when
+        MvcResult result=mvc.perform(get(url))
+                .andExpect(status().isOk())
+                .andReturn();
+        // then
+        assertThat(result.getResponse().getContentAsString()).contains("sellerId");
+        assertThat(result.getResponse().getContentAsString()).contains("buyerId");
+    }
+    @Test
+    @Transactional
+    public void userBuyMannerReviewGetTest() throws Exception{
+        // given
+        User seller=userRepository.findByEmail("seller@email")
+                .orElseThrow(()->new UsernameNotFoundException("seller@email"));
+        User buyer=userRepository.findByEmail("buyer@email")
+                .orElseThrow(()->new UsernameNotFoundException("buyer@email"));
+
+        makeSuccessDealPost(buyer,seller);
+        mannerReviewRepository.save(MannerReview.builder()
+                .buyer(buyer)
+                .seller(seller)
+                .manner(Manner.GOOD_KIND).build());
+        String url="http://localhost:"+port+"/api/v1/users/"+buyer.getId()+"/buy-manner-reviews";
+        // when
+        MvcResult result=mvc.perform(get(url))
+                .andExpect(status().isOk())
+                .andReturn();
+        // then
+        assertThat(result.getResponse().getContentAsString()).contains("sellerId");
+        assertThat(result.getResponse().getContentAsString()).contains("buyerId");
+    }
+    @Test
+    @Transactional
+    @WithUserDetails(value = "buyer@email")
+    public void userBuyMannerReviewDeleteTest() throws Exception{
+        // given
+        User seller=userRepository.findByEmail("seller@email")
+                .orElseThrow(()->new UsernameNotFoundException("seller@email"));
+        User buyer=userRepository.findByEmail("buyer@email")
+                .orElseThrow(()->new UsernameNotFoundException("buyer@email"));
+
+        makeSuccessDealPost(buyer,seller);
+        MannerReview mannerReview=mannerReviewRepository.save(MannerReview.builder()
+                .buyer(buyer)
+                .seller(seller)
+                .manner(Manner.GOOD_KIND).build());
+        Integer mannerReviewId=mannerReview.getId();
+        String url="http://localhost:"+port+"/api/v1/users/"+buyer.getId()+"/buy-manner-reviews/"+mannerReviewId;
+        // when
+        mvc.perform(delete(url))
+                .andExpect(status().isOk());
+        // then
+        assertThat(mannerReviewRepository.findById(mannerReviewId).isPresent()).isFalse();
     }
 }
