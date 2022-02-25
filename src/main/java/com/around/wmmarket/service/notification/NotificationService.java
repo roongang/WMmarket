@@ -2,6 +2,7 @@ package com.around.wmmarket.service.notification;
 
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
+import com.around.wmmarket.controller.dto.notification.NotificationGetResponseDto;
 import com.around.wmmarket.domain.emitter.EmitterRepository;
 import com.around.wmmarket.domain.notification.Notification;
 import com.around.wmmarket.domain.notification.NotificationRepository;
@@ -76,5 +77,8 @@ public class NotificationService {
             // event 를 object(dto)로 설정해서 보낼수있음.
             _send(emitter,key,eventName,content);
         });
+    }
+    public NotificationGetResponseDto findAllById(Integer userId){
+
     }
 }
