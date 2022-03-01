@@ -6,10 +6,10 @@ import java.nio.file.Paths;
 public final class Constants {
     // Path
     public static final Path dealPostImagePath=Paths
-            .get("src","main","resources","images","dealPostImages")
+            .get("images","dealPostImage")
             .toAbsolutePath().normalize();
     public static final Path userImagePath=Paths
-            .get("src","main","resources","images","user")
+            .get("images","user")
             .toAbsolutePath().normalize();
 
     // API
