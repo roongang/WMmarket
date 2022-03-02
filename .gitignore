@@ -5,7 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 ### Image
-/src/main/resources/images/
+/images
 
 ### STS ###
 .apt_generated
