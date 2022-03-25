@@ -42,4 +42,8 @@ public class Notification extends BaseTimeEntity {
     public void prePersist(){
         isRead=(isRead!=null)?isRead:false;
     }
+
+    public void read(){
+        this.isRead=true;
+    }
 }

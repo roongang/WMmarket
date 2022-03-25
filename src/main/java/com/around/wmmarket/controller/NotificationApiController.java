@@ -10,9 +10,7 @@ import com.around.wmmarket.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Slf4j
@@ -46,9 +44,19 @@ public class NotificationApiController {
                         .forEach(user->notificationService.send(user, NotificationType.ACTIVITY,message,"sse"));
     }
     @GetMapping("/notifications")
-    public Object sendToSignedUser(@RequestParam Integer userId){
+    public Object getNotifications(@RequestParam Integer userId){
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
+                .data(notificationService.findAllById(userId))
+                .message("알림 반환 성공했습니다.")
+                .build());
+    }
+    @PutMapping("/notifications/{notificationId}")
+    public Object readNotification(@PathVariable("notificationId") Integer notificationId){
+        notificationService.readNotification(notificationId);
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("알림 읽음으로 수정 성공했습니다.")
                 .build());
     }
 }

@@ -8,6 +8,7 @@ import com.around.wmmarket.domain.notification.Notification;
 import com.around.wmmarket.domain.notification.NotificationRepository;
 import com.around.wmmarket.domain.notification.NotificationType;
 import com.around.wmmarket.domain.user.User;
+import com.around.wmmarket.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,9 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,6 +29,7 @@ public class NotificationService {
 
     private final EmitterRepository emitterRepository;
     private final NotificationRepository notificationRepository;
+    private final UserRepository userRepository;
 
     public SseEmitter subscribe(Integer userId,String lastEventId){
         String emitterId=userId+"_"+System.currentTimeMillis();
@@ -43,7 +47,7 @@ public class NotificationService {
             Map<String,Object> events=emitterRepository.findAllEventCacheStartWithById(Integer.toString(userId));
             events.entrySet().stream()
                     .filter(entry-> lastEventId.compareTo(entry.getKey())<0)
-                    .forEach(entry->{_send(emitter,entry.getKey(),EVENT_SSE,entry.getValue());});
+                    .forEach(entry-> _send(emitter,entry.getKey(),EVENT_SSE,entry.getValue()));
 
         }
         return emitter;
@@ -78,7 +82,22 @@ public class NotificationService {
             _send(emitter,key,eventName,content);
         });
     }
-    public NotificationGetResponseDto findAllById(Integer userId){
-
+    public List<NotificationGetResponseDto> findAllById(Integer userId){
+        User receiver=userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        return notificationRepository.findAllByReceiver(receiver).stream()
+                .map(notification -> NotificationGetResponseDto.builder()
+                        .id(notification.getId())
+                        .content(notification.getContent())
+                        .type(notification.getType())
+                        .isRead(notification.getIsRead())
+                        .createdDate(notification.getCreatedDate())
+                        .build())
+                .collect(Collectors.toList());
+    }
+    public void readNotification(Integer notificationId){
+        Notification notification=notificationRepository.findById(notificationId)
+                .orElseThrow(()->new CustomException(ErrorCode.UNDEFINED_RESOURCE,"id에 해당하는 알림이 존재하지 않습니다."));
+        notification.read();
     }
 }
