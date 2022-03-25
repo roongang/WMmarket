@@ -7,6 +7,7 @@ import com.around.wmmarket.domain.emitter.EmitterRepository;
 import com.around.wmmarket.domain.notification.Notification;
 import com.around.wmmarket.domain.notification.NotificationRepository;
 import com.around.wmmarket.domain.notification.NotificationType;
+import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -82,8 +83,9 @@ public class NotificationService {
             _send(emitter,key,eventName,content);
         });
     }
-    public List<NotificationGetResponseDto> findAllById(Integer userId){
-        User receiver=userRepository.findById(userId)
+    public List<NotificationGetResponseDto> findAll(SignedUser signedUser){
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        User receiver=userRepository.findByEmail(signedUser.getUsername())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         return notificationRepository.findAllByReceiver(receiver).stream()
                 .map(notification -> NotificationGetResponseDto.builder()
@@ -95,9 +97,13 @@ public class NotificationService {
                         .build())
                 .collect(Collectors.toList());
     }
-    public void readNotification(Integer notificationId){
+    public void readNotification(SignedUser signedUser,Integer notificationId){
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
         Notification notification=notificationRepository.findById(notificationId)
                 .orElseThrow(()->new CustomException(ErrorCode.UNDEFINED_RESOURCE,"id에 해당하는 알림이 존재하지 않습니다."));
+        if(!notification.getReceiver().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_NOTIFICATION);
+        // read
         notification.read();
     }
 }
