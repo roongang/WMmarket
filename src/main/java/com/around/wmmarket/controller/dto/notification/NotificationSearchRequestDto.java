@@ -1,13 +1,13 @@
 package com.around.wmmarket.controller.dto.notification;
 
 import io.swagger.annotations.ApiParam;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
-@Builder
 @Getter
+@AllArgsConstructor
+@Builder
 public class NotificationSearchRequestDto {
     @ApiParam(value = "알림 수신자 아이디",example = "1",required = false)
     private String userId;
