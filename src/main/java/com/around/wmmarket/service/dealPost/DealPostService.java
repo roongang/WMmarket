@@ -57,6 +57,7 @@ public class DealPostService {
         return DealPostGetResponseDto.builder()
                 .id(dealPost.getId())
                 .userId(dealPost.getUser()!=null?dealPost.getUser().getId():null)
+                .userNickname(dealPost.getUser()!=null?dealPost.getUser().getNickname():null)
                 .category(dealPost.getCategory())
                 .title(dealPost.getTitle())
                 .price(dealPost.getPrice())

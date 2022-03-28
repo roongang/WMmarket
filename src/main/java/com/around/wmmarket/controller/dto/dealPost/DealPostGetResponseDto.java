@@ -18,6 +18,8 @@ public class DealPostGetResponseDto {
     private Integer id;
     @ApiModelProperty(value = "유저 아이디",example = "1",required = true)
     private Integer userId;
+    @ApiModelProperty(value = "유저 닉네임",example = "멋쟁이은지",required = true)
+    private String userNickname;
     @ApiModelProperty(value = "거래 글 카테고리",example = "A",required = true)
     private Category category;
     @ApiModelProperty(value = "거래 글 제목",example = "거래 글 제목입니다.",required = true)

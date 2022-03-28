@@ -92,6 +92,7 @@ public class DealPostQueryRepository {
                 .map(dealPostEntity-> DealPostGetResponseDto.builder()
                         .id(dealPostEntity.getId())
                         .userId(dealPostEntity.getUser()!=null?dealPostEntity.getUser().getId():null)
+                        .userNickname(dealPostEntity.getUser()!=null?dealPostEntity.getUser().getNickname():null)
                         .category(dealPostEntity.getCategory())
                         .title(dealPostEntity.getTitle())
                         .price(dealPostEntity.getPrice())
