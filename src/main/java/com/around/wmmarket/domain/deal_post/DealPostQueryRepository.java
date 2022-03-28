@@ -99,8 +99,14 @@ public class DealPostQueryRepository {
                         .dealState(dealPostEntity.getDealState())
                         .createdDate(dealPostEntity.getCreatedDate())
                         .modifiedDate(dealPostEntity.getModifiedDate())
-                        .imageIds(queryFactory
+                        .imagesId(queryFactory
                                 .select(dealPostImage.id)
+                                .from(dealPostImage)
+                                .innerJoin(dealPostImage.dealPost,dealPost)
+                                .on(dealPostImage.dealPost.id.eq(dealPostEntity.getId()))
+                                .fetch())
+                        .imagesName(queryFactory
+                                .select(dealPostImage.name)
                                 .from(dealPostImage)
                                 .innerJoin(dealPostImage.dealPost,dealPost)
                                 .on(dealPostImage.dealPost.id.eq(dealPostEntity.getId()))
