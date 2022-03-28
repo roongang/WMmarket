@@ -20,18 +20,30 @@ public class Notification extends BaseTimeEntity {
 
     @ManyToOne
     @JoinColumn(name = "USER_ID")
-    private User user;
+    private User receiver;
 
     @Column(nullable = false)
     private String content;
 
     @Column(nullable = false)
-    private String type;
+    private NotificationType type;
+
+    @Column(nullable = false)
+    private Boolean isRead;
 
     @Builder
-    public Notification(User user,String content,String type){
-        this.user=user;
+    public Notification(User receiver,String content,NotificationType type){
+        this.receiver=receiver;
         this.content=content;
         this.type=type;
+    }
+
+    @PrePersist
+    public void prePersist(){
+        isRead=(isRead!=null)?isRead:false;
+    }
+
+    public void read(){
+        this.isRead=true;
     }
 }

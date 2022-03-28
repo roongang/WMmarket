@@ -35,6 +35,7 @@ public enum ErrorCode {
     DUPLICATED_USER_AUTH(BAD_REQUEST,"U010","이미 인증된 회원입니다."),
     INVALID_AUTH_CODE(BAD_REQUEST,"U011","인증 코드가 일치하지 않습니다."),
     DUPLICATED_USER_NICKNAME(BAD_REQUEST,"U012","중복된 회원 닉네임이 있습니다."),
+    UNAUTHORIZED_USER_TO_NOTIFICATION(FORBIDDEN,"U013","알림에 대한 권한이 없습니다."),
 
     // Deal
     UNAUTHORIZED_USER_TO_DEALPOST(FORBIDDEN,"D001","거래글에대한 권한이 없습니다."),
@@ -58,6 +59,7 @@ public enum ErrorCode {
     SESSION_NULL(BAD_REQUEST,"C004","session 이 null 입니다."),
     SESSION_ALREADY_INVALIDATED(BAD_REQUEST,"C005","session 이 이미 비활성화 되었습니다."),
     DUPLICATED_RESOURCE(BAD_REQUEST,"C006","중복된 자원이 이미 존재합니다."),
+    UNDEFINED_RESOURCE(BAD_REQUEST,"C007","해당 자원이 존재하지 않습니다."),
 
     // Server
     UNDEFINED_ERROR(INTERNAL_SERVER_ERROR, "S001", "정의되지 않은 에러입니다."),

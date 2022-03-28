@@ -63,7 +63,7 @@ public class User extends BaseTimeEntity {
 
     // 관계 매핑
     // not yet
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "receiver")
     private final List<Notification> notifications = new ArrayList<>();
 
     // not yet
