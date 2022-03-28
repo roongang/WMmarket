@@ -37,7 +37,12 @@ public class NotificationService {
     private final UserRepository userRepository;
     private final NotificationQueryRepository notificationQueryRepository;
 
-    public SseEmitter subscribe(Integer userId,String lastEventId){
+    public SseEmitter subscribe(SignedUser signedUser,String lastEventId){
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        int userId=userRepository.findByEmail(signedUser.getUsername())
+                .orElseThrow(()-> new CustomException(ErrorCode.USER_NOT_FOUND))
+                .getId();
         String emitterId=userId+"_"+System.currentTimeMillis();
         SseEmitter emitter=emitterRepository.save(emitterId,new SseEmitter(TIMEOUT));
 

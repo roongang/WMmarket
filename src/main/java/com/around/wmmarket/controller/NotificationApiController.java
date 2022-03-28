@@ -3,19 +3,18 @@ package com.around.wmmarket.controller;
 import com.around.wmmarket.common.Constants;
 import com.around.wmmarket.common.ResponseHandler;
 import com.around.wmmarket.common.SuccessResponse;
+import com.around.wmmarket.controller.dto.notification.NotificationGetResponseDto;
 import com.around.wmmarket.controller.dto.notification.NotificationSearchRequestDto;
-import com.around.wmmarket.domain.notification.NotificationType;
-import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.SignedUser;
-import com.around.wmmarket.domain.user.User;
-import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.service.notification.NotificationService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -30,35 +29,17 @@ import javax.validation.constraints.Min;
 @RestController
 public class NotificationApiController {
     private final NotificationService notificationService;
-    // TEST CODE
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @ApiOperation(value = "Emitter 구독하기")
     @GetMapping(value = "/subs",produces = "text/event-stream")
-    public SseEmitter subscribe(@Min(1) @RequestParam Integer userId,
+    public SseEmitter subscribe(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                 @RequestParam(value = "lastEventId", required = false, defaultValue = "") String lastEventId){
-        // TEST CODE make user
-        if(userRepository.findById(userId).isEmpty()){
-            userRepository.save(User.builder()
-                    .email("user"+userId+"@email")
-                    .password(passwordEncoder.encode("password"))
-                    .nickname("nickname"+userId)
-                    .role(Role.USER)
-                    .build());
-        }
-        log.info("subs userId:{},lastEventId:{}",userId,lastEventId);
-        return notificationService.subscribe(userId,lastEventId);
+        return notificationService.subscribe(signedUser,lastEventId);
     }
-    // TEST CODE
-    @ApiOperation(value = "테스트 : 메시지 보내기")
-    @GetMapping("/pubs")
-    public void sendToAllUser(String message){
-        log.info("pubs message:{}",message);
-        userRepository.findAll()
-                        .forEach(user->notificationService.send(user, NotificationType.ACTIVITY,message,"sse"));
-    }
-    @ApiOperation(value = "로그인한 유저의 알림 받기")
+    @ApiOperation(value = "로그인한 유저의 모든 알림 받기")
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "return data : List<NotificationGetResponseDto>",response = NotificationGetResponseDto.class),
+    })
     @GetMapping("/notifications")
     public Object getNotifications(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser){
         return ResponseHandler.toResponse(SuccessResponse.builder()
@@ -78,6 +59,9 @@ public class NotificationApiController {
                 .build());
     }
     @ApiOperation(value = "알림 검색하기")
+    @ApiResponses({
+            @ApiResponse(code = 200,message = "return data : slice",response = Slice.class),
+    })
     @GetMapping("/notifications/page")
     public Object searchNotifications(NotificationSearchRequestDto requestDto){
         return ResponseHandler.toResponse(SuccessResponse.builder()
