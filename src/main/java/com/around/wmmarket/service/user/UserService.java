@@ -169,8 +169,7 @@ public class UserService{
 
         // update
         // delete remain image
-        if(user.getImage()==null) throw new CustomException(ErrorCode.USER_IMAGE_NOT_FOUND);
-        deleteImage(signedUser,userId);
+        if(user.getImage()!=null) deleteImage(signedUser,userId);
         // new image
         String image=fileHandler.parseUserImage(file);
         user.setImage(image);
