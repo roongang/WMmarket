@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 public final class Constants {
     // Path
     public static final Path dealPostImagePath=Paths
-            .get("images","dealPostImage")
+            .get("images","dealPost")
             .toAbsolutePath().normalize();
     public static final Path userImagePath=Paths
             .get("images","user")

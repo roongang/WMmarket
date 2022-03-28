@@ -3,6 +3,7 @@ package com.around.wmmarket.service.dealPost;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.dealPost.*;
+import com.around.wmmarket.controller.dto.dealPostImage.DealPostImageGetResponseDto;
 import com.around.wmmarket.domain.deal_post.*;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
 import com.around.wmmarket.domain.user.SignedUser;
@@ -63,7 +64,9 @@ public class DealPostService {
                 .dealState(dealPost.getDealState())
                 .createdDate(dealPost.getCreatedDate())
                 .modifiedDate(dealPost.getModifiedDate())
-                .imageIds(dealPost.getDealPostImages().stream()
+                .imagesName(dealPost.getDealPostImages().stream()
+                        .map(DealPostImage::getName).collect(Collectors.toList()))
+                .imagesId(dealPost.getDealPostImages().stream()
                         .map(DealPostImage::getId).collect(Collectors.toList()))
                 .viewCnt(dealPost.getViewCnt())
                 .pullingCnt(dealPost.getPullingCnt())
@@ -82,11 +85,14 @@ public class DealPostService {
         return signedUser.getUsername().equals(dealPost.getUser().getEmail());
     }
 
-    public List<Integer> getImages(Integer dealPostId){
+    public List<DealPostImageGetResponseDto> getImages(Integer dealPostId){
         DealPost dealPost=dealPostRepository.findById(dealPostId)
                 .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
         return dealPost.getDealPostImages().stream()
-                .map(DealPostImage::getId)
+                .map(dealPostImage-> DealPostImageGetResponseDto.builder()
+                        .id(dealPostImage.getId())
+                        .name(dealPostImage.getName())
+                        .build())
                 .collect(Collectors.toList());
     }
 
@@ -142,8 +148,10 @@ public class DealPostService {
         if(dealPost.getUser()==null) throw new CustomException(ErrorCode.DEALPOST_USER_NOT_FOUND);
         if(!dealPost.getUser().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEALPOST);
         // delete
-        dealPost.getDealPostImages().stream()
+        List<Integer> dealPostImageIdList=dealPost.getDealPostImages().stream()
                 .map(DealPostImage::getId)
+                .collect(Collectors.toList());
+        dealPostImageIdList.stream()
                 .forEach(dealPostImageService::delete);
         dealPostRepository.delete(dealPost);
     }

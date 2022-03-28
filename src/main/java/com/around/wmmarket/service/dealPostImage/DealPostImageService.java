@@ -33,10 +33,11 @@ public class DealPostImageService {
                 .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
         if(!dealPost.getUser().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEALPOST);
         // save
-        return new DealPostImageSaveResponseDto(
-                this.save(dealPost,files).stream()
-                        .map(DealPostImage::getId)
-                        .collect(Collectors.toList()));
+        List<DealPostImage> dealPostImages=this.save(dealPost,files);
+        return DealPostImageSaveResponseDto.builder()
+                .ids(dealPostImages.stream().map(DealPostImage::getId).collect(Collectors.toList()))
+                .names(dealPostImages.stream().map(DealPostImage::getName).collect(Collectors.toList()))
+                .build();
     }
 
     @Transactional

@@ -33,7 +33,9 @@ public class DealPostGetResponseDto {
     @ApiModelProperty(value = "거래 글 수정시간",example = "2022-01-04 09:38:32.470811",required = true)
     private LocalDateTime modifiedDate;
     @ApiModelProperty(value = "거래 글 이미지 아이디 리스트",example = "[1,2,3]",required = true)
-    private List<Integer> imageIds;
+    private List<Integer> imagesId;
+    @ApiModelProperty(value = "거래 글 이미지 이름 리스트",example = "[1.jpg,2.jpg,3.jpg]",required = true)
+    private List<String> imagesName;
     @ApiModelProperty(value = "거래 글 조회수",example = "10",required = true)
     private Integer viewCnt;
     @ApiModelProperty(value = "거래 글 끌어올리기 횟수",example = "0",required = true)
