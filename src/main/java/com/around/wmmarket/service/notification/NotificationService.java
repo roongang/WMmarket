@@ -3,8 +3,10 @@ package com.around.wmmarket.service.notification;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.notification.NotificationGetResponseDto;
+import com.around.wmmarket.controller.dto.notification.NotificationSearchRequestDto;
 import com.around.wmmarket.domain.emitter.EmitterRepository;
 import com.around.wmmarket.domain.notification.Notification;
+import com.around.wmmarket.domain.notification.NotificationQueryRepository;
 import com.around.wmmarket.domain.notification.NotificationRepository;
 import com.around.wmmarket.domain.notification.NotificationType;
 import com.around.wmmarket.domain.user.SignedUser;
@@ -12,11 +14,13 @@ import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,6 +35,7 @@ public class NotificationService {
     private final EmitterRepository emitterRepository;
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final NotificationQueryRepository notificationQueryRepository;
 
     public SseEmitter subscribe(Integer userId,String lastEventId){
         String emitterId=userId+"_"+System.currentTimeMillis();
@@ -105,5 +110,15 @@ public class NotificationService {
         if(!notification.getReceiver().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_NOTIFICATION);
         // read
         notification.read();
+    }
+    public Slice<NotificationGetResponseDto> findByFilter(NotificationSearchRequestDto requestDto){
+        Map<String,String> filter=new HashMap<>();
+        filter.put("userId",requestDto.getUserId());
+        filter.put("content",requestDto.getContent());
+        filter.put("type",requestDto.getType());
+        filter.put("isRead",requestDto.getIsRead());
+        filter.put("createdDate",requestDto.getCreatedDate());
+        // search
+        return notificationQueryRepository.findByFilter(filter);
     }
 }
