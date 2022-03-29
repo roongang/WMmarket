@@ -6,6 +6,7 @@ import com.around.wmmarket.common.ResponseHandler;
 import com.around.wmmarket.common.SuccessResponse;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
+import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
 import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveRequestDto;
 import com.around.wmmarket.controller.dto.user.*;
 import com.around.wmmarket.domain.user.SignedUser;
@@ -45,7 +46,6 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collections;
 
 @Slf4j
@@ -263,16 +263,16 @@ public class UserApiController {
                 .build());
     }
 
-    @ApiOperation(value = "유저 좋아요 ID 리스트 반환") // SWAGGER
+    @ApiOperation(value = "유저 좋아요한 거래글 리스트 반환") // SWAGGER
     @ApiResponses({
-            @ApiResponse(code = 200,message = "return data : List dealPostId",response = ArrayList.class),
+            @ApiResponse(code = 200,message = "return data : List DealPostGetResponseDto",response = DealPostGetResponseDto.class),
     }) // SWAGGER
     @GetMapping("/users/{userId}/likes")
     public ResponseEntity<Object> getLikes(
             @Min(1) @PathVariable("userId") Integer userId) {
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
-                .message("유저 좋아요 ID 리스트 반환 성공했습니다.")
+                .message("유저 좋아요한 거래글 반환 성공했습니다.")
                 .data(userService.getLikes(userId)).build());
     }
 

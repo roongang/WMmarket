@@ -12,6 +12,7 @@ import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveResponseD
 import com.around.wmmarket.controller.dto.user.*;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
+import com.around.wmmarket.domain.deal_post_image.DealPostImage;
 import com.around.wmmarket.domain.manner_review.MannerReview;
 import com.around.wmmarket.domain.user.*;
 import com.around.wmmarket.domain.user_like.UserLike;
@@ -195,14 +196,34 @@ public class UserService{
         userLikeService.save(userId,dealPostId);
     }
 
-    public List<Integer> getLikes(Integer userId){
+    public List<DealPostGetResponseDto> getLikes(Integer userId){
         // check
         User user=userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         // get
         return user.getUserLikes().stream()
                 .map(UserLike::getDealPost)
-                .map(DealPost::getId)
+                .map(dealPost -> DealPostGetResponseDto.builder()
+                        .id(dealPost.getId())
+                        .userId(dealPost.getUser()!=null?dealPost.getUser().getId():null)
+                        .userNickname(dealPost.getUser()!=null?dealPost.getUser().getNickname():null)
+                        .category(dealPost.getCategory())
+                        .title(dealPost.getTitle())
+                        .price(dealPost.getPrice())
+                        .content(dealPost.getContent())
+                        .dealState(dealPost.getDealState())
+                        .createdDate(dealPost.getCreatedDate())
+                        .modifiedDate(dealPost.getModifiedDate())
+                        .imagesId(dealPost.getDealPostImages().stream()
+                                .map(DealPostImage::getId)
+                                .collect(Collectors.toList()))
+                        .imagesName(dealPost.getDealPostImages().stream()
+                                .map(DealPostImage::getName)
+                                .collect(Collectors.toList()))
+                        .viewCnt(dealPost.getViewCnt())
+                        .pullingCnt(dealPost.getPullingCnt())
+                        .pullingDate(dealPost.getPullingDate())
+                        .build())
                 .collect(Collectors.toList());
     }
     public void deleteLike(SignedUser signedUser,Integer userId,Integer dealPostId){
