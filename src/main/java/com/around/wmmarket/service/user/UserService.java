@@ -6,6 +6,7 @@ import com.around.wmmarket.common.FileHandler;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
+import com.around.wmmarket.controller.dto.keyword.KeyWordGetResponseDto;
 import com.around.wmmarket.controller.dto.mannerReview.MannerReviewGetResponseDto;
 import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveRequestDto;
 import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveResponseDto;
@@ -13,6 +14,8 @@ import com.around.wmmarket.controller.dto.user.*;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
+import com.around.wmmarket.domain.keyword.Keyword;
+import com.around.wmmarket.domain.keyword.KeywordRepository;
 import com.around.wmmarket.domain.manner_review.MannerReview;
 import com.around.wmmarket.domain.user.*;
 import com.around.wmmarket.domain.user_like.UserLike;
@@ -36,6 +39,7 @@ public class UserService{
     private final UserRepository userRepository;
     private final UserQueryRepository userQueryRepository;
     private final DealPostRepository dealPostRepository;
+    private final KeywordRepository keywordRepository;
 
     private final UserLikeService userLikeService;
     private final DealPostService dealPostService;
@@ -340,5 +344,34 @@ public class UserService{
             builder.append(String.format("%02x",b));
         }
         return builder.toString();
+    }
+    // keyword
+    public List<KeyWordGetResponseDto> getKeyWords(SignedUser signedUser,Integer userId){
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        User user=userRepository.findByEmail(signedUser.getUsername())
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        if(!user.getId().equals(userId)) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+        return user.getKeywords().stream()
+                .map(keyword -> KeyWordGetResponseDto.builder()
+                        .id(keyword.getId())
+                        .userId(keyword.getUser()!=null?keyword.getUser().getId():null)
+                        .userNickname(keyword.getUser()!=null?keyword.getUser().getNickname():null)
+                        .word(keyword.getWord())
+                        .createdDate(keyword.getCreatedDate())
+                        .build())
+                .collect(Collectors.toList());
+    }
+    public void deleteKeyWordByWord(SignedUser signedUser,Integer userId,String word){
+        // check
+        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        User user=userRepository.findByEmail(signedUser.getUsername())
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        if(!user.getId().equals(userId)) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+        // delete
+        Optional<Keyword> keyword=user.getKeywords().stream()
+                .filter(tmp_keyword -> tmp_keyword.getWord().equals(word))
+                .findFirst();
+        keyword.ifPresent(keywordRepository::delete);
     }
 }
