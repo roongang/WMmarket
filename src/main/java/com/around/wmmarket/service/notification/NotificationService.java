@@ -63,7 +63,7 @@ public class NotificationService {
         }
         return emitter;
     }
-    private void _send(SseEmitter emitter,String id,String eventName,Object data){
+    private void _send(SseEmitter emitter, String id, String eventName, Object data){
         try {
             log.info("send message id:{},eventName:{}",id,eventName);
             emitter.send(SseEmitter.event()
@@ -77,10 +77,11 @@ public class NotificationService {
         }
     }
     @Transactional
-    public void send(User receiver, NotificationType type,String content,String eventName){
+    public void send(User receiver, NotificationType type,String content,String url,String eventName){
         Notification notification=Notification.builder()
                 .receiver(receiver)
                 .content(content)
+                .url(url)
                 .type(type)
                 .build();
         String userId=Integer.toString(receiver.getId());
@@ -101,6 +102,7 @@ public class NotificationService {
                 .map(notification -> NotificationGetResponseDto.builder()
                         .id(notification.getId())
                         .content(notification.getContent())
+                        .url(notification.getUrl())
                         .type(notification.getType())
                         .isRead(notification.getIsRead())
                         .createdDate(notification.getCreatedDate())
@@ -119,6 +121,7 @@ public class NotificationService {
     public Slice<NotificationGetResponseDto> findByFilter(NotificationSearchRequestDto requestDto){
         Map<String,String> filter=new HashMap<>();
         filter.put("userId",requestDto.getUserId());
+        filter.put("userNickname",requestDto.getUserNickname());
         filter.put("content",requestDto.getContent());
         filter.put("type",requestDto.getType());
         filter.put("isRead",requestDto.getIsRead());

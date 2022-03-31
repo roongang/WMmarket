@@ -129,5 +129,6 @@ public class User extends BaseTimeEntity {
         while(!this.dealSuccesses.isEmpty()) this.dealSuccesses.get(this.dealSuccesses.size()-1).setBuyer(null);
         while(!this.sellMannerReviews.isEmpty()) this.sellMannerReviews.get(this.sellDealReviews.size()-1).setSeller(null);
         while(!this.buyMannerReviews.isEmpty()) this.buyMannerReviews.get(this.buyMannerReviews.size()-1).setBuyer(null);
+        while(!this.keywords.isEmpty()) this.keywords.get(this.keywords.size()-1).setUser(null);
     }
 }

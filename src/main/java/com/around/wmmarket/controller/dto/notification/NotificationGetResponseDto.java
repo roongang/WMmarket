@@ -16,6 +16,8 @@ public class NotificationGetResponseDto {
     private Integer id;
     @ApiModelProperty(value = "알림 내용",example = "수박마켓 알림입니다.",required = true)
     private String content;
+    @ApiModelProperty(value = "알림 리소스 url",example = "/api/v1/deal-posts/1",required = true)
+    private String url;
     @ApiModelProperty(value = "알림 타입",example = "ACTIVITY",required = true)
     private NotificationType type;
     @ApiModelProperty(value = "알림 읽음 여부",example = "false",required = true)

@@ -37,6 +37,7 @@ public class NotificationQueryRepository {
                 .limit(pageable.getPageSize()+1)
                 .where(
                         userIdEq(filter.get("userId")),
+                        userNicknameEq(filter.get("userNickname")),
                         typeEq(filter.get("type")),
                         isReadEq(filter.get("isRead")),
                         // content
@@ -54,7 +55,13 @@ public class NotificationQueryRepository {
                 .fetch();
         // content
         List<NotificationGetResponseDto> content=notificationList.stream()
-                .map(notificationEntity -> NotificationGetResponseDto.builder().build())
+                .map(notificationEntity -> NotificationGetResponseDto.builder()
+                        .id(notificationEntity.getId())
+                        .content(notificationEntity.getContent())
+                        .url(notificationEntity.getUrl())
+                        .isRead(notificationEntity.getIsRead())
+                        .type(notificationEntity.getType())
+                        .createdDate(notificationEntity.getCreatedDate()).build())
                 .collect(Collectors.toList());
         boolean hasNext=false;
         if(content.size()>pageable.getPageSize()){
@@ -66,6 +73,9 @@ public class NotificationQueryRepository {
     // BooleanExpression
     private BooleanExpression userIdEq(String userId){
         return hasText(userId)?notification.receiver.id.eq(Integer.parseInt(userId)):null;
+    }
+    private BooleanExpression userNicknameEq(String userNickname){
+        return hasText(userNickname)?notification.receiver.nickname.eq(userNickname):null;
     }
     private BooleanExpression typeEq(String type){
         return hasText(type)?notification.type.eq(NotificationType.valueOf(type)):null;

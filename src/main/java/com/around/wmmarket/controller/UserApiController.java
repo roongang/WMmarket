@@ -378,4 +378,25 @@ public class UserApiController {
                 .message("유저 인증 성공했습니다.")
                 .build());
     }
+    // keyword
+    @ApiOperation(value = "유저 키워드 반환")
+    @GetMapping("/users/{userId}/keywords")
+    public ResponseEntity<Object> getUserKeyWords(@AuthenticationPrincipal SignedUser signedUser,
+                                                  @PathVariable("userId") Integer userId){
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .data(userService.getKeyWords(signedUser,userId))
+                .message("유저 키워드 반환 성공했습니다.")
+                .build());
+    }
+    @ApiOperation(value = "유저 키워드 삭제")
+    @DeleteMapping("/users/{userId}/keywords")
+    public ResponseEntity<Object> deleteUserKeyWordByWord(@AuthenticationPrincipal SignedUser signedUser,
+                                                          @PathVariable("userId") Integer userId,
+                                                          @NotNull @RequestParam String word){
+        userService.deleteKeyWordByWord(signedUser,userId,word);
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("유저 키워드 삭제 성공했습니다.").build());
+    }
 }

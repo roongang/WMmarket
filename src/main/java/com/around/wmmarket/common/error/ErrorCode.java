@@ -36,6 +36,7 @@ public enum ErrorCode {
     INVALID_AUTH_CODE(BAD_REQUEST,"U011","인증 코드가 일치하지 않습니다."),
     DUPLICATED_USER_NICKNAME(BAD_REQUEST,"U012","중복된 회원 닉네임이 있습니다."),
     UNAUTHORIZED_USER_TO_NOTIFICATION(FORBIDDEN,"U013","알림에 대한 권한이 없습니다."),
+    UNAUTHORIZED_USER_TO_KEYWORD(FORBIDDEN,"U014","키워드에 대한 권한이 없습니다."),
 
     // Deal
     UNAUTHORIZED_USER_TO_DEALPOST(FORBIDDEN,"D001","거래글에대한 권한이 없습니다."),
@@ -51,6 +52,7 @@ public enum ErrorCode {
     DEALPOST_STATE_SAME(BAD_REQUEST,"D011","거래글 상태가 이전과 동일합니다."),
     UNAUTHORIZED_USER_TO_MANNER_REVIEW(BAD_REQUEST,"D012","매너 리뷰에대한 권한이 없습니다."),
     MANNER_REVIEW_NOT_FOUND(BAD_REQUEST,"D013","매너 리뷰를 찾을 수 없습니다."),
+    KEYWORD_NOT_FOUND(BAD_REQUEST,"D014","키워드를 찾을 수 없습니다."),
 
     // Common
     INVALID_TYPE_VALUE(BAD_REQUEST, "C001", "Invalid Type Value"),
