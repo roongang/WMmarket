@@ -77,10 +77,11 @@ public class NotificationService {
         }
     }
     @Transactional
-    public void send(User receiver, NotificationType type,String content,String eventName){
+    public void send(User receiver, NotificationType type,String content,String url,String eventName){
         Notification notification=Notification.builder()
                 .receiver(receiver)
                 .content(content)
+                .url(url)
                 .type(type)
                 .build();
         String userId=Integer.toString(receiver.getId());
@@ -101,6 +102,7 @@ public class NotificationService {
                 .map(notification -> NotificationGetResponseDto.builder()
                         .id(notification.getId())
                         .content(notification.getContent())
+                        .url(notification.getUrl())
                         .type(notification.getType())
                         .isRead(notification.getIsRead())
                         .createdDate(notification.getCreatedDate())

@@ -1,5 +1,6 @@
 package com.around.wmmarket.service.dealPost;
 
+import com.around.wmmarket.common.Constants;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
 import com.around.wmmarket.controller.dto.dealPost.*;
@@ -217,6 +218,7 @@ public class DealPostService {
                 .forEach(user -> notificationService.send(user
                         , NotificationType.KEYWORD
                         ,"키워드로 등록된 게시글이 올라왔습니다!"
+                        , Constants.API_PATH +"/deal-posts/"+dealPost.getId()
                         ,NotificationType.KEYWORD.name()));
     }
 }

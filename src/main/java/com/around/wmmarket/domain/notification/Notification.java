@@ -25,6 +25,9 @@ public class Notification extends BaseTimeEntity {
     @Column(nullable = false)
     private String content;
 
+    @Column(nullable = true)
+    private String url;
+
     @Column(nullable = false)
     private NotificationType type;
 
@@ -32,9 +35,10 @@ public class Notification extends BaseTimeEntity {
     private Boolean isRead;
 
     @Builder
-    public Notification(User receiver,String content,NotificationType type){
+    public Notification(User receiver,String content,String url,NotificationType type){
         this.receiver=receiver;
         this.content=content;
+        this.url=url;
         this.type=type;
     }
 
