@@ -63,7 +63,7 @@ public class NotificationService {
         }
         return emitter;
     }
-    private void _send(SseEmitter emitter,String id,String eventName,Object data){
+    private void _send(SseEmitter emitter, String id, String eventName, Object data){
         try {
             log.info("send message id:{},eventName:{}",id,eventName);
             emitter.send(SseEmitter.event()

@@ -6,13 +6,18 @@ import com.around.wmmarket.controller.dto.dealPost.*;
 import com.around.wmmarket.controller.dto.dealPostImage.DealPostImageGetResponseDto;
 import com.around.wmmarket.domain.deal_post.*;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
+import com.around.wmmarket.domain.keyword.Keyword;
+import com.around.wmmarket.domain.keyword.KeywordRepository;
+import com.around.wmmarket.domain.notification.NotificationType;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.service.dealPostImage.DealPostImageService;
 import com.around.wmmarket.service.dealSuccess.DealSuccessService;
+import com.around.wmmarket.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -28,9 +33,11 @@ public class DealPostService {
     private final DealPostRepository dealPostRepository;
     private final DealPostQueryRepository dealPostQueryRepository;
     private final UserRepository userRepository;
+    private final KeywordRepository keywordRepository;
     // service
     private final DealPostImageService dealPostImageService;
     private final DealSuccessService dealSuccessService;
+    private final NotificationService notificationService;
 
     @Transactional
     public DealPostSaveResponseDto save(SignedUser signedUser, DealPostSaveRequestDto requestDto) {
@@ -47,7 +54,12 @@ public class DealPostService {
                 .content(requestDto.getContent())
                 .dealState(DealState.ONGOING).build();
         if(requestDto.getFiles()!=null) dealPostImageService.save(dealPost,requestDto.getFiles());
-        return new DealPostSaveResponseDto(dealPostRepository.save(dealPost).getId());
+        DealPostSaveResponseDto response=DealPostSaveResponseDto.builder()
+                .id(dealPostRepository.save(dealPost).getId())
+                .build();
+        // 거래 글 알림 전송
+        sendDealPostNotification(dealPost);
+        return response;
     }
 
     public DealPostGetResponseDto getDealPostDto(Integer id) {
@@ -191,5 +203,20 @@ public class DealPostService {
         if(!dealPost.getUser().getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_DEALPOST);
         // pull
         dealPost.increasePullingCnt();
+    }
+
+    @Async
+    public void sendDealPostNotification(DealPost dealPost){
+        keywordRepository.findAll().stream()
+                .filter(keyword ->
+                        dealPost.getTitle().contains(keyword.getWord())
+                        || dealPost.getContent().contains(keyword.getWord())
+                        || dealPost.getCategory().name().contains(keyword.getWord()))
+                .map(Keyword::getUser)
+                .collect(Collectors.toSet())
+                .forEach(user -> notificationService.send(user
+                        , NotificationType.KEYWORD
+                        ,"키워드로 등록된 게시글이 올라왔습니다!"
+                        ,NotificationType.KEYWORD.name()));
     }
 }
