@@ -121,6 +121,7 @@ public class NotificationService {
     public Slice<NotificationGetResponseDto> findByFilter(NotificationSearchRequestDto requestDto){
         Map<String,String> filter=new HashMap<>();
         filter.put("userId",requestDto.getUserId());
+        filter.put("userNickname",requestDto.getUserNickname());
         filter.put("content",requestDto.getContent());
         filter.put("type",requestDto.getType());
         filter.put("isRead",requestDto.getIsRead());

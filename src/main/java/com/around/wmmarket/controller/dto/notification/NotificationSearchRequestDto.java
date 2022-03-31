@@ -11,6 +11,8 @@ import lombok.Getter;
 public class NotificationSearchRequestDto {
     @ApiParam(value = "알림 수신자 아이디",example = "1",required = false)
     private String userId;
+    @ApiParam(value = "알림 수신자 닉네임",example = "test_nickname",required = false)
+    private String userNickname;
     @ApiParam(value = "알림 내용",example = "알림입니다.",required = false)
     private String content;
     @ApiParam(value = "알림 타입",example = "ACTIVITY",required = false)
