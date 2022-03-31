@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @Service
 public class NotificationService {
     private static final Long TIMEOUT=60L*1000*60;
-    private static final String EVENT_SSE="sse";
+    private static final String CONNECTION="connection";
 
     private final EmitterRepository emitterRepository;
     private final NotificationRepository notificationRepository;
@@ -50,7 +50,7 @@ public class NotificationService {
         emitter.onTimeout(()->emitterRepository.deleteById(emitterId));
 
         // SEND EVENT FOR ERROR 503
-        _send(emitter,emitterId,EVENT_SSE,"EventStream_Created.[userId="+userId+"]");
+        _send(emitter,emitterId,CONNECTION,"EventStream_Created.[userId="+userId+"]");
 
         // lastEventId
         if(lastEventId!=null && !lastEventId.isEmpty()){
@@ -58,7 +58,7 @@ public class NotificationService {
             Map<String,Object> events=emitterRepository.findAllEventCacheStartWithById(Integer.toString(userId));
             events.entrySet().stream()
                     .filter(entry-> lastEventId.compareTo(entry.getKey())<0)
-                    .forEach(entry-> _send(emitter,entry.getKey(),EVENT_SSE,entry.getValue()));
+                    .forEach(entry-> _send(emitter,entry.getKey(),CONNECTION,entry.getValue()));
 
         }
         return emitter;
