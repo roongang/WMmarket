@@ -10,7 +10,7 @@ import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
 import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveRequestDto;
 import com.around.wmmarket.controller.dto.user.*;
 import com.around.wmmarket.domain.user.SignedUser;
-import com.around.wmmarket.service.user.CustomUserDetailsService;
+import com.around.wmmarket.service.user.SignService;
 import com.around.wmmarket.service.user.UserService;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.annotations.ApiOperation;
@@ -26,13 +26,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -55,9 +49,7 @@ import java.util.Collections;
 @RestController
 public class UserApiController {
     private final UserService userService;
-    private final CustomUserDetailsService customUserDetailsService;
-
-    private final AuthenticationManager authenticationManager;
+    private final SignService signService;
     private final ResourceLoader resourceLoader;
     private final Tika tika=new Tika();
 
@@ -86,29 +78,7 @@ public class UserApiController {
     @PostMapping("/signin")
     public ResponseEntity<Object> signin(@Valid @RequestBody UserSignInRequestDto requestDto,
                                          @ApiIgnore HttpSession session){
-        // 이미 로그인한 유저면 반환
-        if(session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY)!=null) throw new CustomException(ErrorCode.DUPLICATED_SIGN_IN);
-
-        SignedUser signedUser;
-        try { signedUser = customUserDetailsService.getSignedUser(requestDto);}
-        catch (UsernameNotFoundException e) {
-            session.invalidate();
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        }
-        // 인증 토큰 발급
-        UsernamePasswordAuthenticationToken token =
-                new UsernamePasswordAuthenticationToken(signedUser.getUsername(),signedUser.getPassword());
-        // 인증 객체
-        Authentication authentication;
-        try{ authentication = authenticationManager.authenticate(token);}
-        catch (Exception e){
-            session.invalidate();
-            throw new CustomException(ErrorCode.INVALID_USER_PASSWORD);
-        }
-        // 시큐리티 컨텍스트에 인증 저장
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        // 세션에 컨텍스트 저장
-        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,SecurityContextHolder.getContext());
+        signService.signin(requestDto,session);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                         .status(HttpStatus.CREATED)
                         .message("유저 로그인 성공했습니다.").build());
@@ -116,10 +86,7 @@ public class UserApiController {
     @ApiOperation(value = "유저 로그아웃") // SWAGGER
     @PostMapping("/signout")
     public ResponseEntity<Object> signout(@ApiIgnore HttpSession session){
-        if(session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY)==null){
-            throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
-        }
-        session.invalidate();
+        signService.signout(session);
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 로그아웃 성공했습니다.")
