@@ -13,7 +13,8 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry){
         registry.addMapping("/**")
                 .allowedOrigins("*") // TODO : 나중엔 프론트 서버만
-                .allowedMethods("*");
+                .allowedMethods("*")
+                .allowCredentials(true);
     }
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry){
