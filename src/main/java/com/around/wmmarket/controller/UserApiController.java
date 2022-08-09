@@ -165,7 +165,13 @@ public class UserApiController {
     public ResponseEntity<Object> getImage(
             @Min(1) @PathVariable("userId") Integer userId) {
         String fileName= userService.getImage(userId);
-        if(fileName==null) throw new CustomException(ErrorCode.USER_IMAGE_NOT_FOUND);
+        if(fileName==null) {
+            return ResponseHandler.toResponse(SuccessResponse.builder()
+                    .status(HttpStatus.OK)
+                    .message("유저 이미지 반환 성공했습니다.(이미지 존재하지 않음)")
+                    .data(Collections.emptyList())
+                    .build());
+        }
         Resource resource=resourceLoader.getResource("file:"+ Paths.get(Constants.userImagePath.toString(),fileName));
 
         File file;
