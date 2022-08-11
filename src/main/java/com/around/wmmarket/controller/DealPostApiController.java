@@ -89,6 +89,17 @@ public class DealPostApiController {
                 .build());
     }
 
+    @ApiOperation(value = "거래글 조회수 증가")
+    @PutMapping("/deal-posts/{dealPostId}/view-cnt")
+    public ResponseEntity<?> increaseViewCnt(@Min(1) @PathVariable("dealPostId") Integer dealPostId,
+                                             @Valid @RequestBody DealPostUpdateRequestDto requestDto){
+        dealPostService.increaseViewCnt(dealPostId,requestDto.getViewCnt());
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .message("거래글 조회수 증가 성공했습니다.")
+                .build());
+    }
+
     @ApiOperation(value = "거래 글 삭제") // SWAGGER
     @DeleteMapping("/deal-posts/{dealPostId}")
     public ResponseEntity<?> delete(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,

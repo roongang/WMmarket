@@ -154,6 +154,15 @@ public class DealPostService {
     }
 
     @Transactional
+    public void increaseViewCnt(Integer dealPostId,Integer viewCnt){
+        // check
+        DealPost dealPost=dealPostRepository.findById(dealPostId)
+                .orElseThrow(() -> new CustomException(ErrorCode.DEALPOST_NOT_FOUND));
+        // update
+        dealPost.increaseViewCnt(viewCnt);
+    }
+
+    @Transactional
     public void delete(SignedUser signedUser,Integer dealPostId) {
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);

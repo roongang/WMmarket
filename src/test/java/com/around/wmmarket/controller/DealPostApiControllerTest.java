@@ -152,6 +152,37 @@ public class DealPostApiControllerTest {
     @Test
     @Transactional
     @WithUserDetails(value = "user@email")
+    public void dealPostIncreaseViewCntTest() throws Exception{
+        // given
+        dealPostRepository.save(DealPost.builder()
+                .user(user)
+                .title("title")
+                .category(Category.A)
+                .content("content")
+                .price(1000)
+                .dealState(DealState.ONGOING)
+                .build());
+        DealPost dealPost=dealPostRepository.findAll().get(0);
+        int dealPostId=dealPost.getId();
+        int beforeViewCnt=dealPost.getViewCnt();
+        int updateViewCnt=1;
+        DealPostUpdateRequestDto requestDto=DealPostUpdateRequestDto.builder()
+                .viewCnt(updateViewCnt)
+                .build();
+        String url="http://localhost:"+port+"/api/v1/deal-posts/"+dealPostId+"/view-cnt";
+        // when
+        mvc.perform(put(url)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(new ObjectMapper().writeValueAsString(requestDto)))
+                .andExpect(status().isOk());
+        // then
+        dealPost=dealPostRepository.findAll().get(0);
+        assertThat(beforeViewCnt+updateViewCnt).isEqualTo(dealPost.getViewCnt());
+    }
+
+    @Test
+    @Transactional
+    @WithUserDetails(value = "user@email")
     public void dealPostUpdateTest() throws Exception{
         // given
         dealPostRepository.save(DealPost.builder()
