@@ -227,9 +227,8 @@ public class UserApiController {
     @PostMapping("/users/{userId}/likes")
     public ResponseEntity<Object> saveLike(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                            @Min(1) @PathVariable("userId") Integer userId,
-                                           @ApiParam(value = "거래 글 아이디",example = "1",required = true)
-                                           @Min(1) @RequestParam Integer dealPostId) {
-        userService.saveLike(signedUser,userId,dealPostId);
+                                           @Valid @RequestBody UserLikeSaveRequestDto requestDto) {
+        userService.saveLike(signedUser,userId,requestDto.getDealPostId());
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.CREATED)
                 .message("유저 좋아요 삽입 성공하였습니다.")
@@ -253,9 +252,8 @@ public class UserApiController {
     @DeleteMapping("/users/{userId}/likes")
     public ResponseEntity<Object> deleteLike(@ApiIgnore @AuthenticationPrincipal SignedUser signedUser,
                                              @Min(1) @PathVariable("userId") Integer userId,
-                                             @ApiParam(value = "거래 글 아이디",example = "1",required = true)
-                                             @Min(1) @RequestParam Integer dealPostId) {
-        userService.deleteLike(signedUser,userId,dealPostId);
+                                             @Valid @RequestBody UserLikeDeleteRequestDto requestDto) {
+        userService.deleteLike(signedUser,userId,requestDto.getDealPostId());
         return ResponseHandler.toResponse(SuccessResponse.builder()
                 .status(HttpStatus.OK)
                 .message("유저 좋아요 삭제 성공했습니다.")
