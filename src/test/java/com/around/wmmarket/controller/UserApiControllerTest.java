@@ -1,6 +1,8 @@
 package com.around.wmmarket.controller;
 
 import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveRequestDto;
+import com.around.wmmarket.controller.dto.user.UserLikeDeleteRequestDto;
+import com.around.wmmarket.controller.dto.user.UserLikeSaveRequestDto;
 import com.around.wmmarket.controller.dto.user.UserSignInRequestDto;
 import com.around.wmmarket.controller.dto.user.UserUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.Category;
@@ -328,10 +330,14 @@ public class UserApiControllerTest {
         User user=userRepository.findByEmail("user@email")
                 .orElseThrow(()->new UsernameNotFoundException("user@email"));
 
+        UserLikeSaveRequestDto requestDto=new UserLikeSaveRequestDto();
+        requestDto.setDealPostId(dealPost.getId());
+
         String url="http://localhost:"+port+"/api/v1/users/"+user.getId()+"/likes";
         // when
         mvc.perform(post(url)
-                .param("dealPostId",dealPost.getId().toString()))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(new ObjectMapper().writeValueAsString(requestDto)))
                 .andExpect(status().isCreated());
         // then
         user=userRepository.findByEmail("user@email")
@@ -396,10 +402,14 @@ public class UserApiControllerTest {
                 .dealPost(dealPost)
                 .build());
 
+        UserLikeDeleteRequestDto requestDto=new UserLikeDeleteRequestDto();
+        requestDto.setDealPostId(dealPost.getId());
+
         String url="http://localhost:"+port+"/api/v1/users/"+user.getId()+"/likes";
         // when
         mvc.perform(delete(url)
-                        .param("dealPostId",dealPost.getId().toString()))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(new ObjectMapper().writeValueAsString(requestDto)))
                 .andExpect(status().isOk());
         // then
         user=userRepository.findByEmail("user@email")
