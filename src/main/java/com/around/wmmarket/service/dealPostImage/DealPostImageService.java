@@ -28,6 +28,7 @@ public class DealPostImageService {
     public DealPostImageSaveResponseDto save(SignedUser signedUser, Integer dealPostId, List<MultipartFile> files) {
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        // TODO : 다음 라인 삭제 해도됨
         if(!dealPostRepository.existsById(dealPostId)) throw new CustomException(ErrorCode.DEALPOST_NOT_FOUND);
         DealPost dealPost=dealPostRepository.findById(dealPostId)
                 .orElseThrow(()->new CustomException(ErrorCode.DEALPOST_NOT_FOUND));

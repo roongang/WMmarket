@@ -21,6 +21,8 @@ import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.domain.user_like.UserLike;
 import com.around.wmmarket.domain.user_like.UserLikeRepository;
 import com.around.wmmarket.common.FileHandler;
+import com.around.wmmarket.domain.user_role.UserRole;
+import com.around.wmmarket.domain.user_role.UserRoleRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
@@ -80,6 +82,8 @@ public class UserApiControllerTest {
     @Autowired
     private UserLikeRepository userLikeRepository;
     @Autowired
+    private UserRoleRepository userRoleRepository;
+    @Autowired
     private DealSuccessRepository dealSuccessRepository;
     @Autowired
     private MannerReviewRepository mannerReviewRepository;
@@ -96,25 +100,37 @@ public class UserApiControllerTest {
                 .email("user@email")
                 .password(passwordEncoder.encode("password"))
                 .nickname("nickname")
-                .role(Role.USER).build();
+                .build();
         image=fileHandler.parseUserImage(new MockMultipartFile("image","img.jpg","image/jpeg","img".getBytes(StandardCharsets.UTF_8)));
         user.setImage(image);
+        userRoleRepository.save(UserRole.builder()
+                .user(user)
+                .role(Role.USER).build());
         userRepository.save(user);
-        userRepository.save(User.builder()
+        User deleteUser=userRepository.save(User.builder()
                 .email("deleteUser@email")
                 .password(passwordEncoder.encode("password"))
                 .nickname("nickname1")
+                .build());
+        userRoleRepository.save(UserRole.builder()
+                .user(deleteUser)
                 .role(Role.USER).build());
         // seller buyer
-        userRepository.save(User.builder()
+        User seller=userRepository.save(User.builder()
                 .email("seller@email")
                 .password(passwordEncoder.encode("password"))
                 .nickname("seller nickname")
+                .build());
+        userRoleRepository.save(UserRole.builder()
+                .user(seller)
                 .role(Role.USER).build());
-        userRepository.save(User.builder()
+        User buyer=userRepository.save(User.builder()
                 .email("buyer@email")
                 .password(passwordEncoder.encode("password"))
                 .nickname("buyer nickname")
+                .build());
+        userRoleRepository.save(UserRole.builder()
+                .user(buyer)
                 .role(Role.USER).build());
     }
     @Before
@@ -151,14 +167,14 @@ public class UserApiControllerTest {
                 .param("email",testEmail)
                 .param("password",testPassword)
                 .param("nickname",testNickname)
-                .param("role",testRole.toString())
+                .param("roles",testRole.toString())
         ).andExpect(status().isCreated());
         // then
         List<User> allUser = userRepository.findAll();
         assertThat(allUser.get(0).getEmail()).isEqualTo(testEmail);
         log.info("user password = "+allUser.get(0).getPassword());
         assertThat(allUser.get(0).getNickname()).isEqualTo(testNickname);
-        assertThat(allUser.get(0).getRole()).isEqualTo(testRole);
+        assertThat(allUser.get(0).getUserRoles().get(0)).isEqualTo(testRole);
     }
 
     @Test
@@ -172,7 +188,6 @@ public class UserApiControllerTest {
                 .email(testEmail)
                 .password(passwordEncoder.encode(testPassword))
                 .nickname(testNickname)
-                .role(testRole)
                 .build());
 
         UserSignInRequestDto requestDto = UserSignInRequestDto.builder()

@@ -1,10 +1,10 @@
 package com.around.wmmarket.service.user;
 
 import com.around.wmmarket.controller.dto.user.UserSignInRequestDto;
-import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
+import com.around.wmmarket.domain.user_role.UserRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,7 +15,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,12 +31,15 @@ public class  CustomUserDetailsService implements UserDetailsService {
         return SignedUser.builder()
                 .name(user.getEmail())
                 .password(user.getPassword())
-                .role(authorities(user.getRole())).build();
+                .role(authorities(user.getUserRoles())).build();
     }
 
     // 임시로 role 하나만 만들게 설정
-    public Collection<? extends GrantedAuthority> authorities(Role role){
-        return Collections.singleton(new SimpleGrantedAuthority("ROLE_"+role.toString()));
+    public Collection<? extends GrantedAuthority> authorities(List<UserRole> userRoles){
+        return userRoles.stream()
+                .map(role -> "ROLE_"+role.toString())
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
     }
 
     public SignedUser getSignedUser(UserSignInRequestDto requestDto){
@@ -47,6 +51,6 @@ public class  CustomUserDetailsService implements UserDetailsService {
         return SignedUser.builder()
                 .name(email)
                 .password(password)
-                .role(authorities(user.getRole())).build(); // TODO : 매개변수로 써야할까
+                .role(authorities(user.getUserRoles())).build(); // TODO : 매개변수로 써야할까
     }
 }

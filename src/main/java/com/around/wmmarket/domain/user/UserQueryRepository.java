@@ -32,7 +32,6 @@ public class UserQueryRepository {
                         user.id,
                         user.email,
                         user.nickname,
-                        user.role,
                         user.city_1,
                         user.town_1,
                         user.city_2,
@@ -46,7 +45,6 @@ public class UserQueryRepository {
                         emailCt(filter.get("email")),
                         nicknameEq(filter.get("nickname")),
                         nicknameCt(filter.get("nickname")),
-                        roleEq(filter.get("role")),
                         city_1Eq(filter.get("city_1")),
                         city_1Ct(filter.get("city_1")),
                         town_1Eq(filter.get("town_1")),
@@ -132,9 +130,6 @@ public class UserQueryRepository {
             return user.nickname.contains(val);
         }
         return null;
-    }
-    private BooleanExpression roleEq(String role){
-        return hasText(role)?user.role.eq(Role.valueOf(role)):null;
     }
     private BooleanExpression city_1Eq(String opers){
         if(!hasText(opers)) return null;
