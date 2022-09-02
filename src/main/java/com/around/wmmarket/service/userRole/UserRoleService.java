@@ -30,7 +30,10 @@ public class UserRoleService {
         if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
         // save
         List<UserRole> userRoles=roles.stream()
-                .map(role -> save(user,role))
+                .map(role -> UserRole.builder()
+                        .user(user)
+                        .role(role)
+                        .build())
                 .collect(Collectors.toList());
         return UserRoleSaveResponseDto.builder()
                 .ids(userRoles.stream()
@@ -44,13 +47,12 @@ public class UserRoleService {
     }
 
     @Transactional
-    public UserRole save(User user,Role role){
+    public int save(User user,Role role){
         return userRoleRepository.save(
                 UserRole.builder()
                         .user(user)
                         .role(role)
-                        .build()
-        );
+                        .build()).getId();
     }
 
     @Transactional

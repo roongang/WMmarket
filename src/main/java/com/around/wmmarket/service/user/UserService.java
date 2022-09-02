@@ -68,10 +68,12 @@ public class UserService{
                 .town_2(requestDto.getTown_2())
                 .build();
         if(requestDto.getImage()!=null) user.setImage(fileHandler.parseUserImage(requestDto.getImage()));
-        requestDto.getRoles().stream()
-                .map(Role::valueOf)
-                .map(role -> userRoleService.save(user,role));
-        return new UserSaveResponseDto(userRepository.save(user).getId());
+        user = userRepository.save(user);
+        for(String strRole: requestDto.getRoles()){
+            Role role = Role.valueOf(strRole);
+            userRoleService.save(user,role);
+        }
+        return new UserSaveResponseDto(user.getId());
     }
 
     public UserGetResponseDto getUserDto(Integer id){
@@ -141,7 +143,7 @@ public class UserService{
             if(userRepository.existsByNickname(requestDto.getNickname())) throw new CustomException(ErrorCode.DUPLICATED_USER_NICKNAME);
             user.setNickname(requestDto.getNickname());
         }
-        if(!requestDto.getRoles().isEmpty()) {
+        if(requestDto.getRoles()!=null && !requestDto.getRoles().isEmpty()) {
             userRoleService.deleteAll(user);
             requestDto.getRoles().stream()
                     .map(Role::valueOf)

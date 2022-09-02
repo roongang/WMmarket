@@ -5,12 +5,14 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @AllArgsConstructor
 @Getter
+@Setter
 @Builder
 public class UserGetResponseDto {
     @ApiModelProperty(value = "유저 아이디",example = "1",required = true)

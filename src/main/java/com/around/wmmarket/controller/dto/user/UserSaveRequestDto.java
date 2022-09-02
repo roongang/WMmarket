@@ -1,7 +1,5 @@
 package com.around.wmmarket.controller.dto.user;
 
-import com.around.wmmarket.common.validation.Enum;
-import com.around.wmmarket.domain.user.Role;
 import io.swagger.annotations.ApiParam;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +24,7 @@ public class UserSaveRequestDto {
     @NotBlank
     private String nickname;
     @ApiParam(value = "유저 역할",example = "USER",required = true)
-    @Enum(enumClass = Role.class)
+    //@Enum(enumClass = Role.class)
     private List<String> roles;
     @ApiParam(value = "유저 사는곳1 시",example = "서울특별시",required = false)
     private String city_1;

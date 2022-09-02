@@ -1,7 +1,5 @@
 package com.around.wmmarket.controller.dto.user;
 
-import com.around.wmmarket.common.validation.Enum;
-import com.around.wmmarket.domain.user.Role;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +16,7 @@ public class UserUpdateRequestDto {
     @ApiModelProperty(value = "유저 닉네임",example = "update_nickname",required = false)
     private final String nickname;
     @ApiModelProperty(value = "유저 권한",example = "ADMIN",required = false)
-    @Enum(enumClass = Role.class,isNullable = true)
+    //@Enum(enumClass = Role.class,isNullable = true)
     private final List<String> roles;
     @ApiModelProperty(value = "유저 사는곳1 시",example = "서울시",required = false)
     private final String city_1;

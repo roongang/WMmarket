@@ -13,6 +13,8 @@ import com.around.wmmarket.domain.manner_review.MannerReviewRepository;
 import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
+import com.around.wmmarket.domain.user_role.UserRole;
+import com.around.wmmarket.domain.user_role.UserRoleRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +55,8 @@ public class MannerReviewApiControllerTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private UserRoleRepository userRoleRepository;
+    @Autowired
     private DealPostRepository dealPostRepository;
     @Autowired
     private DealSuccessRepository dealSuccessRepository;
@@ -66,16 +70,26 @@ public class MannerReviewApiControllerTest {
     public void set(){
         if(userRepository.existsByEmail("seller@email")
         || userRepository.existsByEmail("buyer@email")) return;
-        userRepository.save(User.builder()
+        User seller=User.builder()
                 .email("seller@email")
                 .password(passwordEncoder.encode("password"))
                 .nickname("seller nickname")
-                .role(Role.USER).build());
-        userRepository.save(User.builder()
+                .build();
+        userRepository.save(seller);
+        userRoleRepository.save(UserRole.builder()
+                .user(seller)
+                .role(Role.USER)
+                .build());
+        User buyer=User.builder()
                 .email("buyer@email")
                 .password(passwordEncoder.encode("password"))
                 .nickname("buyer nickname")
-                .role(Role.USER).build());
+                .build();
+        userRepository.save(buyer);
+        userRoleRepository.save(UserRole.builder()
+                .user(buyer)
+                .role(Role.USER)
+                .build());
     }
 
     @AfterTransaction

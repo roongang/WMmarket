@@ -13,6 +13,8 @@ import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
+import com.around.wmmarket.domain.user_role.UserRole;
+import com.around.wmmarket.domain.user_role.UserRoleRepository;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +62,8 @@ public class DealPostApiControllerTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private UserRoleRepository userRoleRepository;
+    @Autowired
     private DealPostRepository dealPostRepository;
     @Autowired
     private DealSuccessRepository dealSuccessRepository;
@@ -78,8 +82,12 @@ public class DealPostApiControllerTest {
                 .email("user@email")
                 .password(passwordEncoder.encode("password"))
                 .nickname("nickname")
-                .role(Role.USER).build();
+                .build();
         userRepository.save(user);
+        userRoleRepository.save(UserRole.builder()
+                .user(user)
+                .role(Role.USER)
+                .build());
     }
     @Before
     public void setup(){
@@ -197,8 +205,12 @@ public class DealPostApiControllerTest {
                 .email("buyer@email")
                 .password(passwordEncoder.encode("password"))
                 .nickname("nickname1")
-                .role(Role.USER).build();
+                .build();
         userRepository.save(buyer);
+        userRoleRepository.save(UserRole.builder()
+                .user(buyer)
+                .role(Role.USER)
+                .build());
         int buyerId=userRepository.findByEmail("buyer@email").orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND))
                 .getId();
         DealPostUpdateRequestDto requestDto=DealPostUpdateRequestDto.builder()
@@ -233,12 +245,16 @@ public class DealPostApiControllerTest {
                 .dealState(DealState.ONGOING).build());
         int dealPostId=dealPostRepository.findAll().get(0).getId();
 
-        userRepository.save(User.builder()
+        User user2=User.builder()
                 .email("user@email2")
                 .password(passwordEncoder.encode("password"))
                 .nickname("nickname2")
+                .build();
+        userRepository.save(user2);
+        userRoleRepository.save(UserRole.builder()
+                .user(user2)
                 .role(Role.USER).build());
-        User user2=userRepository.findByEmail("user@email2")
+        user2=userRepository.findByEmail("user@email2")
                 .orElseThrow(()->new UsernameNotFoundException("user@email2 없음"));
 
         DealPostUpdateRequestDto requestDto=DealPostUpdateRequestDto.builder()
@@ -270,12 +286,13 @@ public class DealPostApiControllerTest {
                 .dealState(DealState.ONGOING).build());
         int dealPostId=dealPostRepository.findAll().get(0).getId();
 
-        userRepository.save(User.builder()
+        User user3=User.builder()
                 .email("user@email3")
                 .password(passwordEncoder.encode("password"))
                 .nickname("nickname3")
-                .role(Role.USER).build());
-        User user3=userRepository.findByEmail("user@email3")
+                .build();
+        userRepository.save(user3);
+        user3=userRepository.findByEmail("user@email3")
                 .orElseThrow(()->new UsernameNotFoundException("user@email3 없음"));
 
         DealPostUpdateRequestDto requestDto=DealPostUpdateRequestDto.builder()
@@ -307,12 +324,13 @@ public class DealPostApiControllerTest {
                 .dealState(DealState.ONGOING).build());
         int dealPostId=dealPostRepository.findAll().get(0).getId();
 
-        userRepository.save(User.builder()
+        User user2=User.builder()
                 .email("user@email2")
                 .password(passwordEncoder.encode("password"))
                 .nickname("nickname2")
-                .role(Role.USER).build());
-        User user2=userRepository.findByEmail("user@email2")
+                .build();
+        userRepository.save(user2);
+        user2=userRepository.findByEmail("user@email2")
                 .orElseThrow(()->new UsernameNotFoundException("user@email2 없음"));
 
         DealPostUpdateRequestDto requestDto2=DealPostUpdateRequestDto.builder()
