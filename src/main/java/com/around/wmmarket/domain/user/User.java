@@ -8,6 +8,7 @@ import com.around.wmmarket.domain.keyword.Keyword;
 import com.around.wmmarket.domain.manner_review.MannerReview;
 import com.around.wmmarket.domain.notification.Notification;
 import com.around.wmmarket.domain.user_like.UserLike;
+import com.around.wmmarket.domain.user_role.UserRole;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,11 +39,6 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false, length=100, unique = true)
     private String nickname;
 
-    // TODO : 권한도 List 로 가져야함
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length=50)
-    private Role role;
-
     @Column(nullable = true)
     private String city_1;
 
@@ -66,7 +62,6 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "receiver")
     private final List<Notification> notifications = new ArrayList<>();
 
-    // not yet
     @OneToMany(mappedBy = "user")
     private final List<Keyword> keywords = new ArrayList<>();
 
@@ -92,13 +87,15 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private final List<UserLike> userLikes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private final List<UserRole> userRoles = new ArrayList<>();
+
     @Builder
-    public User(String email,String password,String image,String nickname,Role role,String city_1,String town_1,String city_2,String town_2,int isAuth,String code){
+    public User(String email,String password,String image,String nickname,String city_1,String town_1,String city_2,String town_2,int isAuth,String code){
         this.email=email;
         this.password=password;
         this.image=image;
         this.nickname=nickname;
-        this.role=role;
         this.city_1=city_1;
         this.town_1=town_1;
         this.city_2=city_2;
@@ -111,7 +108,6 @@ public class User extends BaseTimeEntity {
     public void setPassword(String password){this.password=password;}
     public void setImage(String image){this.image=image;}
     public void setNickname(String nickname){this.nickname=nickname;}
-    public void setRole(Role role){this.role=role;}
     public void setCity_1(String city_1){this.city_1=city_1;}
     public void setTown_1(String town_1){this.town_1=town_1;}
     public void setCity_2(String city_2){this.city_2=city_2;}
@@ -130,5 +126,7 @@ public class User extends BaseTimeEntity {
         while(!this.sellMannerReviews.isEmpty()) this.sellMannerReviews.get(this.sellDealReviews.size()-1).setSeller(null);
         while(!this.buyMannerReviews.isEmpty()) this.buyMannerReviews.get(this.buyMannerReviews.size()-1).setBuyer(null);
         while(!this.keywords.isEmpty()) this.keywords.get(this.keywords.size()-1).setUser(null);
+        while(!this.userLikes.isEmpty()) this.userLikes.get(this.userLikes.size()-1).setUser(null);
+        while(!this.userRoles.isEmpty()) this.userRoles.get(this.userRoles.size()-1).setUser(null);
     }
 }

@@ -19,9 +19,11 @@ import com.around.wmmarket.domain.keyword.KeywordRepository;
 import com.around.wmmarket.domain.manner_review.MannerReview;
 import com.around.wmmarket.domain.user.*;
 import com.around.wmmarket.domain.user_like.UserLike;
+import com.around.wmmarket.domain.user_role.UserRole;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.mannerReview.MannerReviewService;
 import com.around.wmmarket.service.userLike.UserLikeService;
+import com.around.wmmarket.service.userRole.UserRoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,6 +44,7 @@ public class UserService{
     private final KeywordRepository keywordRepository;
 
     private final UserLikeService userLikeService;
+    private final UserRoleService userRoleService;
     private final DealPostService dealPostService;
     private final MannerReviewService mannerReviewService;
 
@@ -59,14 +62,18 @@ public class UserService{
                 .email(requestDto.getEmail())
                 .password(passwordEncoder.encode(requestDto.getPassword()))
                 .nickname(requestDto.getNickname())
-                .role(Role.valueOf(requestDto.getRole()))
                 .city_1(requestDto.getCity_1())
                 .town_1(requestDto.getTown_1())
                 .city_2(requestDto.getCity_2())
                 .town_2(requestDto.getTown_2())
                 .build();
         if(requestDto.getImage()!=null) user.setImage(fileHandler.parseUserImage(requestDto.getImage()));
-        return new UserSaveResponseDto(userRepository.save(user).getId());
+        user = userRepository.save(user);
+        for(String strRole: requestDto.getRoles()){
+            Role role = Role.valueOf(strRole);
+            userRoleService.save(user,role);
+        }
+        return new UserSaveResponseDto(user.getId());
     }
 
     public UserGetResponseDto getUserDto(Integer id){
@@ -77,7 +84,7 @@ public class UserService{
                 .id(user.getId())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
-                .role(user.getRole())
+                .roles(user.getUserRoles().stream().map(UserRole::getRole).map(Role::name).collect(Collectors.toList()))
                 .city_1(user.getCity_1())
                 .town_1(user.getTown_1())
                 .city_2(user.getCity_2())
@@ -100,7 +107,7 @@ public class UserService{
                 .id(user.getId())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
-                .role(user.getRole())
+                .roles(user.getUserRoles().stream().map(UserRole::getRole).map(Role::name).collect(Collectors.toList()))
                 .city_1(user.getCity_1())
                 .town_1(user.getTown_1())
                 .city_2(user.getCity_2())
@@ -136,7 +143,12 @@ public class UserService{
             if(userRepository.existsByNickname(requestDto.getNickname())) throw new CustomException(ErrorCode.DUPLICATED_USER_NICKNAME);
             user.setNickname(requestDto.getNickname());
         }
-        if(requestDto.getRole()!=null) user.setRole(Role.valueOf(requestDto.getRole()));
+        if(requestDto.getRoles()!=null && !requestDto.getRoles().isEmpty()) {
+            userRoleService.deleteAll(user);
+            requestDto.getRoles().stream()
+                    .map(Role::valueOf)
+                    .map(role -> userRoleService.save(user,role));
+        }
         if(requestDto.getCity_1()!=null) user.setCity_1(requestDto.getCity_1());
         if(requestDto.getTown_1()!=null) user.setTown_1(requestDto.getTown_1());
         if(requestDto.getCity_2()!=null) user.setCity_2(requestDto.getCity_2());

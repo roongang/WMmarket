@@ -3,7 +3,6 @@ package com.around.wmmarket.domain.user;
 import com.around.wmmarket.common.QueryDslUtil;
 import com.around.wmmarket.controller.dto.user.UserGetResponseDto;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import static com.around.wmmarket.domain.user.QUser.user;
 import static org.springframework.util.StringUtils.hasText;
@@ -27,26 +27,14 @@ public class UserQueryRepository {
 
     public Slice<UserGetResponseDto> findByFilter(Map<String,String> filter){
         Pageable pageable= QueryDslUtil.toPageable(filter.get("page"), filter.get("size"), filter.get("sort"));
-        List<UserGetResponseDto> content=queryFactory
-                .select(Projections.constructor(UserGetResponseDto.class,
-                        user.id,
-                        user.email,
-                        user.nickname,
-                        user.role,
-                        user.city_1,
-                        user.town_1,
-                        user.city_2,
-                        user.town_2,
-                        user.isAuth,
-                        user.createdDate,
-                        user.modifiedDate))
+        List<User> userList=queryFactory
+                .select(user)
                 .from(user)
                 .where(
                         emailEq(filter.get("email")),
                         emailCt(filter.get("email")),
                         nicknameEq(filter.get("nickname")),
                         nicknameCt(filter.get("nickname")),
-                        roleEq(filter.get("role")),
                         city_1Eq(filter.get("city_1")),
                         city_1Ct(filter.get("city_1")),
                         town_1Eq(filter.get("town_1")),
@@ -74,6 +62,24 @@ public class UserQueryRepository {
                 .orderBy(QueryDslUtil.getOrderSpecifiers(filter.get("sort"),user)
                         .toArray(new OrderSpecifier[0]))
                 .fetch();
+        // content
+        List<UserGetResponseDto> content=userList.stream()
+                .map(userEntity -> UserGetResponseDto.builder()
+                        .id(userEntity.getId())
+                        .email(userEntity.getEmail())
+                        .nickname(userEntity.getNickname())
+                        .roles(userEntity.getUserRoles().stream()
+                                .map(userRole -> userRole.getRole().name())
+                                .collect(Collectors.toList()))
+                        .city_1(userEntity.getCity_1())
+                        .town_1(userEntity.getTown_1())
+                        .city_2(userEntity.getCity_2())
+                        .town_2(userEntity.getTown_2())
+                        .isAuth(userEntity.getIsAuth())
+                        .createdDate(userEntity.getCreatedDate())
+                        .modifiedDate(userEntity.getModifiedDate())
+                        .build())
+                .collect(Collectors.toList());
         boolean hasNext=false;
         if(content.size()>pageable.getPageSize()){
             content.remove(pageable.getPageSize());
@@ -132,9 +138,6 @@ public class UserQueryRepository {
             return user.nickname.contains(val);
         }
         return null;
-    }
-    private BooleanExpression roleEq(String role){
-        return hasText(role)?user.role.eq(Role.valueOf(role)):null;
     }
     private BooleanExpression city_1Eq(String opers){
         if(!hasText(opers)) return null;

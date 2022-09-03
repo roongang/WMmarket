@@ -1,7 +1,5 @@
 package com.around.wmmarket.controller.dto.user;
 
-import com.around.wmmarket.common.validation.Enum;
-import com.around.wmmarket.domain.user.Role;
 import io.swagger.annotations.ApiParam;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,8 +24,8 @@ public class UserSaveRequestDto {
     @NotBlank
     private String nickname;
     @ApiParam(value = "유저 역할",example = "USER",required = true)
-    @Enum(enumClass = Role.class)
-    private String role;
+    //@Enum(enumClass = Role.class)
+    private List<String> roles;
     @ApiParam(value = "유저 사는곳1 시",example = "서울특별시",required = false)
     private String city_1;
     @ApiParam(value = "유저 사는곳1 구",example = "동대문구",required = false)

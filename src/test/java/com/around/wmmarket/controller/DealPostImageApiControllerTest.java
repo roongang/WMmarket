@@ -9,6 +9,8 @@ import com.around.wmmarket.domain.deal_post_image.DealPostImageRepository;
 import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
+import com.around.wmmarket.domain.user_role.UserRole;
+import com.around.wmmarket.domain.user_role.UserRoleRepository;
 import com.around.wmmarket.service.dealPostImage.DealPostImageService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -30,7 +32,6 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +58,8 @@ public class DealPostImageApiControllerTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private UserRoleRepository userRoleRepository;
+    @Autowired
     private DealPostRepository dealPostRepository;
     @Autowired
     private DealPostImageRepository dealPostImageRepository;
@@ -73,8 +76,12 @@ public class DealPostImageApiControllerTest {
                 .email("user@email")
                 .password(passwordEncoder.encode("password"))
                 .nickname("nickname")
-                .role(Role.USER).build();
+                .build();
         userRepository.save(user);
+        userRoleRepository.save(UserRole.builder()
+                .user(user)
+                .role(Role.USER)
+                .build());
         dealPost=DealPost.builder()
                 .user(user)
                 .category(Category.A)

@@ -1,5 +1,6 @@
 package com.around.wmmarket.controller;
 
+import com.around.wmmarket.common.FileHandler;
 import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveRequestDto;
 import com.around.wmmarket.controller.dto.user.UserLikeDeleteRequestDto;
 import com.around.wmmarket.controller.dto.user.UserLikeSaveRequestDto;
@@ -20,7 +21,8 @@ import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.domain.user_like.UserLike;
 import com.around.wmmarket.domain.user_like.UserLikeRepository;
-import com.around.wmmarket.common.FileHandler;
+import com.around.wmmarket.domain.user_role.UserRole;
+import com.around.wmmarket.domain.user_role.UserRoleRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
@@ -53,7 +55,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -80,6 +81,8 @@ public class UserApiControllerTest {
     @Autowired
     private UserLikeRepository userLikeRepository;
     @Autowired
+    private UserRoleRepository userRoleRepository;
+    @Autowired
     private DealSuccessRepository dealSuccessRepository;
     @Autowired
     private MannerReviewRepository mannerReviewRepository;
@@ -96,25 +99,37 @@ public class UserApiControllerTest {
                 .email("user@email")
                 .password(passwordEncoder.encode("password"))
                 .nickname("nickname")
-                .role(Role.USER).build();
+                .build();
         image=fileHandler.parseUserImage(new MockMultipartFile("image","img.jpg","image/jpeg","img".getBytes(StandardCharsets.UTF_8)));
         user.setImage(image);
-        userRepository.save(user);
-        userRepository.save(User.builder()
+        user = userRepository.save(user);
+        userRoleRepository.save(UserRole.builder()
+                .user(user)
+                .role(Role.USER).build());
+        User deleteUser=userRepository.save(User.builder()
                 .email("deleteUser@email")
                 .password(passwordEncoder.encode("password"))
                 .nickname("nickname1")
+                .build());
+        userRoleRepository.save(UserRole.builder()
+                .user(deleteUser)
                 .role(Role.USER).build());
         // seller buyer
-        userRepository.save(User.builder()
+        User seller=userRepository.save(User.builder()
                 .email("seller@email")
                 .password(passwordEncoder.encode("password"))
                 .nickname("seller nickname")
+                .build());
+        userRoleRepository.save(UserRole.builder()
+                .user(seller)
                 .role(Role.USER).build());
-        userRepository.save(User.builder()
+        User buyer=userRepository.save(User.builder()
                 .email("buyer@email")
                 .password(passwordEncoder.encode("password"))
                 .nickname("buyer nickname")
+                .build());
+        userRoleRepository.save(UserRole.builder()
+                .user(buyer)
                 .role(Role.USER).build());
     }
     @Before
@@ -137,9 +152,10 @@ public class UserApiControllerTest {
 
     /////////////////////////////////////////////////////////////////////////// TEST
     @Test
+    @Transactional
     public void userSaveTest() throws Exception{
         // given
-        String testEmail="test_email3@email";
+        String testEmail="test_email@email";
         String testPassword="test_password";
         String testNickname="test_nickname";
         Role testRole=Role.USER;
@@ -151,28 +167,34 @@ public class UserApiControllerTest {
                 .param("email",testEmail)
                 .param("password",testPassword)
                 .param("nickname",testNickname)
-                .param("role",testRole.toString())
+                .param("roles",testRole.toString())
         ).andExpect(status().isCreated());
         // then
-        List<User> allUser = userRepository.findAll();
-        assertThat(allUser.get(0).getEmail()).isEqualTo(testEmail);
-        log.info("user password = "+allUser.get(0).getPassword());
-        assertThat(allUser.get(0).getNickname()).isEqualTo(testNickname);
-        assertThat(allUser.get(0).getRole()).isEqualTo(testRole);
+        User testUser=userRepository.findByEmail(testEmail)
+                .orElseThrow(()->new UsernameNotFoundException("user not found"));
+        assertThat(testUser.getEmail()).isEqualTo(testEmail);
+        log.info("user password = "+testUser.getPassword());
+        assertThat(testUser.getNickname()).isEqualTo(testNickname);
+        assertThat(testUser.getUserRoles().get(0).getRole()).isEqualTo(testRole);
+
+        for(User tmp:userRepository.findAll()){
+            log.info("user.getId() = "+tmp.getId());
+            log.info("user.getEmail() = "+tmp.getEmail());
+        }
     }
 
     @Test
+    @Transactional
     public void userSignInTest() throws Exception{
         // given
-        String testEmail="test_email2@email";
-        String testPassword="test_password2";
-        String testNickname="test_nickname2";
+        String testEmail="test_email@email";
+        String testPassword="test_password";
+        String testNickname="test_nickname";
         Role testRole=Role.USER;
         userRepository.save(User.builder()
                 .email(testEmail)
                 .password(passwordEncoder.encode(testPassword))
                 .nickname(testNickname)
-                .role(testRole)
                 .build());
 
         UserSignInRequestDto requestDto = UserSignInRequestDto.builder()
@@ -218,7 +240,7 @@ public class UserApiControllerTest {
                 .password("update_password")
                 .nickname("update_nickname")
                 .build();
-        User user=userRepository.findByEmail("user@email")
+        user=userRepository.findByEmail("user@email")
                 .orElseThrow(() -> new UsernameNotFoundException("user@email"));
         String url="http://localhost:"+port+"/api/v1/users/"+user.getId();
         // when

@@ -13,6 +13,8 @@ import com.around.wmmarket.domain.deal_success.DealSuccessRepository;
 import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
+import com.around.wmmarket.domain.user_role.UserRole;
+import com.around.wmmarket.domain.user_role.UserRoleRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -55,6 +57,8 @@ public class DealReviewApiControllerTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private UserRoleRepository userRoleRepository;
+    @Autowired
     private DealReviewRepository dealReviewRepository;
     @Autowired
     private DealSuccessRepository dealSuccessRepository;
@@ -75,14 +79,22 @@ public class DealReviewApiControllerTest {
                 .email("user1_email")
                 .password(passwordEncoder.encode("user1_pw"))
                 .nickname("user1_nn")
-                .role(Role.USER).build();
+                .build();
         userRepository.save(user1);
+        userRoleRepository.save(UserRole.builder()
+                .user(user1)
+                .role(Role.USER)
+                .build());
         User user2=User.builder()
                 .email("user2_email")
                 .password(passwordEncoder.encode("user2_pw"))
                 .nickname("user2_nn")
-                .role(Role.USER).build();
+                .build();
         userRepository.save(user2);
+        userRoleRepository.save(UserRole.builder()
+                .user(user2)
+                .role(Role.USER)
+                .build());
 
         DealPost dealPost=DealPost.builder()
                 .user(user1)
