@@ -131,6 +131,15 @@ public class UserApiControllerTest {
         userRoleRepository.save(UserRole.builder()
                 .user(buyer)
                 .role(Role.USER).build());
+
+        User admin=userRepository.save(User.builder()
+                .email("admin@email")
+                .password(passwordEncoder.encode("password"))
+                .nickname("admin nickname")
+                .build());
+        userRoleRepository.save(UserRole.builder()
+                .user(admin)
+                .role(Role.ADMIN).build());
     }
     @Before
     public void setup(){
@@ -235,6 +244,30 @@ public class UserApiControllerTest {
     @Transactional
     @WithUserDetails(value = "user@email")
     public void userUpdateTest() throws Exception{
+        // given
+        UserUpdateRequestDto requestDto= UserUpdateRequestDto.builder()
+                .password("update_password")
+                .nickname("update_nickname")
+                .build();
+        user=userRepository.findByEmail("user@email")
+                .orElseThrow(() -> new UsernameNotFoundException("user@email"));
+        String url="http://localhost:"+port+"/api/v1/users/"+user.getId();
+        // when
+        mvc.perform(put(url)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(new ObjectMapper().writeValueAsString(requestDto))
+        ).andExpect(status().isOk());
+        // then
+        User updateUser=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user:user@email not found"));
+        assertThat(passwordEncoder.matches("update_password", updateUser.getPassword())).isTrue();
+        assertThat(updateUser.getNickname()).isEqualTo("update_nickname");
+    }
+
+    @Test
+    @Transactional
+    @WithUserDetails(value = "admin@email")
+    public void userUpdateByAdminTest() throws Exception {
         // given
         UserUpdateRequestDto requestDto= UserUpdateRequestDto.builder()
                 .password("update_password")

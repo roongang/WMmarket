@@ -1,7 +1,6 @@
 package com.around.wmmarket.domain.user;
 
 import lombok.Builder;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,11 +22,6 @@ public class SignedUser implements UserDetails {
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.role;
-    }
-
-    @Override
     public String getPassword() {
         return this.password;
     }
@@ -35,6 +29,11 @@ public class SignedUser implements UserDetails {
     @Override
     public String getUsername() {
         return this.name;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.role;
     }
 
     // TODO : singedUser 로직 추가해줘야함

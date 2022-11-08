@@ -135,7 +135,10 @@ public class UserService{
         // compare id, signed user
         User user=userRepository.findById(id)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
-        if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+        // check user equals signed user or admin
+        if(!user.getEmail().equals(signedUser.getUsername()) &&
+                signedUser.getAuthorities().stream().noneMatch(authority -> authority.getAuthority().equals("ROLE_"+Role.ADMIN.name()))) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+
 
         // update logic
         if(requestDto.getPassword()!=null) user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
