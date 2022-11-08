@@ -166,7 +166,8 @@ public class UserService{
         // compare id, signed user
         User user=userRepository.findById(id)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
-        if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+        if(!user.getEmail().equals(signedUser.getUsername()) &&
+                signedUser.getAuthorities().stream().noneMatch(authority -> authority.getAuthority().equals("ROLE_"+Role.ADMIN))) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
 
         // delete logic
         userRepository.delete(user);

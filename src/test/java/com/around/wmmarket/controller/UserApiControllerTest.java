@@ -307,6 +307,23 @@ public class UserApiControllerTest {
 
     @Test
     @Transactional
+    @WithUserDetails(value = "admin@email")
+    public void userDeleteByAdminTest() throws Exception{
+        // given
+        User deleteUser=userRepository.findByEmail("deleteUser@email")
+                .orElseThrow(()->new UsernameNotFoundException("deleteUser"));
+        String url="http://localhost:"+port+"/api/v1/users/"+deleteUser.getId();
+        // when
+        mvc.perform(delete(url)
+                .session(session)
+        ).andExpect(status().isOk());
+        // then
+        assertThat(userRepository.findByEmail("deleteUser@email")).isEmpty();
+        assertThat(session.isInvalid()).isTrue();
+    }
+
+    @Test
+    @Transactional
     public void userImageGetTest() throws Exception{
         // given
         User user=userRepository.findByEmail("user@email")
