@@ -77,7 +77,7 @@ public class DealPostApiControllerTest {
 
     @BeforeTransaction
     public void makeUser(){
-        if(userRepository.existsByEmail("user@email")) return;
+        //if(userRepository.existsByEmail("user@email")) return;
         user = User.builder()
                 .email("user@email")
                 .password(passwordEncoder.encode("password"))
