@@ -17,15 +17,15 @@ import javax.persistence.*;
 public class DealSuccess extends BaseTimeEntity {
 
     @Id
-    private Integer dealSuccessId;
+    private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "BUYER_ID")
     private User buyer;
 
     // dealPost 와 1:1 식별관계임
     @MapsId
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "DEAL_POST_ID")
     private DealPost dealPost;
 

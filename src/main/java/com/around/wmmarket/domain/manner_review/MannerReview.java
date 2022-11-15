@@ -32,8 +32,8 @@ public class MannerReview extends BaseTimeEntity {
 
     @Builder
     public MannerReview(User seller,User buyer,Manner manner){
-        this.seller=seller;
-        this.buyer=buyer;
+        setSeller(seller);
+        setBuyer(buyer);
         this.manner=manner;
     }
 

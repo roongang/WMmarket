@@ -2,7 +2,7 @@ package com.around.wmmarket.common;
 
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
-import com.around.wmmarket.domain.user.Role;
+import com.around.wmmarket.domain.user_role.Role;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;

@@ -6,7 +6,7 @@ import com.around.wmmarket.domain.deal_post.DealPostRepository;
 import com.around.wmmarket.domain.deal_post.DealState;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
 import com.around.wmmarket.domain.deal_post_image.DealPostImageRepository;
-import com.around.wmmarket.domain.user.Role;
+import com.around.wmmarket.domain.user_role.Role;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.domain.user_role.UserRole;

@@ -10,7 +10,7 @@ import com.around.wmmarket.domain.deal_success.DealSuccessRepository;
 import com.around.wmmarket.domain.manner_review.Manner;
 import com.around.wmmarket.domain.manner_review.MannerReview;
 import com.around.wmmarket.domain.manner_review.MannerReviewRepository;
-import com.around.wmmarket.domain.user.Role;
+import com.around.wmmarket.domain.user_role.Role;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.domain.user_role.UserRole;

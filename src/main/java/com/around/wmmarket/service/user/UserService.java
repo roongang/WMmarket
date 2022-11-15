@@ -20,6 +20,7 @@ import com.around.wmmarket.domain.keyword.KeywordRepository;
 import com.around.wmmarket.domain.manner_review.MannerReview;
 import com.around.wmmarket.domain.user.*;
 import com.around.wmmarket.domain.user_like.UserLike;
+import com.around.wmmarket.domain.user_role.Role;
 import com.around.wmmarket.domain.user_role.UserRole;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.mannerReview.MannerReviewService;
@@ -202,6 +203,7 @@ public class UserService{
         fileHandler.delete(Constants.userImagePath,user.getImage());
         user.setImage(null);
     }
+
     public void saveLike(SignedUser signedUser,Integer userId,Integer dealPostId){
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);

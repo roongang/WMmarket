@@ -26,7 +26,7 @@ public class  CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException{
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findWithUserRolesByEmail(email)
                 .orElseThrow(()-> new UsernameNotFoundException(email));
         return SignedUser.builder()
                 .name(user.getEmail())
@@ -45,7 +45,7 @@ public class  CustomUserDetailsService implements UserDetailsService {
         String email=requestDto.getEmail();
         String password=requestDto.getPassword();
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findWithUserRolesByEmail(email)
                 .orElseThrow(()-> new UsernameNotFoundException(email));
         return SignedUser.builder()
                 .name(email)
