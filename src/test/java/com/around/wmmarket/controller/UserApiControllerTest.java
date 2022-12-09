@@ -47,9 +47,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import javax.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -118,6 +118,7 @@ public class UserApiControllerTest {
     }
     /////////////////////////////////////////////////////////////////////////// TEST
     @Test
+    @Transactional
     public void userSaveTest() throws Exception{
         // given
         String testEmail="test_email@email";
@@ -149,6 +150,7 @@ public class UserApiControllerTest {
     }
 
     @Test
+    @Transactional
     public void userSignInTest() throws Exception{
         // given
         String testEmail="test_email@email";
@@ -178,6 +180,7 @@ public class UserApiControllerTest {
     }
 
     @Test
+    @Transactional
     public void userGetTest() throws Exception{
         // given
         String testEmail="test_email@email";
@@ -206,6 +209,7 @@ public class UserApiControllerTest {
     }
 
     @Test
+    @Transactional
     @WithAccount(email="user@email")
     public void userUpdateTest() throws Exception{
         // given
@@ -230,6 +234,7 @@ public class UserApiControllerTest {
     }
 
     @Test
+    @Transactional
     @WithAccount(email="admin@email",roles = {Role.ADMIN})
     public void userUpdateByAdminTest() throws Exception {
         // given
@@ -257,6 +262,7 @@ public class UserApiControllerTest {
     }
 
     @Test
+    @Transactional
     @WithAccount(email="deleteUser@email")
     public void userDeleteTest() throws Exception{
         // given
@@ -273,6 +279,7 @@ public class UserApiControllerTest {
     }
 
     @Test
+    @Transactional
     @WithAccount(email="admin@email",roles = {Role.ADMIN})
     public void userDeleteByAdminTest() throws Exception{
         // given
@@ -293,6 +300,7 @@ public class UserApiControllerTest {
     }
 
     @Test
+    @Transactional
     @WithAccount(email="user@email")
     public void userImageGetTest() throws Exception{
         // given
@@ -308,6 +316,7 @@ public class UserApiControllerTest {
     }
 
     @Test
+    @Transactional
     @WithAccount(email="user@email")
     public void userImageUpdateTest() throws Exception{
         // given
@@ -330,6 +339,7 @@ public class UserApiControllerTest {
     }
 
     @Test
+    @Transactional
     @WithAccount(email="user@email")
     public void userImageDeleteTest() throws Exception{
         // given
@@ -347,6 +357,7 @@ public class UserApiControllerTest {
 
     // userLike
     @Test
+    @Transactional
     @WithAccount(email="user@email")
     public void userLikeSaveTest() throws Exception{
         // given
@@ -377,6 +388,7 @@ public class UserApiControllerTest {
     }
 
     @Test
+    @Transactional
     public void userLikesGetTest() throws Exception{
         // given
         // save dealPost & like
@@ -408,6 +420,7 @@ public class UserApiControllerTest {
     }
 
     @Test
+    @Transactional
     @WithAccount(email="user@email")
     public void userLikesDeleteTest() throws Exception{
         // given
@@ -446,6 +459,7 @@ public class UserApiControllerTest {
     }
 
     @Test
+    @Transactional
     public void userDealPostsGetTest() throws Exception{
         // given
         User user=userRepository.save(User.builder()
