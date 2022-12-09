@@ -1,18 +1,17 @@
 package com.around.wmmarket.controller;
 
+import com.around.wmmarket.config.WithAccount;
 import com.around.wmmarket.domain.deal_post.Category;
 import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
 import com.around.wmmarket.domain.deal_post.DealState;
 import com.around.wmmarket.domain.deal_post_image.DealPostImage;
 import com.around.wmmarket.domain.deal_post_image.DealPostImageRepository;
-import com.around.wmmarket.domain.user_role.Role;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
-import com.around.wmmarket.domain.user_role.UserRole;
-import com.around.wmmarket.domain.user_role.UserRoleRepository;
 import com.around.wmmarket.service.dealPostImage.DealPostImageService;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,11 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.transaction.AfterTransaction;
-import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -52,45 +48,15 @@ public class DealPostImageApiControllerTest {
     private WebApplicationContext context;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
     private DealPostImageService dealPostImageService;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private UserRoleRepository userRoleRepository;
     @Autowired
     private DealPostRepository dealPostRepository;
     @Autowired
     private DealPostImageRepository dealPostImageRepository;
 
     private MockMvc mvc;
-
-    static User user;
-    static DealPost dealPost;
-
-    @BeforeTransaction
-    public void makeUser(){
-        //if(userRepository.existsByEmail("user@email")) return;
-        user = User.builder()
-                .email("user@email")
-                .password(passwordEncoder.encode("password"))
-                .nickname("nickname")
-                .build();
-        userRepository.save(user);
-        userRoleRepository.save(UserRole.builder()
-                .user(user)
-                .role(Role.USER)
-                .build());
-        dealPost=DealPost.builder()
-                .user(user)
-                .category(Category.A)
-                .title("title")
-                .price(1000)
-                .content("content")
-                .dealState(DealState.ONGOING).build();
-        dealPostRepository.save(dealPost);
-    }
 
     @Before
     public void setup(){
@@ -101,7 +67,7 @@ public class DealPostImageApiControllerTest {
                 .build();
     }
 
-    @AfterTransaction
+    @After
     public void tearDown(){
         // repo
         dealPostImageRepository.deleteAll();
@@ -111,12 +77,21 @@ public class DealPostImageApiControllerTest {
 
     @Test
     @Transactional
-    @WithUserDetails(value = "user@email")
+    @WithAccount(email = "user@email")
     public void dealPostImageSave() throws Exception{
         // given
         MockMultipartFile file1= new MockMultipartFile("files","img1.jpg","image/jpeg","img1".getBytes(StandardCharsets.UTF_8));
         MockMultipartFile file2= new MockMultipartFile("files","img2.png","image/png","img2".getBytes(StandardCharsets.UTF_8));
 
+        User user= userRepository.findByEmail("user@email").orElseThrow(()->new UsernameNotFoundException("user not found"));
+        DealPost dealPost=dealPostRepository.save(DealPost.builder()
+                .user(user)
+                .category(Category.A)
+                .title("title")
+                .price(50000)
+                .content("content")
+                .dealState(DealState.ONGOING)
+                .build());
         String url = "http://localhost:"+port+"/api/v1/deal-post-images";
         // when
         mvc.perform(multipart(url)
@@ -126,7 +101,7 @@ public class DealPostImageApiControllerTest {
         ).andExpect(status().isCreated());
         // then
         dealPost=dealPostRepository.findAll().get(0);
-        log.info("image list size:"+dealPost.getDealPostImages().size()); // TODO : 어떻게 리스트에 4개가 저장되는거지???? 도저히 모르겠네
+        log.info("image list size:"+dealPost.getDealPostImages().size());
         for(DealPostImage image:dealPost.getDealPostImages()){
             log.info(image.getName());
         }
@@ -135,17 +110,25 @@ public class DealPostImageApiControllerTest {
         for(DealPostImage image:list){
             log.info(image.getName());
         }
-        // then
-        // for(DealPostImage dealPostImage:dealPost.getDealPostImages()) dealPostImageService.delete(dealPostImage.getId());
     }
 
     @Test
     @Transactional
-    @WithUserDetails(value = "user@email")
+    @WithAccount(email = "user@email")
     public void dealPostImageDeleteTest() throws Exception{
         // given
         List<MultipartFile> files=new ArrayList<>();
         files.add(new MockMultipartFile("files","img.jpg","image/jpeg","img".getBytes(StandardCharsets.UTF_8)));
+
+        User user= userRepository.findByEmail("user@email").orElseThrow(()->new UsernameNotFoundException("user not found"));
+        DealPost dealPost=dealPostRepository.save(DealPost.builder()
+                .user(user)
+                .category(Category.A)
+                .title("title")
+                .price(50000)
+                .content("content")
+                .dealState(DealState.ONGOING)
+                .build());
         dealPostImageService.save(dealPost,files);
         int dealPostImageId=dealPostImageRepository.findAll().get(0).getId();
 
