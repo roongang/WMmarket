@@ -1,5 +1,6 @@
 package com.around.wmmarket.controller;
 
+import com.around.wmmarket.config.WithAccount;
 import com.around.wmmarket.controller.dto.dealReview.DealReviewSaveRequestDto;
 import com.around.wmmarket.controller.dto.dealReview.DealReviewUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.Category;
@@ -10,13 +11,11 @@ import com.around.wmmarket.domain.deal_review.DealReview;
 import com.around.wmmarket.domain.deal_review.DealReviewRepository;
 import com.around.wmmarket.domain.deal_success.DealSuccess;
 import com.around.wmmarket.domain.deal_success.DealSuccessRepository;
-import com.around.wmmarket.domain.user_role.Role;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
-import com.around.wmmarket.domain.user_role.UserRole;
-import com.around.wmmarket.domain.user_role.UserRoleRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,10 +25,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.transaction.AfterTransaction;
-import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -57,8 +53,6 @@ public class DealReviewApiControllerTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private UserRoleRepository userRoleRepository;
-    @Autowired
     private DealReviewRepository dealReviewRepository;
     @Autowired
     private DealSuccessRepository dealSuccessRepository;
@@ -72,46 +66,38 @@ public class DealReviewApiControllerTest {
     4. 유저2 회원가입 및 로그인
     5. 유저2 리뷰 작성
     */
-    @BeforeTransaction
-    public void setting(){
-        if(userRepository.existsByEmail("user1_email")) return;
-        User user1= User.builder()
-                .email("user1_email")
-                .password(passwordEncoder.encode("user1_pw"))
-                .nickname("user1_nn")
-                .build();
-        userRepository.save(user1);
-        userRoleRepository.save(UserRole.builder()
-                .user(user1)
-                .role(Role.USER)
-                .build());
-        User user2=User.builder()
-                .email("user2_email")
-                .password(passwordEncoder.encode("user2_pw"))
-                .nickname("user2_nn")
-                .build();
-        userRepository.save(user2);
-        userRoleRepository.save(UserRole.builder()
-                .user(user2)
-                .role(Role.USER)
-                .build());
-
+    public void makeDealSuccess(User seller,User buyer){
         DealPost dealPost=DealPost.builder()
-                .user(user1)
+                .user(seller)
                 .category(Category.A)
                 .title("title")
                 .price(50000)
                 .content("content")
                 .dealState(DealState.ONGOING).build();
-        dealPost.setDealState(DealState.DONE);
-        DealSuccess dealSuccess=DealSuccess.builder()
-                .dealPost(dealPost)
-                .buyer(user2).build();
-        dealSuccessRepository.save(dealSuccess);
-        dealPost.setDealSuccess(dealSuccess);
         dealPostRepository.save(dealPost);
+        dealPost.setDealState(DealState.DONE);
+        DealSuccess dealSuccess=dealSuccessRepository.save(DealSuccess.builder()
+                .dealPost(dealPost)
+                .buyer(buyer).build());
+        dealPost.setDealSuccess(dealSuccess);
     }
 
+    public DealReview makeDealReview(User seller,User buyer){
+        DealPost dealPost=dealPostRepository.save(DealPost.builder()
+                .user(seller)
+                .category(Category.A)
+                .title("title")
+                .price(50000)
+                .content("content")
+                .dealState(DealState.ONGOING).build());
+        makeDealSuccess(seller,buyer);
+        return dealReviewRepository.save(DealReview.builder()
+                .seller(seller)
+                .buyer(buyer)
+                .content("review_content")
+                .dealPost(dealPost)
+                .build());
+    }
     @Before
     public void setup(){
         mvc= MockMvcBuilders
@@ -121,7 +107,7 @@ public class DealReviewApiControllerTest {
                 .build();
     }
 
-    @AfterTransaction
+    @After
     public void tearDown(){
         dealReviewRepository.deleteAll();
         dealSuccessRepository.deleteAll();
@@ -131,9 +117,17 @@ public class DealReviewApiControllerTest {
 
     @Test
     @Transactional
-    @WithUserDetails(value = "user2_email")
+    @WithAccount(email = "buyer@email")
     public void dealReviewSave() throws Exception{
         // given
+        User seller=userRepository.save(User.builder()
+                .email("seller@email")
+                .nickname("seller")
+                .password("password").build());
+        User buyer=userRepository.findByEmail("buyer@email")
+                .orElseThrow(()->new UsernameNotFoundException("user not found"));
+        makeDealSuccess(seller,buyer);
+
         DealReviewSaveRequestDto requestDto=DealReviewSaveRequestDto.builder()
                 .dealPostId(dealPostRepository.findAll().get(0).getId())
                 .content("review_content").build();
@@ -151,17 +145,16 @@ public class DealReviewApiControllerTest {
     @Transactional
     public void dealReviewGet() throws Exception{
         // given
-        DealPost dealPost=dealPostRepository.findAll().get(0);
-        User user2=userRepository.findByEmail("user2_email")
-                .orElseThrow(()->new UsernameNotFoundException("user2_email not found"));
-        DealReview dealReview=DealReview.builder()
-                .seller(dealPost.getUser())
-                .buyer(user2)
-                .content("review_content")
-                .dealPost(dealPost)
-                .build();
-        dealReviewRepository.save(dealReview);
-        dealReview=dealReviewRepository.findAll().get(0);
+        User buyer=userRepository.save(User.builder()
+                .email("buyer@email")
+                .nickname("buyer")
+                .password("password").build());
+        User seller=userRepository.save(User.builder()
+                .email("seller@email")
+                .nickname("seller")
+                .password("password").build());
+        DealReview dealReview=makeDealReview(seller,buyer);
+
         String url="http://localhost:"+port+"/api/v1/deal-reviews/"+dealReview.getId();
         // when
         MvcResult result=mvc.perform(get(url)
@@ -174,25 +167,21 @@ public class DealReviewApiControllerTest {
 
     @Test
     @Transactional
-    @WithUserDetails(value = "user2_email")
+    @WithAccount(email = "buyer@email")
     public void dealReviewPut() throws Exception{
         // given
-        DealPost dealPost=dealPostRepository.findAll().get(0);
-        User user2=userRepository.findByEmail("user2_email")
-                .orElseThrow(()->new UsernameNotFoundException("user2_email not found"));
-        DealReview dealReview=DealReview.builder()
-                .seller(dealPost.getUser())
-                .buyer(user2)
-                .content("review_content")
-                .dealPost(dealPost)
-                .build();
-        dealReviewRepository.save(dealReview);
+        User buyer=userRepository.findByEmail("buyer@email")
+                .orElseThrow(()->new UsernameNotFoundException("user not found"));
+        User seller=userRepository.save(User.builder()
+                .email("seller@email")
+                .nickname("seller")
+                .password("password").build());;
+        DealReview dealReview=makeDealReview(seller,buyer);
 
         DealReviewUpdateRequestDto requestDto=DealReviewUpdateRequestDto.builder()
                 .content("update_review")
                 .build();
-        int dealReviewId=dealReviewRepository.findAll().get(0).getId();
-        String url="http://localhost:"+port+"/api/v1/deal-reviews/"+dealReviewId;
+        String url="http://localhost:"+port+"/api/v1/deal-reviews/"+dealReview.getId();
         // when
         mvc.perform(put(url)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -204,20 +193,17 @@ public class DealReviewApiControllerTest {
 
     @Test
     @Transactional
-    @WithUserDetails(value = "user2_email")
+    @WithAccount(email = "buyer@email")
     public void dealReviewDelete() throws Exception{
         // given
-        DealPost dealPost=dealPostRepository.findAll().get(0);
-        User user2=userRepository.findByEmail("user2_email")
-                .orElseThrow(()->new UsernameNotFoundException("user2_email not found"));
-        DealReview dealReview=DealReview.builder()
-                .seller(dealPost.getUser())
-                .buyer(user2)
-                .content("review_content")
-                .dealPost(dealPost)
-                .build();
-        dealReviewRepository.save(dealReview);
-        dealReview=dealReviewRepository.findAll().get(0);
+        User buyer=userRepository.findByEmail("buyer@email")
+                .orElseThrow(()->new UsernameNotFoundException("user not found"));
+        User seller=userRepository.save(User.builder()
+                .email("seller@email")
+                .nickname("seller")
+                .password("password").build());
+        DealReview dealReview=makeDealReview(seller,buyer);
+
         String url="http://localhost:"+port+"/api/v1/deal-reviews/"+dealReview.getId();
         // when
         mvc.perform(delete(url)
