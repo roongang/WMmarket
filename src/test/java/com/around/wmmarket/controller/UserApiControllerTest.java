@@ -1,6 +1,6 @@
 package com.around.wmmarket.controller;
 
-import com.around.wmmarket.common.FileHandler;
+import com.around.wmmarket.config.WithAccount;
 import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveRequestDto;
 import com.around.wmmarket.controller.dto.user.UserLikeDeleteRequestDto;
 import com.around.wmmarket.controller.dto.user.UserLikeSaveRequestDto;
@@ -15,12 +15,13 @@ import com.around.wmmarket.domain.deal_success.DealSuccessRepository;
 import com.around.wmmarket.domain.manner_review.Manner;
 import com.around.wmmarket.domain.manner_review.MannerReview;
 import com.around.wmmarket.domain.manner_review.MannerReviewRepository;
-import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.domain.user_like.UserLike;
+import com.around.wmmarket.domain.user_like.UserLikeId;
 import com.around.wmmarket.domain.user_like.UserLikeRepository;
+import com.around.wmmarket.domain.user_role.Role;
 import com.around.wmmarket.domain.user_role.UserRole;
 import com.around.wmmarket.domain.user_role.UserRoleRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,26 +35,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.transaction.AfterTransaction;
-import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -62,6 +57,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
+@Transactional
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserApiControllerTest {
@@ -69,8 +65,6 @@ public class UserApiControllerTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private FileHandler fileHandler;
     @Autowired
     private WebApplicationContext context;
 
@@ -89,49 +83,7 @@ public class UserApiControllerTest {
 
     private MockHttpSession session;
     private MockMvc mvc;
-    private User user;
-    private String image;
 
-    @BeforeTransaction
-    public void makeUser(){
-        if(userRepository.existsByEmail("user@email")) return;
-        user = User.builder()
-                .email("user@email")
-                .password(passwordEncoder.encode("password"))
-                .nickname("nickname")
-                .build();
-        image=fileHandler.parseUserImage(new MockMultipartFile("image","img.jpg","image/jpeg","img".getBytes(StandardCharsets.UTF_8)));
-        user.setImage(image);
-        user = userRepository.save(user);
-        userRoleRepository.save(UserRole.builder()
-                .user(user)
-                .role(Role.USER).build());
-        User deleteUser=userRepository.save(User.builder()
-                .email("deleteUser@email")
-                .password(passwordEncoder.encode("password"))
-                .nickname("nickname1")
-                .build());
-        userRoleRepository.save(UserRole.builder()
-                .user(deleteUser)
-                .role(Role.USER).build());
-        // seller buyer
-        User seller=userRepository.save(User.builder()
-                .email("seller@email")
-                .password(passwordEncoder.encode("password"))
-                .nickname("seller nickname")
-                .build());
-        userRoleRepository.save(UserRole.builder()
-                .user(seller)
-                .role(Role.USER).build());
-        User buyer=userRepository.save(User.builder()
-                .email("buyer@email")
-                .password(passwordEncoder.encode("password"))
-                .nickname("buyer nickname")
-                .build());
-        userRoleRepository.save(UserRole.builder()
-                .user(buyer)
-                .role(Role.USER).build());
-    }
     @Before
     public void setup(){
         mvc = MockMvcBuilders
@@ -142,17 +94,22 @@ public class UserApiControllerTest {
         session = new MockHttpSession();
     }
 
-    @AfterTransaction
-    public void tearDown(){
-        mannerReviewRepository.deleteAll();
-        dealSuccessRepository.deleteAll();
-        dealPostRepository.deleteAll();
-        userRepository.deleteAll();
-    }
+    public void makeSuccessDealPost(User buyer,User seller) {
+        DealPost dealPost=dealPostRepository.save(DealPost.builder()
+                .user(seller)
+                .price(1000)
+                .content("content")
+                .title("title")
+                .category(Category.A)
+                .dealState(DealState.DONE).build());
 
+        dealSuccessRepository.save(DealSuccess.builder()
+                .buyer(buyer)
+                .dealPost(dealPost)
+                .build());
+    }
     /////////////////////////////////////////////////////////////////////////// TEST
     @Test
-    @Transactional
     public void userSaveTest() throws Exception{
         // given
         String testEmail="test_email@email";
@@ -184,13 +141,11 @@ public class UserApiControllerTest {
     }
 
     @Test
-    @Transactional
     public void userSignInTest() throws Exception{
         // given
         String testEmail="test_email@email";
         String testPassword="test_password";
         String testNickname="test_nickname";
-        Role testRole=Role.USER;
         userRepository.save(User.builder()
                 .email(testEmail)
                 .password(passwordEncoder.encode(testPassword))
@@ -208,41 +163,52 @@ public class UserApiControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(new ObjectMapper().writeValueAsString(requestDto))).andExpect(status().isCreated());
         // then
-        Object object = session.getAttribute("SPRING_SECURITY_CONTEXT");
-        SecurityContextImpl context = (SecurityContextImpl) object;
-        SignedUser signedUser = (SignedUser) context.getAuthentication().getPrincipal();
+        SecurityContext securityContext = (SecurityContext) session.getAttribute("SPRING_SECURITY_CONTEXT");
+        SignedUser signedUser = (SignedUser) securityContext.getAuthentication().getPrincipal();
         assertThat(testEmail).isEqualTo(signedUser.getUsername());
         assertThat(passwordEncoder.matches(testPassword,signedUser.getPassword())).isTrue();
     }
 
     @Test
-    @Transactional
     public void userGetTest() throws Exception{
         // given
+        String testEmail="test_email@email";
+        String testPassword="test_password";
+        String testNickname="test_nickname";
+        User user=userRepository.save(User.builder()
+                .email(testEmail)
+                .password(passwordEncoder.encode(testPassword))
+                .nickname(testNickname)
+                .build());
+        userRoleRepository.save(UserRole.builder()
+                .user(user)
+                .role(Role.USER)
+                .build());
+
         String url="http://localhost:"+port+"/api/v1/users";
         // when
         MvcResult result=mvc.perform(get(url)
-                .param("email","user@email"))
+                .param("email",testEmail))
                 .andExpect(status().isOk())
                 .andReturn();
         // then
-        assertThat(result.getResponse().getContentAsString()).contains("user@email");
-        assertThat(result.getResponse().getContentAsString()).contains("nickname");
+        assertThat(result.getResponse().getContentAsString()).contains(testEmail);
+        assertThat(result.getResponse().getContentAsString()).contains(testNickname);
         assertThat(result.getResponse().getContentAsString()).contains("USER");
     }
 
     @Test
-    @Transactional
-    @WithUserDetails(value = "user@email")
+    @WithAccount(email="user@email")
     public void userUpdateTest() throws Exception{
         // given
         UserUpdateRequestDto requestDto= UserUpdateRequestDto.builder()
                 .password("update_password")
                 .nickname("update_nickname")
                 .build();
-        user=userRepository.findByEmail("user@email")
+        User user=userRepository.findByEmail("user@email")
                 .orElseThrow(() -> new UsernameNotFoundException("user@email"));
         String url="http://localhost:"+port+"/api/v1/users/"+user.getId();
+
         // when
         mvc.perform(put(url)
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -256,8 +222,34 @@ public class UserApiControllerTest {
     }
 
     @Test
-    @Transactional
-    @WithUserDetails(value = "deleteUser@email")
+    @WithAccount(email="admin@email",roles = {Role.ADMIN})
+    public void userUpdateByAdminTest() throws Exception {
+        // given
+        UserUpdateRequestDto requestDto= UserUpdateRequestDto.builder()
+                .password("update password")
+                .nickname("update nickname")
+                .build();
+        User user=userRepository.save(User.builder()
+                .email("user@email")
+                .password(passwordEncoder.encode("user_password"))
+                .nickname("user nickname")
+                .build());
+
+        String url="http://localhost:"+port+"/api/v1/users/"+user.getId();
+        // when
+        mvc.perform(put(url)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(new ObjectMapper().writeValueAsString(requestDto))
+        ).andExpect(status().isOk());
+        // then
+        User updateUser=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user@email not found"));
+        assertThat(passwordEncoder.matches("update password", updateUser.getPassword())).isTrue();
+        assertThat(updateUser.getNickname()).isEqualTo("update nickname");
+    }
+
+    @Test
+    @WithAccount(email="deleteUser@email")
     public void userDeleteTest() throws Exception{
         // given
         User deleteUser=userRepository.findByEmail("deleteUser@email")
@@ -273,7 +265,27 @@ public class UserApiControllerTest {
     }
 
     @Test
-    @Transactional
+    @WithAccount(email="admin@email",roles = {Role.ADMIN})
+    public void userDeleteByAdminTest() throws Exception{
+        // given
+        User deleteUser = userRepository.save(User.builder()
+                .email("deleteUser@email")
+                .password("password")
+                .nickname("deleteUser nickname")
+                .build());
+
+        String url="http://localhost:"+port+"/api/v1/users/"+deleteUser.getId();
+        // when
+        mvc.perform(delete(url)
+                .session(session)
+        ).andExpect(status().isOk());
+        // then
+        assertThat(userRepository.findByEmail(deleteUser.getEmail())).isEmpty();
+        assertThat(session.isInvalid()).isTrue();
+    }
+
+    @Test
+    @WithAccount(email="user@email")
     public void userImageGetTest() throws Exception{
         // given
         User user=userRepository.findByEmail("user@email")
@@ -284,42 +296,35 @@ public class UserApiControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         // then
-        assertThat(result.getResponse().getHeader(HttpHeaders.CONTENT_DISPOSITION)).contains(image);
+        assertThat(result.getResponse().getHeader(HttpHeaders.CONTENT_DISPOSITION)).contains(user.getImage());
     }
 
     @Test
-    @Transactional
-    @WithUserDetails(value = "user@email")
+    @WithAccount(email="user@email")
     public void userImageUpdateTest() throws Exception{
         // given
-        MultipartFile file=new MockMultipartFile("image","img.jpg","image/jpeg","img".getBytes(StandardCharsets.UTF_8));
-        String image=fileHandler.parseUserImage(file);
-        user.setImage(image);
-
         MockMultipartFile updateFile=new MockMultipartFile("file","img.jpg","image/jpeg","updateImg".getBytes(StandardCharsets.UTF_8));
 
         User user=userRepository.findByEmail("user@email")
                 .orElseThrow(()->new UsernameNotFoundException("user@email"));
+        String priorImage=user.getImage();
+
         String url="http://localhost:"+port+"/api/v1/users/"+user.getId()+"/image";
         // when
         MockMultipartHttpServletRequestBuilder builder=multipart(url);
-        builder.with(new RequestPostProcessor() {
-            @Override
-            public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
-                request.setMethod("PUT");
-                return request;
-            }
+        builder.with(request -> {
+            request.setMethod("PUT");
+            return request;
         });
         mvc.perform(builder
                 .file(updateFile))
                 .andExpect(status().isOk());
         // then
-        assertThat(userRepository.findAll().get(0).getImage()).isNotEqualTo(image);
+        assertThat(userRepository.findAll().get(0).getImage()).isNotEqualTo(priorImage);
     }
 
     @Test
-    @Transactional
-    @WithUserDetails(value = "user@email")
+    @WithAccount(email="user@email")
     public void userImageDeleteTest() throws Exception{
         // given
         User user=userRepository.findByEmail("user@email")
@@ -336,21 +341,18 @@ public class UserApiControllerTest {
 
     // userLike
     @Test
-    @Transactional
-    @WithUserDetails(value = "user@email")
+    @WithAccount(email="user@email")
     public void userLikeSaveTest() throws Exception{
         // given
-        dealPostRepository.save(DealPost.builder()
+        User user=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user@email"));
+        DealPost dealPost=dealPostRepository.save(DealPost.builder()
                 .user(user)
                 .price(1000)
                 .content("content")
                 .title("title")
                 .category(Category.A)
                 .dealState(DealState.ONGOING).build());
-        DealPost dealPost=dealPostRepository.findAll().get(0);
-
-        User user=userRepository.findByEmail("user@email")
-                .orElseThrow(()->new UsernameNotFoundException("user@email"));
 
         UserLikeSaveRequestDto requestDto=new UserLikeSaveRequestDto();
         requestDto.setDealPostId(dealPost.getId());
@@ -362,27 +364,28 @@ public class UserApiControllerTest {
                         .content(new ObjectMapper().writeValueAsString(requestDto)))
                 .andExpect(status().isCreated());
         // then
-        user=userRepository.findByEmail("user@email")
-                        .orElseThrow(()->new UsernameNotFoundException("user@email"));
-        log.info("likes num:"+user.getUserLikes().size());
-        assertThat(userLikeRepository.findAll().isEmpty()).isFalse();
+        assertThat(userLikeRepository.findById(UserLikeId.builder()
+                .userId(user.getId())
+                .dealPostId(dealPost.getId())
+                .build())).isNotNull();
     }
 
     @Test
-    @Transactional
     public void userLikesGetTest() throws Exception{
         // given
         // save dealPost & like
-        user=userRepository.findByEmail("user@email")
-                .orElseThrow(()->new UsernameNotFoundException("user@email"));
-        dealPostRepository.save(DealPost.builder()
+        User user = userRepository.save(User.builder()
+                .email("user@email")
+                .password("password")
+                .nickname("user nickname")
+                .build());
+        DealPost dealPost=dealPostRepository.save(DealPost.builder()
                 .user(user)
                 .price(1000)
                 .content("content")
                 .title("title")
                 .category(Category.A)
                 .dealState(DealState.ONGOING).build());
-        DealPost dealPost=dealPostRepository.findAll().get(0);
 
         userLikeRepository.save(UserLike.builder()
                 .user(user)
@@ -395,34 +398,34 @@ public class UserApiControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         // then
-        user=userRepository.findByEmail("user@email")
-                .orElseThrow(()->new UsernameNotFoundException("user@email"));
-        log.info("likes num:"+user.getUserLikes().size());
-        log.info("result:"+result.getResponse().getContentAsString());
         assertThat(result.getResponse().getContentAsString()).contains(dealPost.getId().toString());
+        assertThat(userLikeRepository.findById(UserLikeId.builder()
+                .userId(user.getId())
+                .dealPostId(dealPost.getId())
+                .build())).isNotNull();
     }
 
     @Test
-    @Transactional
-    @WithUserDetails(value = "user@email")
+    @WithAccount(email="user@email")
     public void userLikesDeleteTest() throws Exception{
         // given
         // save dealPost & like
-        user=userRepository.findByEmail("user@email")
+        User user=userRepository.findByEmail("user@email")
                 .orElseThrow(()->new UsernameNotFoundException("user@email"));
-        dealPostRepository.save(DealPost.builder()
+        DealPost dealPost=dealPostRepository.save(DealPost.builder()
                 .user(user)
                 .price(1000)
                 .content("content")
                 .title("title")
                 .category(Category.A)
                 .dealState(DealState.ONGOING).build());
-        DealPost dealPost=dealPostRepository.findAll().get(0);
 
+        user=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user@email"));
         userLikeRepository.save(UserLike.builder()
-                .user(user)
-                .dealPost(dealPost)
-                .build());
+               .user(user)
+               .dealPost(dealPost)
+               .build());
 
         UserLikeDeleteRequestDto requestDto=new UserLikeDeleteRequestDto();
         requestDto.setDealPostId(dealPost.getId());
@@ -441,10 +444,12 @@ public class UserApiControllerTest {
     }
 
     @Test
-    @Transactional
-    @WithUserDetails(value = "user@email")
     public void userDealPostsGetTest() throws Exception{
         // given
+        User user=userRepository.save(User.builder()
+                .email("user@email")
+                .password("password")
+                .nickname("user nickname").build());
         // 글 여러개 쓰기
         for(int i=1;i<=5;i++){
             dealPostRepository.save(DealPost.builder()
@@ -466,29 +471,17 @@ public class UserApiControllerTest {
             assertThat(result.getResponse().getContentAsString()).contains(price);
         }
     }
-    @Transactional
-    public void makeSuccessDealPost(User buyer,User seller) {
-        DealPost dealPost=dealPostRepository.save(DealPost.builder()
-                .user(seller)
-                .price(1000)
-                .content("content")
-                .title("title")
-                .category(Category.A)
-                .dealState(DealState.DONE).build());
-        dealSuccessRepository.save(DealSuccess.builder()
-                .buyer(buyer)
-                .dealPost(dealPost)
-                .build());
-    }
+
     @Test
-    @Transactional
-    @WithUserDetails(value = "buyer@email")
+    @WithAccount(email="buyer@email")
     public void userMannerReviewSaveTest() throws Exception{
         // given
-        User seller=userRepository.findByEmail("seller@email")
-                .orElseThrow(()->new UsernameNotFoundException("seller@email"));
         User buyer=userRepository.findByEmail("buyer@email")
                 .orElseThrow(()->new UsernameNotFoundException("buyer@email"));
+        User seller=userRepository.save(User.builder()
+                .email("seller@email")
+                .password("password")
+                .nickname("seller nickname").build());
 
         makeSuccessDealPost(buyer,seller);
 
@@ -505,16 +498,21 @@ public class UserApiControllerTest {
         // then
         Assertions.assertThat(mannerReviewRepository.findAll()).isNotNull();
     }
+
     @Test
-    @Transactional
     public void userSellMannerReviewGetTest() throws Exception{
         // given
-        User seller=userRepository.findByEmail("seller@email")
-                .orElseThrow(()->new UsernameNotFoundException("seller@email"));
-        User buyer=userRepository.findByEmail("buyer@email")
-                .orElseThrow(()->new UsernameNotFoundException("buyer@email"));
+        User buyer=userRepository.save(User.builder()
+                .email("buyer@email")
+                .password("password")
+                .nickname("buyer nickname").build());
+        User seller=userRepository.save(User.builder()
+                .email("seller@email")
+                .password("password")
+                .nickname("seller nickname").build());
 
         makeSuccessDealPost(buyer,seller);
+
         mannerReviewRepository.save(MannerReview.builder()
                 .buyer(buyer)
                 .seller(seller)
@@ -528,14 +526,18 @@ public class UserApiControllerTest {
         assertThat(result.getResponse().getContentAsString()).contains("sellerId");
         assertThat(result.getResponse().getContentAsString()).contains("buyerId");
     }
+
     @Test
-    @Transactional
     public void userBuyMannerReviewGetTest() throws Exception{
         // given
-        User seller=userRepository.findByEmail("seller@email")
-                .orElseThrow(()->new UsernameNotFoundException("seller@email"));
-        User buyer=userRepository.findByEmail("buyer@email")
-                .orElseThrow(()->new UsernameNotFoundException("buyer@email"));
+        User buyer=userRepository.save(User.builder()
+                .email("buyer@email")
+                .password("password")
+                .nickname("buyer nickname").build());
+        User seller=userRepository.save(User.builder()
+                .email("seller@email")
+                .password("password")
+                .nickname("seller nickname").build());
 
         makeSuccessDealPost(buyer,seller);
         mannerReviewRepository.save(MannerReview.builder()
@@ -551,15 +553,17 @@ public class UserApiControllerTest {
         assertThat(result.getResponse().getContentAsString()).contains("sellerId");
         assertThat(result.getResponse().getContentAsString()).contains("buyerId");
     }
+
     @Test
-    @Transactional
-    @WithUserDetails(value = "buyer@email")
+    @WithAccount(email="buyer@email")
     public void userBuyMannerReviewDeleteTest() throws Exception{
         // given
-        User seller=userRepository.findByEmail("seller@email")
-                .orElseThrow(()->new UsernameNotFoundException("seller@email"));
         User buyer=userRepository.findByEmail("buyer@email")
                 .orElseThrow(()->new UsernameNotFoundException("buyer@email"));
+        User seller=userRepository.save(User.builder()
+                .email("seller@email")
+                .password("password")
+                .nickname("seller nickname").build());
 
         makeSuccessDealPost(buyer,seller);
         MannerReview mannerReview=mannerReviewRepository.save(MannerReview.builder()

@@ -2,6 +2,7 @@ package com.around.wmmarket.controller;
 
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
+import com.around.wmmarket.config.WithAccount;
 import com.around.wmmarket.controller.dto.dealPost.DealPostSaveRequestDto;
 import com.around.wmmarket.controller.dto.dealPost.DealPostUpdateRequestDto;
 import com.around.wmmarket.domain.deal_post.Category;
@@ -9,10 +10,10 @@ import com.around.wmmarket.domain.deal_post.DealPost;
 import com.around.wmmarket.domain.deal_post.DealPostRepository;
 import com.around.wmmarket.domain.deal_post.DealState;
 import com.around.wmmarket.domain.deal_success.DealSuccessRepository;
-import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
+import com.around.wmmarket.domain.user_role.Role;
 import com.around.wmmarket.domain.user_role.UserRole;
 import com.around.wmmarket.domain.user_role.UserRoleRepository;
 import com.around.wmmarket.service.dealPost.DealPostService;
@@ -28,16 +29,13 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.transaction.AfterTransaction;
-import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import javax.transaction.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
@@ -48,6 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
+@Transactional
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class DealPostApiControllerTest {
@@ -73,22 +72,6 @@ public class DealPostApiControllerTest {
 
     private MockMvc mvc;
 
-    private User user;
-
-    @BeforeTransaction
-    public void makeUser(){
-        if(userRepository.existsByEmail("user@email")) return;
-        user = User.builder()
-                .email("user@email")
-                .password(passwordEncoder.encode("password"))
-                .nickname("nickname")
-                .build();
-        userRepository.save(user);
-        userRoleRepository.save(UserRole.builder()
-                .user(user)
-                .role(Role.USER)
-                .build());
-    }
     @Before
     public void setup(){
         mvc= MockMvcBuilders
@@ -97,28 +80,20 @@ public class DealPostApiControllerTest {
                 .alwaysDo(print())
                 .build();
     }
-    @AfterTransaction
-    public void tearDown(){
-        // repo delete
-        dealSuccessRepository.deleteAll();
-        dealPostRepository.deleteAll();
-        userRepository.deleteAll();
-    }
 
     @Test
-    @Transactional
-    @WithUserDetails(value = "user@email")
+    @WithAccount(email = "user@email")
     public void dealPostSave() throws Exception{
         // given
-        // multipart/form-data 형태이므로 setter 적용
-        MockMultipartFile file1= new MockMultipartFile("files","img1.jpg","image/jpeg","img1".getBytes(StandardCharsets.UTF_8));
-        MockMultipartFile file2= new MockMultipartFile("files","img2.png","image/png","img2".getBytes(StandardCharsets.UTF_8));
-
         DealPostSaveRequestDto requestDto = new DealPostSaveRequestDto();
         requestDto.setCategory(Category.A.name());
         requestDto.setTitle("title");
         requestDto.setPrice(1000);
         requestDto.setContent("content");
+        // multipart/form-data 형태이므로 setter 적용
+        MockMultipartFile file1= new MockMultipartFile("files","img1.jpg","image/jpeg","img1".getBytes(StandardCharsets.UTF_8));
+        MockMultipartFile file2= new MockMultipartFile("files","img2.png","image/png","img2".getBytes(StandardCharsets.UTF_8));
+
         String url = "http://localhost:"+port+"/api/v1/deal-posts";
         // when
         mvc.perform(multipart(url)
@@ -134,10 +109,11 @@ public class DealPostApiControllerTest {
     }
 
     @Test
-    @Transactional
-    @WithUserDetails(value = "user@email")
+    @WithAccount(email = "user@email")
     public void dealPostGetTest() throws Exception{
         // given
+        User user=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user not found"));
         DealPost dealPost=DealPost.builder()
                 .user(user)
                 .category(Category.A)
@@ -158,10 +134,12 @@ public class DealPostApiControllerTest {
     }
 
     @Test
-    @Transactional
-    @WithUserDetails(value = "user@email")
+    @WithAccount(email = "user@email")
     public void dealPostIncreaseViewCntTest() throws Exception{
         // given
+        User user=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user not found"));
+
         dealPostRepository.save(DealPost.builder()
                 .user(user)
                 .title("title")
@@ -189,10 +167,11 @@ public class DealPostApiControllerTest {
     }
 
     @Test
-    @Transactional
-    @WithUserDetails(value = "user@email")
+    @WithAccount(email = "user@email")
     public void dealPostUpdateTest() throws Exception{
         // given
+        User user=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user not found"));
         dealPostRepository.save(DealPost.builder()
                 .user(user)
                 .category(Category.A)
@@ -232,10 +211,11 @@ public class DealPostApiControllerTest {
     }
 
     @Test
-    @Transactional
-    @WithUserDetails(value = "user@email")
+    @WithAccount(email = "user@email")
     public void dealPostUpdateSuccessSaveTest() throws Exception{
         // given
+        User user=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user not found"));
         dealPostRepository.save(DealPost.builder()
                 .user(user)
                 .category(Category.A)
@@ -273,10 +253,11 @@ public class DealPostApiControllerTest {
     }
 
     @Test
-    @Transactional
-    @WithUserDetails(value = "user@email")
+    @WithAccount(email = "user@email")
     public void dealPostUpdateSuccessUpdateTest() throws Exception{
         // given
+        User user=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user not found"));
         dealPostRepository.save(DealPost.builder()
                 .user(user)
                 .category(Category.A)
@@ -311,10 +292,11 @@ public class DealPostApiControllerTest {
     }
 
     @Test
-    @Transactional
-    @WithUserDetails(value = "user@email")
+    @WithAccount(email = "user@email")
     public void dealPostUpdateSuccessDeleteTest() throws Exception{
         // given
+        User user=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user not found"));
         dealPostRepository.save(DealPost.builder()
                 .user(user)
                 .category(Category.A)
@@ -358,10 +340,11 @@ public class DealPostApiControllerTest {
     }
 
     @Test
-    @Transactional
-    @WithUserDetails(value = "user@email")
+    @WithAccount(email = "user@email")
     public void dealPostDeleteTest() throws Exception{
         // given
+        User user=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user not found"));
         dealPostRepository.save(DealPost.builder()
                 .user(user)
                 .category(Category.A)
@@ -380,10 +363,11 @@ public class DealPostApiControllerTest {
     }
 
     @Test
-    @Transactional
-    @WithUserDetails(value = "user@email")
+    @WithAccount(email = "user@email")
     public void dealPostPullTest() throws Exception{
         // given
+        User user=userRepository.findByEmail("user@email")
+                .orElseThrow(()->new UsernameNotFoundException("user not found"));
         dealPostRepository.save(DealPost.builder()
                 .user(user)
                 .category(Category.A)

@@ -12,6 +12,8 @@ import com.around.wmmarket.domain.user_like.UserLikeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @RequiredArgsConstructor
 @Service
 public class UserLikeService {
@@ -19,6 +21,7 @@ public class UserLikeService {
     private final UserRepository userRepository;
     private final DealPostRepository dealPostRepository;
 
+    @Transactional
     public void save(Integer userId,Integer dealPostId){
         User user=userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));

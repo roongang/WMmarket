@@ -34,10 +34,9 @@ public class  CustomUserDetailsService implements UserDetailsService {
                 .role(authorities(user.getUserRoles())).build();
     }
 
-    // 임시로 role 하나만 만들게 설정
     public Collection<? extends GrantedAuthority> authorities(List<UserRole> userRoles){
         return userRoles.stream()
-                .map(role -> "ROLE_"+role.toString())
+                .map(role -> "ROLE_"+role.getRole().name())
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }

@@ -37,12 +37,12 @@ public class UserLike extends BaseTimeEntity implements Serializable{
     public void setUser(User user){
         if(this.user!=null) this.user.getUserLikes().remove(this);
         this.user=user;
-        user.getUserLikes().add(this);
+        if(user!=null) user.getUserLikes().add(this);
     }
     public void setDealPost(DealPost dealPost){
         if(this.dealPost!=null) this.dealPost.getUserLikes().remove(this);
         this.dealPost=dealPost;
-        dealPost.getUserLikes().add(this);
+        if(dealPost!=null) dealPost.getUserLikes().add(this);
     }
     // delete
     public void deleteRelation(){

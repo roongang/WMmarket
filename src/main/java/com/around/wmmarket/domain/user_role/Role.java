@@ -1,4 +1,4 @@
-package com.around.wmmarket.domain.user;
+package com.around.wmmarket.domain.user_role;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

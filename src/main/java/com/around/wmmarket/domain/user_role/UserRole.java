@@ -1,6 +1,5 @@
 package com.around.wmmarket.domain.user_role;
 
-import com.around.wmmarket.domain.user.Role;
 import com.around.wmmarket.domain.user.User;
 import lombok.AccessLevel;
 import lombok.Builder;

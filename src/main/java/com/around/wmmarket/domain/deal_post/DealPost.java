@@ -63,7 +63,7 @@ public class DealPost extends BaseTimeEntity {
     @OneToMany(mappedBy = "dealPost")
     private final List<DealReview> dealReviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "dealPost")
+    @OneToMany(mappedBy = "dealPost", orphanRemoval = true)
     private final List<UserLike> userLikes = new ArrayList<>();
 
     @Builder

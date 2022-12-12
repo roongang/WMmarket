@@ -1,5 +1,6 @@
 package com.around.wmmarket.service.user;
 
+import com.around.wmmarket.common.AuthorityHandler;
 import com.around.wmmarket.common.Constants;
 import com.around.wmmarket.common.EmailHandler;
 import com.around.wmmarket.common.FileHandler;
@@ -19,6 +20,7 @@ import com.around.wmmarket.domain.keyword.KeywordRepository;
 import com.around.wmmarket.domain.manner_review.MannerReview;
 import com.around.wmmarket.domain.user.*;
 import com.around.wmmarket.domain.user_like.UserLike;
+import com.around.wmmarket.domain.user_role.Role;
 import com.around.wmmarket.domain.user_role.UserRole;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.around.wmmarket.service.mannerReview.MannerReviewService;
@@ -51,6 +53,7 @@ public class UserService{
     private final PasswordEncoder passwordEncoder;
     private final FileHandler fileHandler;
     private final EmailHandler emailHandler;
+    private final AuthorityHandler authorityHandler;
 
     @Transactional
     public UserSaveResponseDto save(UserSaveRequestDto requestDto){
@@ -131,13 +134,12 @@ public class UserService{
     @Transactional
     public void update(SignedUser signedUser,Integer id, UserUpdateRequestDto requestDto) {
         // check
-        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
-        // compare id, signed user
-        User user=userRepository.findById(id)
-                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
-        if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
+        authorityHandler.checkAuthorityToUser(signedUser,id);
 
         // update logic
+        User user = userRepository.findById(id)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+
         if(requestDto.getPassword()!=null) user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         if(requestDto.getNickname()!=null){
             if(userRepository.existsByNickname(requestDto.getNickname())) throw new CustomException(ErrorCode.DUPLICATED_USER_NICKNAME);
@@ -158,14 +160,12 @@ public class UserService{
     @Transactional
     public void delete(SignedUser signedUser, Integer id, HttpSession session){
         // check
-        if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
+        authorityHandler.checkAuthorityToUser(signedUser,id);
         if(session==null) throw new CustomException(ErrorCode.SESSION_NULL);
-        // compare id, signed user
-        User user=userRepository.findById(id)
-                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
-        if(!user.getEmail().equals(signedUser.getUsername())) throw new CustomException(ErrorCode.UNAUTHORIZED_USER_TO_USER);
 
         // delete logic
+        User user = userRepository.findById(id)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
         userRepository.delete(user);
         session.invalidate();
     }
@@ -203,6 +203,7 @@ public class UserService{
         fileHandler.delete(Constants.userImagePath,user.getImage());
         user.setImage(null);
     }
+
     public void saveLike(SignedUser signedUser,Integer userId,Integer dealPostId){
         // check
         if(signedUser==null) throw new CustomException(ErrorCode.SIGNED_USER_NOT_FOUND);
