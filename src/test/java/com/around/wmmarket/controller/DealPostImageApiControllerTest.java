@@ -11,7 +11,6 @@ import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.around.wmmarket.service.dealPostImage.DealPostImageService;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +38,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
+@Transactional
 @RunWith(SpringRunner.class) //junit4
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class DealPostImageApiControllerTest {
@@ -67,7 +67,7 @@ public class DealPostImageApiControllerTest {
                 .build();
     }
 
-    @After
+    //@After
     public void tearDown(){
         // repo
         dealPostImageRepository.deleteAll();
@@ -76,7 +76,6 @@ public class DealPostImageApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email = "user@email")
     public void dealPostImageSave() throws Exception{
         // given
@@ -113,7 +112,6 @@ public class DealPostImageApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email = "user@email")
     public void dealPostImageDeleteTest() throws Exception{
         // given

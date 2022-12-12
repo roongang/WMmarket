@@ -15,7 +15,6 @@ import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
+@Transactional
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class DealReviewApiControllerTest {
@@ -104,7 +104,7 @@ public class DealReviewApiControllerTest {
                 .build();
     }
 
-    @After
+    //@After
     public void tearDown(){
         dealReviewRepository.deleteAll();
         dealSuccessRepository.deleteAll();
@@ -113,7 +113,6 @@ public class DealReviewApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email = "buyer@email")
     public void dealReviewSave() throws Exception{
         // given
@@ -139,7 +138,6 @@ public class DealReviewApiControllerTest {
     }
 
     @Test
-    @Transactional
     public void dealReviewGet() throws Exception{
         // given
         User buyer=userRepository.save(User.builder()
@@ -163,7 +161,6 @@ public class DealReviewApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email = "buyer@email")
     public void dealReviewPut() throws Exception{
         // given
@@ -189,7 +186,6 @@ public class DealReviewApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email = "buyer@email")
     public void dealReviewDelete() throws Exception{
         // given

@@ -19,7 +19,6 @@ import com.around.wmmarket.domain.user_role.UserRoleRepository;
 import com.around.wmmarket.service.dealPost.DealPostService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
+@Transactional
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class DealPostApiControllerTest {
@@ -81,7 +81,7 @@ public class DealPostApiControllerTest {
                 .build();
     }
 
-    @After
+    //@After
     public void tearDown(){
         // repo delete
         dealSuccessRepository.deleteAll();
@@ -90,7 +90,6 @@ public class DealPostApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email = "user@email")
     public void dealPostSave() throws Exception{
         // given
@@ -118,7 +117,6 @@ public class DealPostApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email = "user@email")
     public void dealPostGetTest() throws Exception{
         // given
@@ -144,7 +142,6 @@ public class DealPostApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email = "user@email")
     public void dealPostIncreaseViewCntTest() throws Exception{
         // given
@@ -178,7 +175,6 @@ public class DealPostApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email = "user@email")
     public void dealPostUpdateTest() throws Exception{
         // given
@@ -223,7 +219,6 @@ public class DealPostApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email = "user@email")
     public void dealPostUpdateSuccessSaveTest() throws Exception{
         // given
@@ -266,7 +261,6 @@ public class DealPostApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email = "user@email")
     public void dealPostUpdateSuccessUpdateTest() throws Exception{
         // given
@@ -306,7 +300,6 @@ public class DealPostApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email = "user@email")
     public void dealPostUpdateSuccessDeleteTest() throws Exception{
         // given
@@ -355,7 +348,6 @@ public class DealPostApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email = "user@email")
     public void dealPostDeleteTest() throws Exception{
         // given
@@ -379,7 +371,6 @@ public class DealPostApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email = "user@email")
     public void dealPostPullTest() throws Exception{
         // given

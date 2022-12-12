@@ -27,7 +27,6 @@ import com.around.wmmarket.domain.user_role.UserRoleRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,6 +57,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Slf4j
+@Transactional
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserApiControllerTest {
@@ -94,7 +94,7 @@ public class UserApiControllerTest {
         session = new MockHttpSession();
     }
 
-    @After
+    //@After
     public void tearDown(){
         mannerReviewRepository.deleteAll();
         dealSuccessRepository.deleteAll();
@@ -118,7 +118,6 @@ public class UserApiControllerTest {
     }
     /////////////////////////////////////////////////////////////////////////// TEST
     @Test
-    @Transactional
     public void userSaveTest() throws Exception{
         // given
         String testEmail="test_email@email";
@@ -136,7 +135,7 @@ public class UserApiControllerTest {
                 .param("roles",testRole.toString())
         ).andExpect(status().isCreated());
         // then
-        User testUser=userRepository.findWithUserRolesByEmail(testEmail)
+        User testUser=userRepository.findByEmail(testEmail)
                 .orElseThrow(()->new UsernameNotFoundException("user not found"));
         assertThat(testUser.getEmail()).isEqualTo(testEmail);
         log.info("user password = "+testUser.getPassword());
@@ -150,7 +149,6 @@ public class UserApiControllerTest {
     }
 
     @Test
-    @Transactional
     public void userSignInTest() throws Exception{
         // given
         String testEmail="test_email@email";
@@ -180,7 +178,6 @@ public class UserApiControllerTest {
     }
 
     @Test
-    @Transactional
     public void userGetTest() throws Exception{
         // given
         String testEmail="test_email@email";
@@ -209,7 +206,6 @@ public class UserApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email="user@email")
     public void userUpdateTest() throws Exception{
         // given
@@ -234,7 +230,6 @@ public class UserApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email="admin@email",roles = {Role.ADMIN})
     public void userUpdateByAdminTest() throws Exception {
         // given
@@ -262,7 +257,6 @@ public class UserApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email="deleteUser@email")
     public void userDeleteTest() throws Exception{
         // given
@@ -279,7 +273,6 @@ public class UserApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email="admin@email",roles = {Role.ADMIN})
     public void userDeleteByAdminTest() throws Exception{
         // given
@@ -300,7 +293,6 @@ public class UserApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email="user@email")
     public void userImageGetTest() throws Exception{
         // given
@@ -316,7 +308,6 @@ public class UserApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email="user@email")
     public void userImageUpdateTest() throws Exception{
         // given
@@ -324,6 +315,8 @@ public class UserApiControllerTest {
 
         User user=userRepository.findByEmail("user@email")
                 .orElseThrow(()->new UsernameNotFoundException("user@email"));
+        String priorImage=user.getImage();
+
         String url="http://localhost:"+port+"/api/v1/users/"+user.getId()+"/image";
         // when
         MockMultipartHttpServletRequestBuilder builder=multipart(url);
@@ -335,11 +328,10 @@ public class UserApiControllerTest {
                 .file(updateFile))
                 .andExpect(status().isOk());
         // then
-        assertThat(userRepository.findAll().get(0).getImage()).isNotEqualTo(user.getImage());
+        assertThat(userRepository.findAll().get(0).getImage()).isNotEqualTo(priorImage);
     }
 
     @Test
-    @Transactional
     @WithAccount(email="user@email")
     public void userImageDeleteTest() throws Exception{
         // given
@@ -357,11 +349,10 @@ public class UserApiControllerTest {
 
     // userLike
     @Test
-    @Transactional
     @WithAccount(email="user@email")
     public void userLikeSaveTest() throws Exception{
         // given
-        User user=userRepository.findWithDealPostsByEmail("user@email")
+        User user=userRepository.findByEmail("user@email")
                 .orElseThrow(()->new UsernameNotFoundException("user@email"));
         DealPost dealPost=dealPostRepository.save(DealPost.builder()
                 .user(user)
@@ -388,7 +379,6 @@ public class UserApiControllerTest {
     }
 
     @Test
-    @Transactional
     public void userLikesGetTest() throws Exception{
         // given
         // save dealPost & like
@@ -417,15 +407,18 @@ public class UserApiControllerTest {
                 .andReturn();
         // then
         assertThat(result.getResponse().getContentAsString()).contains(dealPost.getId().toString());
+        assertThat(userLikeRepository.findById(UserLikeId.builder()
+                .userId(user.getId())
+                .dealPostId(dealPost.getId())
+                .build())).isNotNull();
     }
 
     @Test
-    @Transactional
     @WithAccount(email="user@email")
     public void userLikesDeleteTest() throws Exception{
         // given
         // save dealPost & like
-        User user=userRepository.findWithDealPostsByEmail("user@email")
+        User user=userRepository.findByEmail("user@email")
                 .orElseThrow(()->new UsernameNotFoundException("user@email"));
         DealPost dealPost=dealPostRepository.save(DealPost.builder()
                 .user(user)
@@ -435,7 +428,7 @@ public class UserApiControllerTest {
                 .category(Category.A)
                 .dealState(DealState.ONGOING).build());
 
-        user=userRepository.findWithUserLikesByEmail("user@email")
+        user=userRepository.findByEmail("user@email")
                 .orElseThrow(()->new UsernameNotFoundException("user@email"));
         userLikeRepository.save(UserLike.builder()
                .user(user)
@@ -452,14 +445,13 @@ public class UserApiControllerTest {
                         .content(new ObjectMapper().writeValueAsString(requestDto)))
                 .andExpect(status().isOk());
         // then
-        user=userRepository.findWithUserLikesByEmail("user@email")
+        user=userRepository.findByEmail("user@email")
                 .orElseThrow(()->new UsernameNotFoundException("user@email"));
         log.info("userLike size:"+user.getUserLikes().size());
         assertThat(user.getUserLikes().isEmpty()).isTrue();
     }
 
     @Test
-    @Transactional
     public void userDealPostsGetTest() throws Exception{
         // given
         User user=userRepository.save(User.builder()
@@ -489,11 +481,10 @@ public class UserApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email="buyer@email")
     public void userMannerReviewSaveTest() throws Exception{
         // given
-        User buyer=userRepository.findWithDealSuccessesByEmail("buyer@email")
+        User buyer=userRepository.findByEmail("buyer@email")
                 .orElseThrow(()->new UsernameNotFoundException("buyer@email"));
         User seller=userRepository.save(User.builder()
                 .email("seller@email")
@@ -517,7 +508,6 @@ public class UserApiControllerTest {
     }
 
     @Test
-    @Transactional
     public void userSellMannerReviewGetTest() throws Exception{
         // given
         User buyer=userRepository.save(User.builder()
@@ -546,7 +536,6 @@ public class UserApiControllerTest {
     }
 
     @Test
-    @Transactional
     public void userBuyMannerReviewGetTest() throws Exception{
         // given
         User buyer=userRepository.save(User.builder()
@@ -574,7 +563,6 @@ public class UserApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email="buyer@email")
     public void userBuyMannerReviewDeleteTest() throws Exception{
         // given

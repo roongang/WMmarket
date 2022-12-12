@@ -14,7 +14,6 @@ import com.around.wmmarket.domain.manner_review.MannerReviewRepository;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,6 +35,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Transactional
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class MannerReviewApiControllerTest {
@@ -63,7 +63,7 @@ public class MannerReviewApiControllerTest {
                 .build();
     }
 
-    @After
+    //@After
     public void tearDown(){
         // repo delete
         mannerReviewRepository.deleteAll();
@@ -86,7 +86,6 @@ public class MannerReviewApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email = "buyer@email")
     public void mannerReviewSaveTest() throws Exception{
         // given
@@ -116,7 +115,6 @@ public class MannerReviewApiControllerTest {
     }
 
     @Test
-    @Transactional
     public void mannerReviewGetTest() throws Exception{
         // given
         User seller=userRepository.save(User.builder()
@@ -144,7 +142,6 @@ public class MannerReviewApiControllerTest {
     }
 
     @Test
-    @Transactional
     @WithAccount(email = "buyer@email")
     public void mannerReviewDeleteTest() throws Exception{
         // given
