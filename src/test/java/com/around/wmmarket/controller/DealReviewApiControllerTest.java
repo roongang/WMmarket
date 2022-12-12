@@ -104,14 +104,6 @@ public class DealReviewApiControllerTest {
                 .build();
     }
 
-    //@After
-    public void tearDown(){
-        dealReviewRepository.deleteAll();
-        dealSuccessRepository.deleteAll();
-        dealPostRepository.deleteAll();
-        userRepository.deleteAll();
-    }
-
     @Test
     @WithAccount(email = "buyer@email")
     public void dealReviewSave() throws Exception{

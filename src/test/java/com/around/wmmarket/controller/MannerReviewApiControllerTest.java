@@ -63,15 +63,6 @@ public class MannerReviewApiControllerTest {
                 .build();
     }
 
-    //@After
-    public void tearDown(){
-        // repo delete
-        mannerReviewRepository.deleteAll();
-        dealSuccessRepository.deleteAll();
-        dealPostRepository.deleteAll();
-        userRepository.deleteAll();
-    }
-
     public void makeSuccessDealPost(User buyer,User seller) {
         dealSuccessRepository.save(DealSuccess.builder()
                 .buyer(buyer)

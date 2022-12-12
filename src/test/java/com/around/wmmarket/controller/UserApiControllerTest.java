@@ -94,14 +94,6 @@ public class UserApiControllerTest {
         session = new MockHttpSession();
     }
 
-    //@After
-    public void tearDown(){
-        mannerReviewRepository.deleteAll();
-        dealSuccessRepository.deleteAll();
-        dealPostRepository.deleteAll();
-        userRepository.deleteAll();
-    }
-
     public void makeSuccessDealPost(User buyer,User seller) {
         DealPost dealPost=dealPostRepository.save(DealPost.builder()
                 .user(seller)

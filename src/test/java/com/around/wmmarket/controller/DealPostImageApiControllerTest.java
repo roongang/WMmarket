@@ -67,14 +67,6 @@ public class DealPostImageApiControllerTest {
                 .build();
     }
 
-    //@After
-    public void tearDown(){
-        // repo
-        dealPostImageRepository.deleteAll();
-        dealPostRepository.deleteAll();
-        userRepository.deleteAll();
-    }
-
     @Test
     @WithAccount(email = "user@email")
     public void dealPostImageSave() throws Exception{
