@@ -1,4 +1,5 @@
 buildscript {
+    ext.kotlin_version = '1.5.10'
     ext {
         springBootVersion = '2.1.7.RELEASE'
         queryDslVersion = "4.2.2"
@@ -8,10 +9,12 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
 apply plugin: 'java'
+apply plugin: 'kotlin'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
@@ -41,6 +44,8 @@ dependencies {
     implementation("org.mariadb.jdbc:mariadb-java-client")
     // session
     implementation('org.springframework.session:spring-session-jdbc')
+    // jwt
+    implementation('io.jsonwebtoken:jjwt:0.9.1')
     // spring security
     implementation('org.springframework.boot:spring-boot-starter-security')
     // file upload
@@ -65,6 +70,7 @@ dependencies {
     testImplementation('org.springframework.security:spring-security-test')
     // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
 // QueryDSL
 sourceSets {
@@ -75,3 +81,13 @@ sourceSets {
     }
 }
 targetCompatibility = JavaVersion.VERSION_11
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
