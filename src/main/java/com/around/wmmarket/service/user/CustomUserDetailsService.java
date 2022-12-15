@@ -1,6 +1,6 @@
 package com.around.wmmarket.service.user;
 
-import com.around.wmmarket.controller.dto.user.UserSignInRequestDto;
+import com.around.wmmarket.controller.dto.signin.SigninRequestDto;
 import com.around.wmmarket.domain.user.SignedUser;
 import com.around.wmmarket.domain.user.User;
 import com.around.wmmarket.domain.user.UserRepository;
@@ -41,7 +41,7 @@ public class  CustomUserDetailsService implements UserDetailsService {
                 .collect(Collectors.toList());
     }
 
-    public SignedUser getSignedUser(UserSignInRequestDto requestDto){
+    public SignedUser getSignedUser(SigninRequestDto requestDto){
         String email=requestDto.getEmail();
         String password=requestDto.getPassword();
 

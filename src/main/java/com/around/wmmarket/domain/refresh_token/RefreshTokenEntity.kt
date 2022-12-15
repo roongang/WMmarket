@@ -1,4 +1,4 @@
-package com.around.wmmarket.common.jwt.refreshToken
+package com.around.wmmarket.domain.refresh_token
 
 import lombok.NoArgsConstructor
 import lombok.AccessLevel

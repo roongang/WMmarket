@@ -1,7 +1,6 @@
-package com.around.wmmarket.common.jwt.refreshToken
+package com.around.wmmarket.domain.refresh_token
 
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.stereotype.Repository
 
 interface RefreshTokenEntityRepository : JpaRepository<RefreshTokenEntity?, Int?> {
     fun deleteByKey(key: String?)

@@ -3,8 +3,8 @@ package com.around.wmmarket.controller
 import com.around.wmmarket.common.Constants
 import com.around.wmmarket.common.ResponseHandler
 import com.around.wmmarket.common.SuccessResponse
-import com.around.wmmarket.common.jwt.JwtService
-import com.around.wmmarket.controller.dto.user.UserSignInRequestDto
+import com.around.wmmarket.controller.dto.signin.SigninRequestDto
+import com.around.wmmarket.service.user.SignService
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiResponse
 import org.springframework.http.HttpStatus
@@ -18,20 +18,20 @@ import javax.validation.Valid;
 @Validated
 @RequestMapping(Constants.API_PATH)
 @RestController
-class AuthApiController(
-    private val jwtService: JwtService
+class SignApiController(
+    private val jwtService: SignService
 ) {
     // signin
     @ApiOperation(value = "로그인")
     @ApiResponse(code = 201, message = "로그인 성공")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/signin")
-    fun signin(@Valid @RequestBody request: UserSignInRequestDto) : ResponseEntity<Any>? {
+    fun signin(@Valid @RequestBody request: SigninRequestDto) : ResponseEntity<Any>? {
         // TODO : Kotlin 으로 변경하면 name 추가하기
         return ResponseHandler.toResponse(SuccessResponse(
             HttpStatus.CREATED,
             "로그인 성공",
-            jwtService.createTokenDTO(request))
+            jwtService.createToken(request))
         )
     }
     // signout
@@ -58,7 +58,7 @@ class AuthApiController(
         return ResponseHandler.toResponse(SuccessResponse(
             HttpStatus.CREATED,
             "토큰 재발급 성공",
-            jwtService.reissueTokenDto(request))
+            jwtService.reissueToken(request))
         )
     }
 }

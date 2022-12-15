@@ -1,9 +1,5 @@
 package com.around.wmmarket.common.jwt
 
-import com.around.wmmarket.common.error.CustomException
-import com.around.wmmarket.common.error.ErrorCode
-import com.around.wmmarket.common.jwt.refreshToken.RefreshTokenEntity
-import com.around.wmmarket.domain.user.UserRepository
 import com.around.wmmarket.service.user.CustomUserDetailsService
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
@@ -20,8 +16,7 @@ class JwtTokenProvider(private val customUserDetailsService: CustomUserDetailsSe
     // TODO : application.yml 로 빼기
     private var accessSecretKey = "wmmarket_accessSecretKey"
     private var refreshSecretKey = "wmmarket_refreshSecretKey"
-    //private val accessTokenValidTime = 30 * 60 * 1000L //  30분
-    private val accessTokenValidTime = 10 * 1000L // 10초
+    private val accessTokenValidTime = 3 * 60 * 60 * 1000L //  3시간
     private val refreshTokenValidTime = 7 * 24 * 60 * 60 * 1000L // 7일
     private val signatureAlgorithm = SignatureAlgorithm.HS256
 
@@ -95,7 +90,7 @@ class JwtTokenProvider(private val customUserDetailsService: CustomUserDetailsSe
         return !claims.expiration.before(Date())
     }
 
-    fun expiredAccessToken(accessToken: String?) {
+    fun expireAccessToken(accessToken: String?) {
         try{
             val claims=Jwts.parser().setSigningKey(accessSecretKey).parseClaimsJws(accessToken).body
             // 만료시간을 현재로 변경
@@ -105,7 +100,7 @@ class JwtTokenProvider(private val customUserDetailsService: CustomUserDetailsSe
         }
     }
 
-    fun expiredRefreshToken(refreshToken: String?) {
+    fun expireRefreshToken(refreshToken: String?) {
         try{
             val claims=Jwts.parser().setSigningKey(refreshSecretKey).parseClaimsJws(refreshToken).body
             // 만료시간을 현재로 변경

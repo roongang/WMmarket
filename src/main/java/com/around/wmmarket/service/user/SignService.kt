@@ -1,13 +1,14 @@
-package com.around.wmmarket.common.jwt
+package com.around.wmmarket.service.user
 
 import com.around.wmmarket.common.error.CustomException
 import com.around.wmmarket.common.error.ErrorCode
-import com.around.wmmarket.common.jwt.refreshToken.RefreshTokenEntity
-import com.around.wmmarket.common.jwt.refreshToken.RefreshTokenEntityRepository
-import com.around.wmmarket.controller.dto.user.UserSignInRequestDto
+import com.around.wmmarket.common.jwt.JwtTokenProvider
+import com.around.wmmarket.controller.dto.signin.SigninRequestDto
+import com.around.wmmarket.controller.dto.signin.TokenResponseDto
+import com.around.wmmarket.domain.refresh_token.RefreshTokenEntity
+import com.around.wmmarket.domain.refresh_token.RefreshTokenEntityRepository
 import com.around.wmmarket.domain.user.SignedUser
 import com.around.wmmarket.domain.user.UserRepository
-import com.around.wmmarket.service.user.CustomUserDetailsService
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -16,16 +17,16 @@ import org.springframework.transaction.annotation.Transactional
 import javax.servlet.http.HttpServletRequest
 
 @Service
-class JwtService(
+class SignService(
     private val jwtTokenProvider: JwtTokenProvider,
     private val refreshTokenEntityRepository: RefreshTokenEntityRepository,
     private val customUserDetailsService: CustomUserDetailsService,
     private val authenticationManager: AuthenticationManager,
     private val userRepository: UserRepository
 ) {
-    private val logger = LoggerFactory.getLogger(JwtService::class.java)
+    private val logger = LoggerFactory.getLogger(SignService::class.java)
     @Transactional
-    fun createTokenDTO(requestDTO: UserSignInRequestDto): TokenDTO {
+    fun createToken(requestDTO: SigninRequestDto): TokenResponseDto {
         // authenticate
         val signedUser: SignedUser
         try{
@@ -50,12 +51,15 @@ class JwtService(
         refreshTokenEntityRepository.deleteByKey(tokenDto.key)
         refreshTokenEntityRepository.save(RefreshTokenEntity(tokenDto.refreshToken, tokenDto.key))
 
-        // return tokenDto
-        return tokenDto
+        // return
+        return TokenResponseDto(
+            accessToken = tokenDto.accessToken,
+            refreshToken = tokenDto.refreshToken
+        )
     }
 
     @Transactional
-    fun reissueTokenDto(request: HttpServletRequest): TokenDTO {
+    fun reissueToken(request: HttpServletRequest): TokenResponseDto {
         // resolve refresh token
         val refreshToken = jwtTokenProvider.resolveRefreshToken(request)
                 ?: throw CustomException(ErrorCode.INVALID_REFRESH_TOKEN)
@@ -72,18 +76,24 @@ class JwtService(
         val user = userRepository.findByEmail(refreshTokenEntity.key)
                 .orElseThrow { throw CustomException(ErrorCode.USER_NOT_FOUND) }
 
-        // return tokenDto
-        return jwtTokenProvider.createTokenDTO(user.getEmail(), user.getUserRoles().map { it.getRole().getName() })
+        // get tokenDto
+        val tokenDto = jwtTokenProvider.createTokenDTO(user.getEmail(), user.getUserRoles().map { it.getRole().getName() })
+
+        // return
+        return TokenResponseDto(
+            accessToken = tokenDto.accessToken,
+            refreshToken = tokenDto.refreshToken
+        )
     }
 
     @Transactional
     fun expireToken(request: HttpServletRequest) {
         // expire access token
-        jwtTokenProvider.expiredAccessToken(jwtTokenProvider.resolveAccessToken(request))
+        jwtTokenProvider.expireAccessToken(jwtTokenProvider.resolveAccessToken(request))
 
         // expire refresh token
         val refreshToken = jwtTokenProvider.resolveRefreshToken(request)
-        jwtTokenProvider.expiredRefreshToken(refreshToken)
+        jwtTokenProvider.expireRefreshToken(refreshToken)
 
         // delete refresh token entity
         refreshTokenEntityRepository.deleteByKey(refreshToken)

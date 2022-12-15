@@ -21,9 +21,12 @@ class JwtAuthenticationFilter(private val jwtTokenProvider: JwtTokenProvider) : 
         val accessToken = jwtTokenProvider.resolveAccessToken(request)
         if (accessToken != null) {
             logger.info("accessToken : $accessToken")
-            val authentication = jwtTokenProvider.getAuthentication(accessToken)
-            // AuthenticationPrincipal 에서 사용하기 위해 SecurityContext 에 저장
-            SecurityContextHolder.getContext().authentication = authentication
+            // validate access token
+            if(jwtTokenProvider.validateAccessToken(accessToken)) {
+                val authentication = jwtTokenProvider.getAuthentication(accessToken)
+                // AuthenticationPrincipal 에서 사용하기 위해 SecurityContext 에 저장
+                SecurityContextHolder.getContext().authentication = authentication
+            }
         }
         filterChain.doFilter(request, response)
     }
