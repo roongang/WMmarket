@@ -1,5 +1,6 @@
 package com.around.wmmarket.config;
 
+import com.around.wmmarket.common.ExceptionHandlerFilter;
 import com.around.wmmarket.common.jwt.JwtAuthenticationFilter;
 import com.around.wmmarket.common.jwt.JwtTokenProvider;
 import com.around.wmmarket.domain.user.UserRepository;
@@ -34,10 +35,10 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable(); // http 요청시 csrf token 이 없으면 요청이 거절됨.
         http.httpBasic().disable()
                 .authorizeRequests()
-                .antMatchers("/**").permitAll() // 모든 요청 OK
-                .and()
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
-                        UsernamePasswordAuthenticationFilter.class); // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 넣는다
+                .antMatchers("/**").permitAll(); // 모든 요청 OK
+        http
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class);
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 

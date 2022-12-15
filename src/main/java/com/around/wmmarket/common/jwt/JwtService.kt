@@ -54,6 +54,7 @@ class JwtService(
         return tokenDto
     }
 
+    @Transactional
     fun reissueTokenDto(request: HttpServletRequest): TokenDTO {
         // resolve refresh token
         val refreshToken = jwtTokenProvider.resolveRefreshToken(request)
@@ -73,5 +74,18 @@ class JwtService(
 
         // return tokenDto
         return jwtTokenProvider.createTokenDTO(user.getEmail(), user.getUserRoles().map { it.getRole().getName() })
+    }
+
+    @Transactional
+    fun expireToken(request: HttpServletRequest) {
+        // expire access token
+        jwtTokenProvider.expiredAccessToken(jwtTokenProvider.resolveAccessToken(request))
+
+        // expire refresh token
+        val refreshToken = jwtTokenProvider.resolveRefreshToken(request)
+        jwtTokenProvider.expiredRefreshToken(refreshToken)
+
+        // delete refresh token entity
+        refreshTokenEntityRepository.deleteByKey(refreshToken)
     }
 }

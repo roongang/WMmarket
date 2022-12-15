@@ -6,12 +6,10 @@ import com.around.wmmarket.common.ResponseHandler;
 import com.around.wmmarket.common.SuccessResponse;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
-import com.around.wmmarket.common.jwt.JwtService;
 import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
 import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveRequestDto;
 import com.around.wmmarket.controller.dto.user.*;
 import com.around.wmmarket.domain.user.SignedUser;
-import com.around.wmmarket.service.user.SignService;
 import com.around.wmmarket.service.user.UserService;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.annotations.ApiOperation;
@@ -33,7 +31,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -51,8 +48,6 @@ import java.util.Collections;
 @RestController
 public class UserApiController {
     private final UserService userService;
-    private final SignService signService;
-    private final JwtService jwtService;
     private final ResourceLoader resourceLoader;
     private final Tika tika=new Tika();
 
@@ -67,37 +62,6 @@ public class UserApiController {
                 .status(HttpStatus.CREATED)
                 .message("유저 회원가입 성공했습니다.")
                 .data(userService.save(requestDto))
-                .build());
-    }
-
-    @ApiOperation(value = "유저 로그인") // SWAGGER
-    @ApiResponses({
-            @ApiResponse(code = 201,message = "set session"),
-    })
-    @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
-    @PostMapping("/signin")
-    public ResponseEntity<Object> signin(@Valid @RequestBody UserSignInRequestDto requestDto){
-        return ResponseHandler.toResponse(SuccessResponse.builder()
-                        .status(HttpStatus.CREATED)
-                        .data(jwtService.createTokenDTO(requestDto))
-                        .message("유저 로그인 성공했습니다.").build());
-    }
-    @ApiOperation(value = "유저 로그아웃") // SWAGGER
-    @PostMapping("/signout")
-    public ResponseEntity<Object> signout(@ApiIgnore HttpSession session){
-        signService.signout(session);
-        return ResponseHandler.toResponse(SuccessResponse.builder()
-                .status(HttpStatus.OK)
-                .message("유저 로그아웃 성공했습니다.")
-                .build());
-    }
-    @ApiOperation(value = "리프레시 토큰 발급")
-    @PostMapping("/refresh")
-    public ResponseEntity<Object> refresh(HttpServletRequest request){
-        return ResponseHandler.toResponse(SuccessResponse.builder()
-                .status(HttpStatus.OK)
-                .data(jwtService.reissueTokenDto(request))
-                .message("리프레시 토큰 발급 성공했습니다.")
                 .build());
     }
 
