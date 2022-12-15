@@ -13,7 +13,7 @@ class RefreshTokenEntity (
     refreshToken: String,
     key: String
 ) {
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     var refreshToken = refreshToken
         private set
 

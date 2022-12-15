@@ -63,6 +63,11 @@ public enum ErrorCode {
     DUPLICATED_RESOURCE(BAD_REQUEST,"C006","중복된 자원이 이미 존재합니다."),
     UNDEFINED_RESOURCE(BAD_REQUEST,"C007","해당 자원이 존재하지 않습니다."),
 
+    // JWT
+    ACCESS_TOKEN_EXPIRED(BAD_REQUEST,"J001","Access Token이 만료되었습니다."),
+    REFRESH_TOKEN_NOT_FOUND(BAD_REQUEST,"J002","Refresh Token이 존재하지 않습니다."),
+    INVALID_REFRESH_TOKEN(BAD_REQUEST,"J003","Refresh Token이 유효하지 않습니다."),
+
     // Server
     UNDEFINED_ERROR(INTERNAL_SERVER_ERROR, "S001", "정의되지 않은 에러입니다."),
     FILE_NOT_FOUND(INTERNAL_SERVER_ERROR,"S002","파일을 읽을 수 없습니다."),

@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -69,7 +70,6 @@ public class UserApiController {
                 .build());
     }
 
-    // TODO : 분산환경을 위해 쿠키방식 생각
     @ApiOperation(value = "유저 로그인") // SWAGGER
     @ApiResponses({
             @ApiResponse(code = 201,message = "set session"),
@@ -93,9 +93,13 @@ public class UserApiController {
     }
     @ApiOperation(value = "리프레시 토큰 발급")
     @PostMapping("/refresh")
-    public ResponseEntity<Object> refresh(){
-        return null;
-    }// SWAGGER
+    public ResponseEntity<Object> refresh(HttpServletRequest request){
+        return ResponseHandler.toResponse(SuccessResponse.builder()
+                .status(HttpStatus.OK)
+                .data(jwtService.reissueTokenDto(request))
+                .message("리프레시 토큰 발급 성공했습니다.")
+                .build());
+    }
 
 
     @ApiOperation(value = "유저 반환") // SWAGGER

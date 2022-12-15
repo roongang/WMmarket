@@ -14,11 +14,12 @@ import javax.annotation.PostConstruct
 import javax.servlet.http.HttpServletRequest
 
 @Component
-class JwtTokenProvider(private val customUserDetailsService: CustomUserDetailsService,
-                       private val userRepository: UserRepository) {
+class JwtTokenProvider(private val customUserDetailsService: CustomUserDetailsService) {
+    // TODO : application.yml 로 빼기
     private var accessSecretKey = "wmmarket_accessSecretKey"
     private var refreshSecretKey = "wmmarket_refreshSecretKey"
-    private val accessTokenValidTime = 30 * 60 * 1000L //  30분
+    //private val accessTokenValidTime = 30 * 60 * 1000L //  30분
+    private val accessTokenValidTime = 10 * 1000L // 10초
     private val refreshTokenValidTime = 7 * 24 * 60 * 60 * 1000L // 7일
     private val signatureAlgorithm = SignatureAlgorithm.HS256
 
@@ -65,7 +66,7 @@ class JwtTokenProvider(private val customUserDetailsService: CustomUserDetailsSe
         return Jwts.parser().setSigningKey(accessSecretKey).parseClaimsJws(token).body.subject.toString()
     }
 
-    fun resolveToken(request: HttpServletRequest): String? {
+    fun resolveAccessToken(request: HttpServletRequest): String? {
         val bearerToken = request.getHeader("Authorization")
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7)
@@ -73,24 +74,21 @@ class JwtTokenProvider(private val customUserDetailsService: CustomUserDetailsSe
         return null
     }
 
-    fun reIssueTokenDTO(refreshTokenEntity: RefreshTokenEntity): TokenDTO? {
-        val refreshToken = refreshTokenEntity.refreshToken
-
-        try {
-            val claims = Jwts.parser().setSigningKey(refreshSecretKey).parseClaimsJws(refreshToken)
-            // 토큰이 만료되지 않았다면 새로운 tokenDTO 을 발급
-            if(!claims.body.expiration.before(Date())) {
-                return createTokenDTO(claims.body["sub"].toString(), claims.body["roles"] as List<String>)
-            }
-        } catch (e: Exception) {
-            return null
+    fun resolveRefreshToken(request: HttpServletRequest): String? {
+        val bearerToken = request.getHeader("RefreshToken")
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7)
         }
-
         return null
     }
 
-    fun validateToken(token: String): Boolean {
-        val claims = Jwts.parser().setSigningKey(accessSecretKey).parseClaimsJws(token).body
+    fun validateAccessToken(accessToken: String): Boolean {
+        val claims = Jwts.parser().setSigningKey(accessSecretKey).parseClaimsJws(accessToken).body
+        return !claims.expiration.before(Date())
+    }
+
+    fun validateRefreshToken(refreshToken: String): Boolean {
+        val claims = Jwts.parser().setSigningKey(refreshSecretKey).parseClaimsJws(refreshToken).body
         return !claims.expiration.before(Date())
     }
 }
