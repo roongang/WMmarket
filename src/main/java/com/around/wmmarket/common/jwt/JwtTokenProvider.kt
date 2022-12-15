@@ -1,9 +1,9 @@
 package com.around.wmmarket.common.jwt
 
-import com.around.wmmarket.common.error.CustomException
-import com.around.wmmarket.common.error.ErrorCode
+import com.around.wmmarket.common.jwt.refreshToken.RefreshTokenEntity
 import com.around.wmmarket.domain.user.UserRepository
 import com.around.wmmarket.service.user.CustomUserDetailsService
+import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -16,25 +16,44 @@ import javax.servlet.http.HttpServletRequest
 @Component
 class JwtTokenProvider(private val customUserDetailsService: CustomUserDetailsService,
                        private val userRepository: UserRepository) {
-    private var secretKey = "wmmarketSecretKey"
-    private val tokenValidTime = 30 * 60 * 1000L
+    private var accessSecretKey = "wmmarket_accessSecretKey"
+    private var refreshSecretKey = "wmmarket_refreshSecretKey"
+    private val accessTokenValidTime = 30 * 60 * 1000L //  30분
+    private val refreshTokenValidTime = 7 * 24 * 60 * 60 * 1000L // 7일
+    private val signatureAlgorithm = SignatureAlgorithm.HS256
 
     @PostConstruct
     protected fun init() {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.toByteArray())
+        accessSecretKey = Base64.getEncoder().encodeToString(accessSecretKey.toByteArray())
+        refreshSecretKey = Base64.getEncoder().encodeToString(refreshSecretKey.toByteArray())
     }
 
-    fun createToken(userId: Int, roles: List<String>): String {
-        val claims = Jwts.claims().setSubject(userId.toString())
+    fun createTokenDTO(userEmail: String, roles: List<String>): TokenDTO {
+        val claims = Jwts.claims().setSubject(userEmail)
         claims["roles"] = roles
         val now = Date()
-        val validity = Date(now.time + tokenValidTime)
+
+        return TokenDTO(accessToken = createAccessToken(claims, now),
+                refreshToken = createRefreshToken(claims, now),
+                key = accessSecretKey)
+    }
+
+    fun createAccessToken(claims: Claims, now: Date): String {
         return Jwts.builder()
-            .setClaims(claims)
-            .setIssuedAt(now)
-            .setExpiration(validity)
-            .signWith(SignatureAlgorithm.HS256, secretKey)
-            .compact()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(Date(now.time + accessTokenValidTime))
+                .signWith(signatureAlgorithm, accessSecretKey)
+                .compact()
+    }
+
+    fun createRefreshToken(claims: Claims,now: Date): String {
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(Date(now.time + refreshTokenValidTime))
+                .signWith(signatureAlgorithm, refreshSecretKey)
+                .compact()
     }
 
     fun getAuthentication(token: String) : Authentication {
@@ -43,10 +62,7 @@ class JwtTokenProvider(private val customUserDetailsService: CustomUserDetailsSe
     }
 
     fun getUserEmail(token: String): String {
-        val userId = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).body.subject.toString().toInt()
-        val user = userRepository.findById(userId)
-            .orElseThrow(){ CustomException(ErrorCode.USER_NOT_FOUND) }
-        return user.email
+        return Jwts.parser().setSigningKey(accessSecretKey).parseClaimsJws(token).body.subject.toString()
     }
 
     fun resolveToken(request: HttpServletRequest): String? {
@@ -57,13 +73,24 @@ class JwtTokenProvider(private val customUserDetailsService: CustomUserDetailsSe
         return null
     }
 
-    fun validateToken(token: String): Boolean {
+    fun reIssueTokenDTO(refreshTokenEntity: RefreshTokenEntity): TokenDTO? {
+        val refreshToken = refreshTokenEntity.refreshToken
+
         try {
-            val claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
-            return !claims.body.expiration.before(Date())
+            val claims = Jwts.parser().setSigningKey(refreshSecretKey).parseClaimsJws(refreshToken)
+            // 토큰이 만료되지 않았다면 새로운 tokenDTO 을 발급
+            if(!claims.body.expiration.before(Date())) {
+                return createTokenDTO(claims.body["sub"].toString(), claims.body["roles"] as List<String>)
+            }
         } catch (e: Exception) {
-            e.printStackTrace()
+            return null
         }
-        return false
+
+        return null
+    }
+
+    fun validateToken(token: String): Boolean {
+        val claims = Jwts.parser().setSigningKey(accessSecretKey).parseClaimsJws(token).body
+        return !claims.expiration.before(Date())
     }
 }

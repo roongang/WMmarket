@@ -3,12 +3,10 @@ package com.around.wmmarket.domain.user_role;
 import com.around.wmmarket.domain.user.User;
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "user_role")
 @Entity
@@ -29,6 +27,16 @@ public class UserRole {
     public UserRole(User user,Role role){
         setUser(user);
         this.role=role;
+    }
+    // getter
+    public Integer getId() {
+        return id;
+    }
+    public User getUser() {
+        return user;
+    }
+    public Role getRole() {
+        return role;
     }
     // setter
     public void setUser(User user){

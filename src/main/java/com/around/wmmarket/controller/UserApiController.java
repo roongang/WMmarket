@@ -6,6 +6,7 @@ import com.around.wmmarket.common.ResponseHandler;
 import com.around.wmmarket.common.SuccessResponse;
 import com.around.wmmarket.common.error.CustomException;
 import com.around.wmmarket.common.error.ErrorCode;
+import com.around.wmmarket.common.jwt.JwtService;
 import com.around.wmmarket.controller.dto.dealPost.DealPostGetResponseDto;
 import com.around.wmmarket.controller.dto.mannerReview.MannerReviewSaveRequestDto;
 import com.around.wmmarket.controller.dto.user.*;
@@ -50,6 +51,7 @@ import java.util.Collections;
 public class UserApiController {
     private final UserService userService;
     private final SignService signService;
+    private final JwtService jwtService;
     private final ResourceLoader resourceLoader;
     private final Tika tika=new Tika();
 
@@ -58,7 +60,6 @@ public class UserApiController {
             @ApiResponse(code = 201, message = "CREATED"),
     })
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
-    @Transactional
     @PostMapping("/users")
     public ResponseEntity<Object> save(@Valid @ModelAttribute UserSaveRequestDto requestDto){
         return ResponseHandler.toResponse(SuccessResponse.builder()
@@ -74,13 +75,11 @@ public class UserApiController {
             @ApiResponse(code = 201,message = "set session"),
     })
     @ResponseStatus(value = HttpStatus.CREATED) // SWAGGER
-    @Transactional
     @PostMapping("/signin")
-    public ResponseEntity<Object> signin(@Valid @RequestBody UserSignInRequestDto requestDto,
-                                         @ApiIgnore HttpSession session){
-        signService.signin(requestDto,session);
+    public ResponseEntity<Object> signin(@Valid @RequestBody UserSignInRequestDto requestDto){
         return ResponseHandler.toResponse(SuccessResponse.builder()
                         .status(HttpStatus.CREATED)
+                        .data(jwtService.createTokenDTO(requestDto))
                         .message("유저 로그인 성공했습니다.").build());
     }
     @ApiOperation(value = "유저 로그아웃") // SWAGGER
@@ -92,6 +91,12 @@ public class UserApiController {
                 .message("유저 로그아웃 성공했습니다.")
                 .build());
     }
+    @ApiOperation(value = "리프레시 토큰 발급")
+    @PostMapping("/refresh")
+    public ResponseEntity<Object> refresh(){
+        return null;
+    }// SWAGGER
+
 
     @ApiOperation(value = "유저 반환") // SWAGGER
     @ApiResponses({

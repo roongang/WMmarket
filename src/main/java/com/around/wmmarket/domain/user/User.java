@@ -11,14 +11,12 @@ import com.around.wmmarket.domain.user_like.UserLike;
 import com.around.wmmarket.domain.user_role.UserRole;
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "user")
 @Entity
@@ -102,6 +100,71 @@ public class User extends BaseTimeEntity {
         this.town_2=town_2;
         this.isAuth=isAuth;
         this.code=code;
+    }
+
+    // getter TODO : Kotlin 변환으로 인한 getter 삭제하기
+    public Integer getId() {
+        return id;
+    }
+    public String getEmail() {
+        return email;
+    }
+    public String getPassword() {
+        return password;
+    }
+    public String getImage() {
+        return image;
+    }
+    public String getNickname() {
+        return nickname;
+    }
+    public String getCity_1() {
+        return city_1;
+    }
+    public String getTown_1() {
+        return town_1;
+    }
+    public String getCity_2() {
+        return city_2;
+    }
+    public String getTown_2() {
+        return town_2;
+    }
+    public Integer getIsAuth() {
+        return isAuth;
+    }
+    public String getCode() {
+        return code;
+    }
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+    public List<Keyword> getKeywords() {
+        return keywords;
+    }
+    public List<MannerReview> getSellMannerReviews() {
+        return sellMannerReviews;
+    }
+    public List<MannerReview> getBuyMannerReviews() {
+        return buyMannerReviews;
+    }
+    public List<DealReview> getSellDealReviews() {
+        return sellDealReviews;
+    }
+    public List<DealReview> getBuyDealReviews() {
+        return buyDealReviews;
+    }
+    public List<DealPost> getDealPosts() {
+        return dealPosts;
+    }
+    public List<DealSuccess> getDealSuccesses() {
+        return dealSuccesses;
+    }
+    public List<UserLike> getUserLikes() {
+        return userLikes;
+    }
+    public List<UserRole> getUserRoles() {
+        return userRoles;
     }
 
     // setter
